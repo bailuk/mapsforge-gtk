@@ -3,9 +3,14 @@ apply plugin: 'application'
 dependencies {
     implementation project(":mapsforge-map-gtk")
     implementation project(":mapsforge-themes")
+    implementation 'ch.bailu.java-gtk:library:0.1.0-SNAPSHOT'
     testImplementation "junit:junit:$jUnitVersion"
 }
 
+
+repositories {
+    mavenLocal()
+}
 mainClassName = "org.mapsforge.samples.gtk.Samples"
 run {
     if (project.hasProperty("args")) {

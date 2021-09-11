@@ -50,14 +50,24 @@ import org.mapsforge.map.reader.MapFile;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
 import javax.swing.*;
+import javax.swing.text.View;
+
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.prefs.Preferences;
+
+import ch.bailu.gtk.GTK;
+import ch.bailu.gtk.gio.ApplicationFlags;
+import ch.bailu.gtk.gtk.Application;
+import ch.bailu.gtk.gtk.ApplicationWindow;
+import ch.bailu.gtk.gtk.Widget;
 
 public final class Samples {
     private static final GraphicFactory GRAPHIC_FACTORY = GtkGraphicFactory.INSTANCE;
@@ -73,7 +83,9 @@ public final class Samples {
      * @param args command line args: expects the map files as multiple parameters
      *             with possible SRTM hgt folder as 1st argument.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        GTK.init();
+
         // Square frame buffer
         Parameters.SQUARE_FRAME_BUFFER = false;
 
@@ -89,39 +101,28 @@ public final class Samples {
 
         List<File> mapFiles = SHOW_RASTER_MAP ? null : getMapFiles(args);
         final MapView mapView = createMapView();
-        final BoundingBox boundingBox = addLayers(mapView, mapFiles, hillsCfg);
+        //final BoundingBox boundingBox = addLayers(mapView, mapFiles, hillsCfg);
 
         final PreferencesFacade preferencesFacade = new JavaPreferences(Preferences.userNodeForPackage(Samples.class));
 
-        final JFrame frame = new JFrame();
-        frame.setTitle("Mapsforge Samples");
-        frame.add(mapView);
-        frame.pack();
-        frame.setSize(1024, 768);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                int result = JOptionPane.showConfirmDialog(frame, MESSAGE, TITLE, JOptionPane.YES_NO_OPTION);
-                if (result == JOptionPane.YES_OPTION) {
-                    mapView.getModel().save(preferencesFacade);
-                    mapView.destroyAll();
-                    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                }
-            }
+        final Application app = new Application("org.mapsforge.samples.gtk", ApplicationFlags.FLAGS_NONE);
 
-            @Override
-            public void windowOpened(WindowEvent e) {
-                final Model model = mapView.getModel();
-// TODO                 model.init(preferencesFacade);
-                if (model.mapViewPosition.getZoomLevel() == 0 || !boundingBox.contains(model.mapViewPosition.getCenter())) {
-                    byte zoomLevel = LatLongUtils.zoomForBounds(model.mapViewDimension.getDimension(), boundingBox, model.displayModel.getTileSize());
-                    model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
-                }
-            }
+        app.onActivate(() -> {
+
+            final ApplicationWindow window = new ApplicationWindow(app);
+            window.setTitle("Mapsforge Samples");
+            window.setSizeRequest(1024, 768);
+
+            // TODO onOpened?
+            /*final Model model = mapView.getModel();
+             model.init(preferencesFacade);
+                    if (model.mapViewPosition.getZoomLevel() == 0 || !boundingBox.contains(model.mapViewPosition.getCenter())) {
+                        byte zoomLevel = LatLongUtils.zoomForBounds(model.mapViewDimension.getDimension(), boundingBox, model.displayModel.getTileSize());
+                        model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
+                    }*/
+            window.showAll();
         });
-        frame.setVisible(true);
+        app.run(0, args);
     }
 
     private static BoundingBox addLayers(MapView mapView, List<File> mapFiles, HillsRenderConfig hillsRenderConfig) {
