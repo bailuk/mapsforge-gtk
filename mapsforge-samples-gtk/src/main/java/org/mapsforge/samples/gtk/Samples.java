@@ -20,18 +20,18 @@ package org.mapsforge.samples.gtk;
 
 import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.model.BoundingBox;
+import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.core.util.LatLongUtils;
 import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
-// TODO import org.mapsforge.map.awt.util.AwtUtil;
+import org.mapsforge.map.gtk.util.GtkUtil;
 import org.mapsforge.map.gtk.util.JavaPreferences;
 import org.mapsforge.map.gtk.view.MapView;
 import org.mapsforge.map.datastore.MapDataStore;
 import org.mapsforge.map.datastore.MultiMapDataStore;
-import org.mapsforge.map.gtk.util.JavaPreferences;
 import org.mapsforge.map.layer.Layers;
 import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.debug.TileCoordinatesLayer;
@@ -49,12 +49,6 @@ import org.mapsforge.map.model.common.PreferencesFacade;
 import org.mapsforge.map.reader.MapFile;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
-import javax.swing.*;
-import javax.swing.text.View;
-
-import java.awt.Window;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -72,24 +66,31 @@ import ch.bailu.gtk.gtk.Widget;
 public final class Samples {
     private static final GraphicFactory GRAPHIC_FACTORY = GtkGraphicFactory.INSTANCE;
     private static final boolean SHOW_DEBUG_LAYERS = false;
-    private static final boolean SHOW_RASTER_MAP = false;
+    private static final boolean SHOW_RASTER_MAP = true;
 
-    private static final String MESSAGE = "Are you sure you want to exit the application?";
-    private static final String TITLE = "Confirm close";
-
-    /**
+     /**
      * Starts the {@code Samples}.
      *
      * @param args command line args: expects the map files as multiple parameters
      *             with possible SRTM hgt folder as 1st argument.
      */
-    public static void main(String[] args) throws IOException {
-        GTK.init();
 
+    private HillsRenderConfig hillsCfg = null;
+    private List<File> mapFiles = null;
+
+    public static void main(final String[] args) throws IOException {
+        GTK.init();
         // Square frame buffer
         Parameters.SQUARE_FRAME_BUFFER = false;
 
-        HillsRenderConfig hillsCfg = null;
+        new Samples(args);
+    }
+
+    private Samples(String args[]) {
+        final Application app = new Application("org.mapsforge.samples.gtk", ApplicationFlags.FLAGS_NONE);
+
+        mapFiles = SHOW_RASTER_MAP ? null : getMapFiles(args);
+
         File demFolder = getDemFolder(args);
         if (demFolder != null) {
             MemoryCachingHgtReaderTileSource tileSource = new MemoryCachingHgtReaderTileSource(demFolder, new DiffuseLightShadingAlgorithm(), GRAPHIC_FACTORY);
@@ -99,31 +100,52 @@ public final class Samples {
             args = Arrays.copyOfRange(args, 1, args.length);
         }
 
-        List<File> mapFiles = SHOW_RASTER_MAP ? null : getMapFiles(args);
-        final MapView mapView = createMapView();
-        //final BoundingBox boundingBox = addLayers(mapView, mapFiles, hillsCfg);
-
-        final PreferencesFacade preferencesFacade = new JavaPreferences(Preferences.userNodeForPackage(Samples.class));
-
-        final Application app = new Application("org.mapsforge.samples.gtk", ApplicationFlags.FLAGS_NONE);
-
         app.onActivate(() -> {
-
-            final ApplicationWindow window = new ApplicationWindow(app);
-            window.setTitle("Mapsforge Samples");
-            window.setSizeRequest(1024, 768);
-
-            // TODO onOpened?
-            /*final Model model = mapView.getModel();
-             model.init(preferencesFacade);
-                    if (model.mapViewPosition.getZoomLevel() == 0 || !boundingBox.contains(model.mapViewPosition.getCenter())) {
-                        byte zoomLevel = LatLongUtils.zoomForBounds(model.mapViewDimension.getDimension(), boundingBox, model.displayModel.getTileSize());
-                        model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
-                    }*/
-            window.showAll();
+            onActivate(new ApplicationWindow(app));
         });
         app.run(0, args);
     }
+
+
+    public void onActivate(ApplicationWindow window) {
+        final MapView mapView = createMapView();
+
+        window.setTitle("Mapsforge Samples");
+        window.setDefaultSize(1024, 768);
+
+        window.onShow(() -> {
+            final BoundingBox boundingBox = addLayers(mapView, mapFiles, hillsCfg);
+            final PreferencesFacade preferencesFacade = new JavaPreferences(Preferences.userNodeForPackage(Samples.class));
+            final Model model = mapView.getModel();
+            model.init(preferencesFacade);
+            setMapPosition(model, boundingBox);
+        });
+
+        window.onDestroy(() -> {
+            System.exit(0);
+        });
+
+        window.add(mapView.getDrawingArea());
+        window.showAll();
+    }
+
+
+    private void setMapPosition(Model model, BoundingBox boundingBox) {
+        if (model != null && boundingBox != null) {
+            final Dimension dimension = model.mapViewDimension.getDimension();
+            final LatLong center = model.mapViewPosition.getCenter();
+            byte zoomLevel = model.mapViewPosition.getZoomLevel();
+            int tileSize = model.displayModel.getTileSize();
+
+            if (center != null && dimension != null && dimension.height> 0 && dimension.width > 0) {
+                if (zoomLevel == 0 || !boundingBox.contains(center)) {
+                    zoomLevel = LatLongUtils.zoomForBounds(dimension, boundingBox, tileSize);
+                    model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
+                }
+            }
+        }
+    }
+
 
     private static BoundingBox addLayers(MapView mapView, List<File> mapFiles, HillsRenderConfig hillsRenderConfig) {
         Layers layers = mapView.getLayerManager().getLayers();
@@ -131,11 +153,11 @@ public final class Samples {
         int tileSize = SHOW_RASTER_MAP ? 256 : 512;
 
         // Tile cache
-        // TODO TileCache tileCache = AwtUtil.createTileCache(
-        // TODO         tileSize,
-// TODO                 mapView.getModel().frameBufferModel.getOverdrawFactor(),
-// TODO                 1024,
-// TODO                 new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
+        TileCache tileCache = GtkUtil.createTileCache(
+                 tileSize,
+                 mapView.getModel().frameBufferModel.getOverdrawFactor(),
+                 1024,
+                 new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
 
         final BoundingBox boundingBox;
         if (SHOW_RASTER_MAP) {
@@ -143,9 +165,9 @@ public final class Samples {
             mapView.getModel().displayModel.setFixedTileSize(tileSize);
             OpenStreetMapMapnik tileSource = OpenStreetMapMapnik.INSTANCE;
             tileSource.setUserAgent("mapsforge-samples-awt");
-// TODO             TileDownloadLayer tileDownloadLayer = createTileDownloadLayer(tileCache, mapView.getModel().mapViewPosition, tileSource);
-// TODO             layers.add(tileDownloadLayer);
-// TODO             tileDownloadLayer.start();
+            TileDownloadLayer tileDownloadLayer = createTileDownloadLayer(tileCache, mapView.getModel().mapViewPosition, tileSource);
+            layers.add(tileDownloadLayer);
+            tileDownloadLayer.start();
             mapView.setZoomLevelMin(tileSource.getZoomLevelMin());
             mapView.setZoomLevelMax(tileSource.getZoomLevelMax());
             boundingBox = new BoundingBox(LatLongUtils.LATITUDE_MIN, LatLongUtils.LONGITUDE_MIN, LatLongUtils.LATITUDE_MAX, LatLongUtils.LONGITUDE_MAX);
@@ -156,54 +178,51 @@ public final class Samples {
             for (File file : mapFiles) {
                 mapDataStore.addMapDataStore(new MapFile(file), false, false);
             }
-// TODO             TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsRenderConfig);
-// TODO             layers.add(tileRendererLayer);
+            TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsRenderConfig);
+            layers.add(tileRendererLayer);
             boundingBox = mapDataStore.boundingBox();
         }
 
         // Debug
         if (SHOW_DEBUG_LAYERS) {
-// TODO             layers.add(new TileGridLayer(GRAPHIC_FACTORY, mapView.getModel().displayModel));
-// TODO             layers.add(new TileCoordinatesLayer(GRAPHIC_FACTORY, mapView.getModel().displayModel));
+             layers.add(new TileGridLayer(GRAPHIC_FACTORY, mapView.getModel().displayModel));
+             layers.add(new TileCoordinatesLayer(GRAPHIC_FACTORY, mapView.getModel().displayModel));
         }
 
         return boundingBox;
     }
 
     private static MapView createMapView() {
-// TODO         MapView mapView = new MapView();
-// TODO         mapView.getMapScaleBar().setVisible(true);
-// TODO         if (SHOW_DEBUG_LAYERS) {
-// TODO             mapView.getFpsCounter().setVisible(true);
-// TODO         }
+         MapView mapView = new MapView();
+         mapView.getMapScaleBar().setVisible(true);
+         if (SHOW_DEBUG_LAYERS) {
+             mapView.getFpsCounter().setVisible(true);
+         }
 
-// TODO         return mapView;
-        return null;
+        return mapView;
     }
 
     @SuppressWarnings("unused")
     private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, IMapViewPosition mapViewPosition, TileSource tileSource) {
-// TODO         return new TileDownloadLayer(tileCache, mapViewPosition, tileSource, GRAPHIC_FACTORY) {
-// TODO             @Override
-// TODO             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
-// TODO                 System.out.println("Tap on: " + tapLatLong);
-// TODO                 return true;
-// TODO             }
-// TODO         };
-        return null;
+         return new TileDownloadLayer(tileCache, mapViewPosition, tileSource, GRAPHIC_FACTORY) {
+             @Override
+             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
+                 System.out.println("Tap on: " + tapLatLong);
+                 return true;
+            }
+        };
     }
 
     private static TileRendererLayer createTileRendererLayer(TileCache tileCache, MapDataStore mapDataStore, IMapViewPosition mapViewPosition, HillsRenderConfig hillsRenderConfig) {
-// TODO         TileRendererLayer tileRendererLayer = new TileRendererLayer(tileCache, mapDataStore, mapViewPosition, false, true, false, GRAPHIC_FACTORY, hillsRenderConfig) {
-// TODO             @Override
-// TODO             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
-// TODO                 System.out.println("Tap on: " + tapLatLong);
-// TODO                 return true;
-// TODO             }
-// TODO         };
-// TODO         tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.DEFAULT);
-// TODO         return tileRendererLayer;
-        return null;
+         TileRendererLayer tileRendererLayer = new TileRendererLayer(tileCache, mapDataStore, mapViewPosition, false, true, false, GRAPHIC_FACTORY, hillsRenderConfig) {
+             @Override
+             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
+                 System.out.println("Tap on: " + tapLatLong);
+                 return true;
+             }
+        };
+        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.DEFAULT);
+        return tileRendererLayer;
     }
 
     private static File getDemFolder(String[] args) {
@@ -242,7 +261,4 @@ public final class Samples {
         return result;
     }
 
-    private Samples() {
-        throw new IllegalStateException();
-    }
 }
