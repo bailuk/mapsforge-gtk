@@ -65,7 +65,7 @@ import ch.bailu.gtk.gtk.Widget;
 
 public final class Samples {
     private static final GraphicFactory GRAPHIC_FACTORY = GtkGraphicFactory.INSTANCE;
-    private static final boolean SHOW_DEBUG_LAYERS = false;
+    private static final boolean SHOW_DEBUG_LAYERS = true;
     private static final boolean SHOW_RASTER_MAP = true;
 
      /**

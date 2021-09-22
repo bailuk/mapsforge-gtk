@@ -8,7 +8,7 @@ public class LoadedImageSurface extends ImageSurface {
     private Bytes bytes;
 
     public LoadedImageSurface(Bytes bytes, int width, int height) {
-        super(Cairo.imageSurfaceCreateForData(bytes, Format.ARGB32, width, height, width *4), width, height);
+        super(Cairo.imageSurfaceCreateForData(bytes, Format.RGB24, width, height, width *4), width, height);
         this.bytes = bytes;
     }
 

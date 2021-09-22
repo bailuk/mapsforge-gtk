@@ -7,7 +7,7 @@ import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.map.controller.FrameBufferController;
 import org.mapsforge.map.controller.LayerManagerController;
-import org.mapsforge.map.gtk.graphics.GtkCanvas;
+import org.mapsforge.map.controller.MapViewController;
 import org.mapsforge.map.gtk.graphics.GtkGraphicContext;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.layer.Layer;
@@ -25,9 +25,6 @@ import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.cairo.Context;
-import ch.bailu.gtk.gdk.Gdk;
-import ch.bailu.gtk.gdk.RGBA;
 import ch.bailu.gtk.gdk.Rectangle;
 import ch.bailu.gtk.gtk.DrawingArea;
 import ch.bailu.gtk.gtk.Widget;
@@ -55,6 +52,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
         this.layerManager = new LayerManager(this, this.model.mapViewPosition, GRAPHIC_FACTORY);
         this.layerManager.start();
         LayerManagerController.create(this.layerManager, this.model);
+        MapViewController.create(this, this.model);
 
         this.mapScaleBar = new DefaultMapScaleBar(this.model.mapViewPosition, this.model.mapViewDimension, GRAPHIC_FACTORY,
                 this.model.displayModel);
@@ -69,22 +67,23 @@ public class MapView implements org.mapsforge.map.view.MapView{
             this.frameBuffer.draw(graphicContext);
             //System.out.println("onDraw()");
 
-/*            if (this.mapScaleBar != null) {
+            if (this.mapScaleBar != null) {
                 this.mapScaleBar.draw(graphicContext);
             }
 
             this.fpsCounter.draw(graphicContext);
-*/
+
 
             return GTK.TRUE;
         });
+
 
 
         drawingArea.onSizeAllocate(new Widget.OnSizeAllocate() {
             @Override
             public void onSizeAllocate(Rectangle rectangle) {
                 int width = rectangle.getFieldWidth();
-                int height = rectangle.getFieldWidth();
+                int height = rectangle.getFieldHeight();
                 System.out.println("onSizeAllocate(" + width + ", " + height + ")");
 
                 if (width >0 && height > 0) {
@@ -92,6 +91,9 @@ public class MapView implements org.mapsforge.map.view.MapView{
                 }
             }
         });
+
+
+        new MouseEvents(this, drawingArea);
     }
 
 
@@ -197,6 +199,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
         }
         this.mapScaleBar = mapScaleBar;
     }
+
 
     @Override
     public void setZoomLevel(byte zoomLevel) {

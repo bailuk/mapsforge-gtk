@@ -1,5 +1,7 @@
 package org.mapsforge.map.gtk.graphics;
 
+import java.awt.image.BufferedImage;
+
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Surface;
 
@@ -8,6 +10,7 @@ public abstract class ImageSurface {
     private final int height;
     private Surface surface;
     private Context context = null;
+
 
     public ImageSurface(Surface surface, int width, int height) {
         this.surface = surface;

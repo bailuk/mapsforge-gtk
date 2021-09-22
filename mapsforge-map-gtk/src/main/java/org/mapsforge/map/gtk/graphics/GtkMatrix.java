@@ -2,40 +2,44 @@ package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Matrix;
 
-import java.awt.geom.AffineTransform;
-
 public class GtkMatrix implements Matrix {
-    final AffineTransform affineTransform = new AffineTransform();
+    final ch.bailu.gtk.cairo.Matrix matrix = new ch.bailu.gtk.cairo.Matrix();
+
+    public GtkMatrix() {
+        reset();
+    }
 
     @Override
     public void reset() {
-        this.affineTransform.setToIdentity();
+        matrix.initIdentity();
     }
 
     @Override
     public void rotate(float theta) {
-        this.affineTransform.rotate(theta);
+        matrix.rotate(theta);
     }
 
     @Override
     public void rotate(float theta, float pivotX, float pivotY) {
-        this.affineTransform.rotate(theta, pivotX, pivotY);
+        matrix.translate(pivotX, pivotY);
+        matrix.rotate(theta);
+        matrix.translate(-pivotX, -pivotY);
     }
 
     @Override
     public void scale(float scaleX, float scaleY) {
-        this.affineTransform.scale(scaleX, scaleY);
+        matrix.scale(scaleX, scaleY);
     }
 
     @Override
     public void scale(float scaleX, float scaleY, float pivotX, float pivotY) {
-        this.affineTransform.translate(pivotX, pivotY);
-        this.affineTransform.scale(scaleX, scaleY);
-        this.affineTransform.translate(-pivotX, -pivotY);
+        matrix.translate(pivotX, pivotY);
+        matrix.scale(scaleX, scaleY);
+        matrix.translate(-pivotX, -pivotY);
     }
 
     @Override
     public void translate(float translateX, float translateY) {
-        this.affineTransform.translate(translateX, translateY);
+        matrix.translate(translateX, translateY);
     }
 }

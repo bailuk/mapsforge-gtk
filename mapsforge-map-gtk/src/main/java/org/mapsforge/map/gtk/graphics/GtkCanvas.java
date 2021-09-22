@@ -10,10 +10,6 @@ import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.Rectangle;
 
-import ch.bailu.gtk.cairo.Context;
-import ch.bailu.gtk.gdk.Gdk;
-import ch.bailu.gtk.gdkpixbuf.Pixbuf;
-
 public class GtkCanvas implements Canvas {
     private Dimension dimension = new Dimension(0,0);
     private GtkGraphicContext graphicContext;
@@ -27,20 +23,16 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public Dimension getDimension() {
-
-        //System.out.println("GtkCanvas::getDimension()");
         return dimension;
     }
 
     @Override
     public int getHeight() {
-        //System.out.println("GtkCanvas::getHeight()");
         return dimension.height;
     }
 
     @Override
     public int getWidth() {
-        // System.out.println("GtkCanvas::getWidth()");
         return dimension.width;
     }
 
@@ -60,20 +52,26 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
+        if (alpha != 1f || filter != Filter.NONE) {
+            System.out.println("GtkCanvas::drawBitmap(left, top, "+ alpha + ", " + filter + ")");
+        }
         drawBitmap(bitmap, left, top);
         //System.out.println("GtkCanvas::drawBitmap()");
     }
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
-        drawBitmap(bitmap, 0, 0);
-        System.out.println("GtkCanvas::drawBitmap(matrix)");
+        graphicContext.drawBitmap(bitmap, matrix);
+        //System.out.println("GtkCanvas::drawBitmap(matrix)");
     }
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
+        if (alpha != 1f || filter != Filter.NONE) {
+            System.out.println("GtkCanvas::drawBitmap(matrix, "+ alpha + ", " + filter + ")");
+        }
         drawBitmap(bitmap, matrix);
-        System.out.println("GtkCanvas::drawBitmap(matrix)");
+
     }
 
     @Override
@@ -95,7 +93,8 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2, Paint paint) {
-        System.out.println("GtkCanvas::drawLine()");
+        graphicContext.drawLine(x1,y1, x2, y2, paint);
+        //System.out.println("GtkCanvas::drawLine()");
     }
 
     @Override
@@ -110,7 +109,8 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void drawText(String text, int x, int y, Paint paint) {
-        System.out.println("GtkCanvas::drawText()");
+        graphicContext.drawText(text, x, y, paint);
+        //System.out.println("GtkCanvas::drawText()");
     }
 
     @Override
@@ -144,7 +144,8 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void resetClip() {
-        System.out.println("GtkCanvas::resetClip()");
+        graphicContext.resetClip();
+        //System.out.println("GtkCanvas::resetClip()");
     }
 
     @Override
@@ -154,7 +155,8 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void setClip(int left, int top, int width, int height) {
-        System.out.println("GtkCanvas::setclip()");
+        graphicContext.setClip(left, top,width,height);
+        //System.out.println("GtkCanvas::setclip()");
     }
 
     @Override

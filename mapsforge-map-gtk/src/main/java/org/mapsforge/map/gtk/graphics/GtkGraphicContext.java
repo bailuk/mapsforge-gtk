@@ -12,8 +12,14 @@ import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
 
 import ch.bailu.gtk.cairo.Context;
+import ch.bailu.gtk.cairo.Operator;
 import ch.bailu.gtk.gdk.Gdk;
 import ch.bailu.gtk.gdk.RGBA;
+import ch.bailu.gtk.pango.FontDescription;
+import ch.bailu.gtk.pango.Layout;
+import ch.bailu.gtk.pango.Pango;
+import ch.bailu.gtk.pango.Weight;
+import ch.bailu.gtk.pangocairo.Pangocairo;
 
 public class GtkGraphicContext implements GraphicContext {
 
@@ -41,13 +47,18 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
-        drawBitmap(bitmap, 0,0);
+        GtkMatrix gtkMatrix = (GtkMatrix) matrix;
+        GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
+        context.setMatrix(gtkMatrix.matrix);
+        context.setSourceSurface(gtkBitmap.getSurface(),0,0);
+        context.paint();
+        context.identityMatrix();
        // System.out.println("GraphicContext::drawBitmap(3)");
     }
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
-        drawBitmap(bitmap, 0,0);
+        drawBitmap(bitmap, matrix);
         System.out.println("GraphicContext::drawBitmap(4)");
     }
 
@@ -70,7 +81,12 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2, Paint paint) {
-        System.out.println("GraphicContext::drawLine()");
+        setColor(paint.getColor());
+        context.setLineWidth(paint.getStrokeWidth());
+        context.moveTo(x1, y1);
+        context.lineTo(x2, y2);
+        context.stroke();
+       // System.out.println("GraphicContext::drawLine()");
     }
 
     @Override
@@ -85,7 +101,21 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawText(String text, int x, int y, Paint paint) {
-        System.out.println("GraphicContext::drawText()");
+        Layout layout = Pangocairo.createLayout(context);
+        layout.setText(text, text.length());
+        FontDescription desc = Pango.fontDescriptionFromString("sans 10");
+        layout.setFontDescription(desc);
+        desc.free();
+
+        context.setLineWidth(paint.getStrokeWidth());
+        context.moveTo(x,y-12);
+        Pangocairo.layoutPath(context,layout);
+        layout.unref();
+
+        setColor(paint.getColor());
+
+        context.fillPreserve();
+        context.stroke();
     }
 
     @Override
@@ -95,7 +125,6 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void fillColor(Color color) {
-        System.out.println("GraphicContext::fillColor(enum)");
         switch (color) {
             case RED:
                 fillColor(1f, 0f,0f, 1f);
@@ -113,16 +142,27 @@ public class GtkGraphicContext implements GraphicContext {
                 fillColor(0f, 0f,0f, 1f);
                 break;
             case TRANSPARENT:
+                //fillColor(0f, 0f,0f, 1f);
                 fillColor(0f, 0f,0f, 0f);
                 break;
         }
     }
 
+
     @Override
     public void fillColor(int color) {
-        //System.out.println("GraphicContext::fillColor(int)");
+        context.save();
+        setColor(color);
+        context.setOperator(Operator.SOURCE);
+        context.paint();
+        context.restore();
+
+    }
+
+
+    private void setColor(int color) {
         ARGB argb = new ARGB(color);
-        fillColor(
+        context.setSourceRgba(
                 Conv255.toDouble(argb.red()),
                 Conv255.toDouble(argb.green()),
                 Conv255.toDouble(argb.blue()),
@@ -130,8 +170,11 @@ public class GtkGraphicContext implements GraphicContext {
     }
 
     public void fillColor(double r, double g, double b, double a) {
+        context.save();
         context.setSourceRgba(r,g,b,a);
+        context.setOperator(Operator.SOURCE);
         context.paint();
+        context.restore();
     }
 
     @Override
@@ -148,7 +191,8 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void resetClip() {
-        System.out.println("GraphicContext::resetClip()");
+        context.resetClip();
+        //System.out.println("GraphicContext::resetClip()");
     }
 
     @Override
@@ -158,7 +202,12 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void setClip(int left, int top, int width, int height) {
-        System.out.println("GraphicContext::setClip()");
+        context.resetClip();
+        context.newPath();
+        context.rectangle(left,top,width,height);
+        context.clip();
+
+        //System.out.println("GraphicContext::setClip()");
     }
 
     @Override
