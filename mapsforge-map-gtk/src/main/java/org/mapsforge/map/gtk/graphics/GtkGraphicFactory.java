@@ -102,14 +102,14 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public Path createPath() {
-        System.out.println("GtkGraphicFactory::createPath");
-        return null;
+        //System.out.println("GtkGraphicFactory::createPath");
+        return new GtkPath();
     }
 
     @Override
     public PointTextContainer createPointTextContainer(Point xy, Display display, int priority, String text, Paint paintFront, Paint paintBack, SymbolContainer symbolContainer, Position position, int maxTextWidth) {
-        System.out.println("GtkGraphicFactory::createPointTextContainer");
-        return null;
+        //System.out.println("GtkGraphicFactory::createPointTextContainer");
+        return new GtkPointTextContainer(xy, display, priority, text, paintFront, paintBack, symbolContainer, position, maxTextWidth);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public ResourceBitmap renderSvg(InputStream inputStream, float scaleFactor, int width, int height, int percent, int hash) throws IOException {
-        System.out.println("GtkGraphicFactory::renderSvg");
+        //System.out.println("GtkGraphicFactory::renderSvg");
         return new GtkBitmap(inputStream, hash, scaleFactor, width, height, percent);
     }
 }

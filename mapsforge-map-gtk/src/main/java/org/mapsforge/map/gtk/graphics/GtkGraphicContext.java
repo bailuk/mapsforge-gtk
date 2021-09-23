@@ -7,6 +7,7 @@ import org.mapsforge.core.graphics.GraphicContext;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
+import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
@@ -24,25 +25,29 @@ import ch.bailu.gtk.pangocairo.Pangocairo;
 public class GtkGraphicContext implements GraphicContext {
 
     private final Context context;
+    private final int width, height;
 
-    public GtkGraphicContext(Context context) {
+    public GtkGraphicContext(Context context, int width, int height) {
         this.context = context;
+        this.width = width;
+        this.height = height;
 
     }
     @Override
     public void drawBitmap(Bitmap bitmap, int left, int top) {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
-
         context.setSourceSurface(gtkBitmap.getSurface(), left, top);
         context.paint();
-        //System.out.println("GraphicContext::drawBitmap(1)");
 
     }
 
     @Override
     public void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
+        if (alpha != 1f || filter != Filter.NONE) {
+            System.out.println("GraphicContext::drawBitmap("+alpha+ ", " + filter.toString() + ")");
+        }
         drawBitmap(bitmap, left, top);
-        //System.out.println("GraphicContext::drawBitmap(2)");
+
     }
 
     @Override
@@ -53,13 +58,14 @@ public class GtkGraphicContext implements GraphicContext {
         context.setSourceSurface(gtkBitmap.getSurface(),0,0);
         context.paint();
         context.identityMatrix();
-       // System.out.println("GraphicContext::drawBitmap(3)");
     }
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
+        if (alpha != 1f || filter != Filter.NONE) {
+            System.out.println("GraphicContext::drawBitmap(matrix, "+alpha+ ", " + filter.toString() + ")");
+        }
         drawBitmap(bitmap, matrix);
-        System.out.println("GraphicContext::drawBitmap(4)");
     }
 
     @Override
@@ -86,16 +92,32 @@ public class GtkGraphicContext implements GraphicContext {
         context.moveTo(x1, y1);
         context.lineTo(x2, y2);
         context.stroke();
-       // System.out.println("GraphicContext::drawLine()");
+        System.out.println("GraphicContext::drawLine()");
     }
 
     @Override
     public void drawPath(Path path, Paint paint) {
-        System.out.println("GraphicContext::drawPath()");
+        GtkPaint gtkPaint = (GtkPaint) paint;
+
+        if (!gtkPaint.isTransparent() && !path.isEmpty()) {
+            GtkPath p = (GtkPath) path;
+            context.save();
+
+            setColor(paint.getColor());
+            context.setLineWidth(paint.getStrokeWidth());
+            p.exec(context);
+            if (gtkPaint.style == Style.FILL) {
+                context.fill();
+            } else {
+                context.stroke();
+            }
+            context.restore();
+        }
     }
 
     @Override
     public void drawPathText(String text, Path path, Paint paint) {
+        this.drawPath(path, paint);
         System.out.println("GraphicContext::drawPathText()");
     }
 
@@ -142,7 +164,6 @@ public class GtkGraphicContext implements GraphicContext {
                 fillColor(0f, 0f,0f, 1f);
                 break;
             case TRANSPARENT:
-                //fillColor(0f, 0f,0f, 1f);
                 fillColor(0f, 0f,0f, 0f);
                 break;
         }
@@ -156,7 +177,6 @@ public class GtkGraphicContext implements GraphicContext {
         context.setOperator(Operator.SOURCE);
         context.paint();
         context.restore();
-
     }
 
 
@@ -192,7 +212,6 @@ public class GtkGraphicContext implements GraphicContext {
     @Override
     public void resetClip() {
         context.resetClip();
-        //System.out.println("GraphicContext::resetClip()");
     }
 
     @Override
@@ -207,7 +226,7 @@ public class GtkGraphicContext implements GraphicContext {
         context.rectangle(left,top,width,height);
         context.clip();
 
-        //System.out.println("GraphicContext::setClip()");
+        System.out.println("GraphicContext::setClip()");
     }
 
     @Override
@@ -217,7 +236,37 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void setClipDifference(int left, int top, int width, int height) {
-        System.out.println("GraphicContext::setClipDifference()");
+        context.resetClip();
+        context.newPath();
+
+        final int th=top;
+        final int tw=this.width;
+        context.rectangle(0, 0, tw, th);
+        context.clip();
+
+        final int lh=height;
+        final int lw=left;
+        final int lx=0;
+        final int ly=th;
+        context.rectangle(lx, ly, lw, lh);
+        context.clip();
+
+        final int rh=lh;
+        final int rw=this.width-lw-width;
+        final int rx=this.width-rw;
+        final int ry=th;
+        context.rectangle(rx, ry, lw, rh);
+        context.clip();
+
+        final int bh=this.height-height-th;
+        final int bw=tw;
+        final int bx=0;
+        final int by=this.height-bh;
+        context.rectangle(bx, by, bw, bh);
+
+
+        context.clip();
+        //System.out.println("GraphicContext::setClipDifference()");
     }
 
     @Override

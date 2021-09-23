@@ -40,7 +40,7 @@ public class GtkCanvas implements Canvas {
     public void setBitmap(Bitmap bitmap) {
         //System.out.println("GtkCanvas::setBitmap()");
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
-        graphicContext = new GtkGraphicContext(gtkBitmap.getContext());
+        graphicContext = new GtkGraphicContext(gtkBitmap.getContext(), getWidth(), getHeight());
         dimension = new Dimension(bitmap.getWidth(), bitmap.getHeight());
     }
 
@@ -55,8 +55,7 @@ public class GtkCanvas implements Canvas {
         if (alpha != 1f || filter != Filter.NONE) {
             System.out.println("GtkCanvas::drawBitmap(left, top, "+ alpha + ", " + filter + ")");
         }
-        drawBitmap(bitmap, left, top);
-        //System.out.println("GtkCanvas::drawBitmap()");
+        graphicContext.drawBitmap(bitmap, left, top);
     }
 
     @Override
@@ -99,12 +98,14 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void drawPath(Path path, Paint paint) {
-        System.out.println("GtkCanvas::drawPath()");
+        graphicContext.drawPath(path, paint);
+        //System.out.println("GtkCanvas::drawPath()");
     }
 
     @Override
     public void drawPathText(String text, Path path, Paint paint) {
-        System.out.println("GtkCanvas::drawPathText()");
+        graphicContext.drawPath(path, paint);
+        //System.out.println("GtkCanvas::drawPathText()");
     }
 
     @Override
@@ -166,11 +167,13 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void setClipDifference(int left, int top, int width, int height) {
-        System.out.println("GtkCanvas::setClipDifference()");
+        graphicContext.setClipDifference(left,top,width, height);
+        //System.out.println("GtkCanvas::setClipDifference()");
     }
 
     @Override
     public void setFilterBitmap(boolean filter) {
+
         System.out.println("GtkCanvas::setFilterBitmap()");
     }
 

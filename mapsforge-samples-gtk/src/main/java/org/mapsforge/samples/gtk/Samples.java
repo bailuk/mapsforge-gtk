@@ -18,6 +18,7 @@
  */
 package org.mapsforge.samples.gtk;
 
+import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.Dimension;
@@ -29,6 +30,7 @@ import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.gtk.util.GtkUtil;
 import org.mapsforge.map.gtk.util.JavaPreferences;
+import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.view.MapView;
 import org.mapsforge.map.datastore.MapDataStore;
 import org.mapsforge.map.datastore.MultiMapDataStore;
@@ -61,12 +63,11 @@ import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
-import ch.bailu.gtk.gtk.Widget;
 
 public final class Samples {
     private static final GraphicFactory GRAPHIC_FACTORY = GtkGraphicFactory.INSTANCE;
-    private static final boolean SHOW_DEBUG_LAYERS = true;
-    private static final boolean SHOW_RASTER_MAP = true;
+    private static final boolean SHOW_DEBUG_LAYERS = false;
+    private static final boolean SHOW_RASTER_MAP = false;
 
      /**
      * Starts the {@code Samples}.
@@ -118,6 +119,7 @@ public final class Samples {
             final PreferencesFacade preferencesFacade = new JavaPreferences(Preferences.userNodeForPackage(Samples.class));
             final Model model = mapView.getModel();
             model.init(preferencesFacade);
+            model.displayModel.setBackgroundColor(0xFFFFFFFF);
             setMapPosition(model, boundingBox);
         });
 
@@ -156,7 +158,7 @@ public final class Samples {
         TileCache tileCache = GtkUtil.createTileCache(
                  tileSize,
                  mapView.getModel().frameBufferModel.getOverdrawFactor(),
-                 1024,
+                 512,
                  new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
 
         final BoundingBox boundingBox;

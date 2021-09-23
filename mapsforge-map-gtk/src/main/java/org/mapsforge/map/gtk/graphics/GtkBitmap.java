@@ -1,7 +1,9 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
+import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.ResourceBitmap;
+import org.mapsforge.map.gtk.util.color.ARGB;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -21,7 +23,7 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     private final ImageSurface imageSurface;
     private BufferedImage bufferedImage;
 
-    private int refCount = 1;
+    private int refCount = 0;
 
 
     public GtkBitmap(InputStream inputStream, int hash, float scaleFactor, int width, int height, int percent) throws IOException {
@@ -61,15 +63,15 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     public void decrementRefCount() {
         mustHaveRefCount();
         refCount--;
-        System.out.println(refCount);
-
-        if (refCount == 0) {
+        //System.out.println("- " + refCount);
+        if (refCount < 0) {
+            imageSurface.destroy();
             INSTANCE_COUNT.decrement();
         }
     }
 
     private void mustHaveRefCount() {
-        if (refCount <= 0) {
+        if (refCount < 0) {
             throw new IndexOutOfBoundsException("refCount: " + refCount);
         }
     }
@@ -89,7 +91,7 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
         imageSurface.mustExist();
         mustHaveRefCount();
         refCount++;
-        System.out.println(refCount);
+        //System.out.println("+ "+refCount);
     }
 
     @Override
@@ -105,7 +107,7 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
 
     @Override
     public void setBackgroundColor(int color) {
-        GtkGraphicContext context = new GtkGraphicContext(imageSurface.getContext());
+        GtkGraphicContext context = new GtkGraphicContext(imageSurface.getContext(), getWidth(), getHeight());
         context.fillColor(color);
     }
 

@@ -23,7 +23,7 @@ public class GtkPaint implements Paint {
     private float textSize;
 
     private Align textAlign;
-    private Style style;
+    Style style;
     private float[] dashPathEffect;
     private Cap strokeCap;
     private Join strokeJoin;

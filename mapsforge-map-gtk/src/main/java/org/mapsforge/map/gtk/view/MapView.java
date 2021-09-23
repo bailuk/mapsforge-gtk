@@ -62,7 +62,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
 
         drawingArea.onDraw(context -> {
-            GraphicContext graphicContext = new GtkGraphicContext(context);
+            GraphicContext graphicContext = new GtkGraphicContext(context, getWidth(), getHeight());
 
             this.frameBuffer.draw(graphicContext);
             //System.out.println("onDraw()");

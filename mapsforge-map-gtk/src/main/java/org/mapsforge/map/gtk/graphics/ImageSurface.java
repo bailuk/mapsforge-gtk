@@ -1,7 +1,5 @@
 package org.mapsforge.map.gtk.graphics;
 
-import java.awt.image.BufferedImage;
-
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Surface;
 
@@ -61,5 +59,6 @@ public abstract class ImageSurface {
             throw new NullPointerException();
         }
     }
+
 
 }
