@@ -135,6 +135,7 @@ public final class Samples {
         public final CheckMenuItem scale;
         public final CheckMenuItem coords;
         public final CheckMenuItem grid;
+        public final CheckMenuItem fps;
 
         public Menus() {
             menu = new Menu();
@@ -155,18 +156,19 @@ public final class Samples {
             });
             menu.append(scale);
 
+            fps = new CheckMenuItem();
+            fps.setLabel(new Str("Fps counter"));
+            fps.onToggled(() -> config.setFpsLayer(GTK.is(fps.getActive())));
+            menu.append(fps);
+
             coords = new CheckMenuItem();
             coords.setLabel(new Str("Tile coordinates layer"));
-            coords.onToggled(() -> {
-                config.setCoordsLayer(GTK.is(coords.getActive()));
-            });
+            coords.onToggled(() -> config.setCoordsLayer(GTK.is(coords.getActive())));
             menu.append(coords);
 
             grid = new CheckMenuItem();
             grid.setLabel(new Str("Tile grid layer"));
-            grid.onToggled(() -> {
-                config.setGridLayer(GTK.is(grid.getActive()));
-            });
+            grid.onToggled(() -> config.setGridLayer(GTK.is(grid.getActive())));
             menu.append(grid);
 
             menu.showAll();

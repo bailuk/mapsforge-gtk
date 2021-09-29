@@ -159,4 +159,9 @@ public class LayerConfig {
         mapView.getMapScaleBar().setVisible(on);
         mapView.repaint();
     }
+
+    public void setFpsLayer(boolean on) {
+        mapView.getFpsCounter().setVisible(on);
+        mapView.repaint();
+    }
 }

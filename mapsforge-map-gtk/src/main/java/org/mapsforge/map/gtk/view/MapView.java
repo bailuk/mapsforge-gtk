@@ -61,18 +61,11 @@ public class MapView implements org.mapsforge.map.view.MapView{
         drawingArea.onDraw(context -> {
             final GraphicContext graphicContext = new GtkGraphicContext(context, dimension);
 
-            drawDiagonal(context);
-
             this.frameBuffer.draw(graphicContext);
-
-            //drawDiagonal(context);
-
             if (this.mapScaleBar != null) {
                 this.mapScaleBar.draw(graphicContext);
             }
             this.fpsCounter.draw(graphicContext);
-
-
 
             return GTK.TRUE;
         });
@@ -87,13 +80,6 @@ public class MapView implements org.mapsforge.map.view.MapView{
         });
 
         new MouseEvents(this, drawingArea);
-    }
-
-    private void drawDiagonal(Context context) {
-        context.setSourceRgb(0, 1, 1);
-        context.moveTo(5, 5);
-        context.lineTo(dimension.width - 5, dimension.height - 5);
-        context.stroke();
     }
 
     @Override

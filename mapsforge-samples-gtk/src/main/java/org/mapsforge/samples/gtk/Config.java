@@ -30,9 +30,9 @@ public class Config {
             menus.scale.setActive(GTK.is(scaleBarOn.get()));
             menus.coords.setActive(GTK.is(coordsLayerOn.get()));
             menus.grid.setActive(GTK.is(gridLayerOn.get()));
+            menus.fps.setActive(GTK.is(fpsLayerOn.get()));
         }
     }
-
 
     private class Bool {
         private final String key;
@@ -60,6 +60,20 @@ public class Config {
     private final Bool scaleBarOn = new Bool("scaleBarOn", false);
     private final Bool coordsLayerOn = new Bool("coordsLayerOn", false);
     private final Bool gridLayerOn = new Bool("gridLayerOn", false);
+    private final Bool fpsLayerOn = new Bool("fpsLayerOn", false);
+
+
+    public void setFpsLayer(boolean on) {
+        if (fpsLayerOn.set(on)) {
+            setFpsLayer();
+        }
+    }
+
+    private void setFpsLayer() {
+        if (layerConfig != null) {
+            layerConfig.setFpsLayer(fpsLayerOn.get());
+        }
+    }
 
     public void setGridLayer(boolean on) {
         if (gridLayerOn.set(on)) {
@@ -102,6 +116,7 @@ public class Config {
         setScaleBar();
         setGridLayer();
         setCoordsLayer();
+        setFpsLayer();
     }
 
     public void setScaleBar() {
