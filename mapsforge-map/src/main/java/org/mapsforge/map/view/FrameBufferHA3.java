@@ -122,10 +122,6 @@ public class FrameBufferHA3 extends FrameBuffer {
          * This draw() is always called when layer manager has finished. This ensures that the
          * last generated frame is always put on screen.
          */
-
-        // FIXME: resetting the background color is redundant if the background color of the map view is already set
-        graphicContext.fillColor(this.displayModel.getBackgroundColor());
-
         swapBitmaps();
 
         synchronized (this.matrix) {

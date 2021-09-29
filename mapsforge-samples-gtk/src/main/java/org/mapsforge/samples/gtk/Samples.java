@@ -18,14 +18,8 @@
  */
 package org.mapsforge.samples.gtk;
 
-import org.mapsforge.core.model.BoundingBox;
-import org.mapsforge.core.model.Dimension;
-import org.mapsforge.core.model.LatLong;
-import org.mapsforge.core.model.MapPosition;
-import org.mapsforge.core.util.LatLongUtils;
 import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
-import org.mapsforge.map.model.Model;
 
 import java.io.IOException;
 
@@ -41,23 +35,19 @@ import ch.bailu.gtk.gtk.ApplicationWindow;
 import ch.bailu.gtk.gtk.Box;
 import ch.bailu.gtk.gtk.Button;
 import ch.bailu.gtk.gtk.CheckMenuItem;
-import ch.bailu.gtk.gtk.Gtk;
 import ch.bailu.gtk.gtk.HeaderBar;
 import ch.bailu.gtk.gtk.IconSize;
 import ch.bailu.gtk.gtk.Image;
-import ch.bailu.gtk.gtk.Label;
 import ch.bailu.gtk.gtk.Menu;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.Orientation;
 import ch.bailu.gtk.gtk.RadioMenuItem;
 import ch.bailu.gtk.gtk.SeparatorMenuItem;
-import ch.bailu.gtk.gtk.VBox;
 import ch.bailu.gtk.wrapper.Str;
 import ch.bailu.gtk.wrapper.Strs;
 
 public final class Samples {
 
-    private final LayerConfig layerConfig;
     private final Config config = new Config();
 
      /**
@@ -74,39 +64,35 @@ public final class Samples {
 
     private Samples(String args[]) {
         final Application app = new Application(new Str("org.mapsforge.samples.gtk"), ApplicationFlags.FLAGS_NONE);
-        layerConfig = new LayerConfig(args);
 
-        app.onActivate(() -> {
-            onActivate(new ApplicationWindow(app));
-        });
+        app.onActivate(() -> onActivate(new ApplicationWindow(app), args));
         app.run(args.length, new Strs(args));
     }
 
 
 
-    public void onActivate(ApplicationWindow window) {
+    public void onActivate(ApplicationWindow window, String args[]) {
         var mapView = createMapView();
         var header = createHeader(mapView);
+
+        window.setTitlebar(header);
 
         try  {
             window.setIcon(Pixbuf.newFromFilePixbuf(new Str("../docs/logo/Mapsforge.svg")));
         } catch (AllocationError e) {
             System.out.println(e.getMessage());
         }
-        window.setTitlebar(header);
+
         window.setDefaultSize(1024, 768);
 
         window.onShow(() -> {
-            final BoundingBox boundingBox = layerConfig.initLayers(mapView);
-            config.setMapView(mapView);
-            setMapPosition(mapView.getModel(), boundingBox);
+            config.initMapView(args, mapView);
         });
 
         window.onDestroy(() -> {
             config.save();
             System.exit(0);
         });
-        window.setBorderWidth(0);
         window.add(mapView.getDrawingArea());
         window.showAll();
     }
@@ -116,7 +102,6 @@ public final class Samples {
         var header = new HeaderBar();
         header.setShowCloseButton(1);
         header.setTitle(new Str("Mapsforge GTK Sample application"));
-        header.setHasSubtitle(0);
         var button = new MenuButton();
         var icon = new ThemedIcon(new Str("open-menu-symbolic"));
         var image = Image.newFromGiconImage(new Icon(icon.getCPointer()), IconSize.BUTTON);
@@ -148,6 +133,8 @@ public final class Samples {
     public class Menus {
         public final Menu menu;
         public final CheckMenuItem scale;
+        public final CheckMenuItem coords;
+        public final CheckMenuItem grid;
 
         public Menus() {
             menu = new Menu();
@@ -168,17 +155,17 @@ public final class Samples {
             });
             menu.append(scale);
 
-            var coords = new CheckMenuItem();
+            coords = new CheckMenuItem();
             coords.setLabel(new Str("Tile coordinates layer"));
             coords.onToggled(() -> {
-                layerConfig.setCoordsLayer(coords.getActive());
+                config.setCoordsLayer(GTK.is(coords.getActive()));
             });
             menu.append(coords);
 
-            var grid = new CheckMenuItem();
+            grid = new CheckMenuItem();
             grid.setLabel(new Str("Tile grid layer"));
             grid.onToggled(() -> {
-                layerConfig.setGridLayer(coords.getActive());
+                config.setGridLayer(GTK.is(grid.getActive()));
             });
             menu.append(grid);
 
@@ -194,21 +181,6 @@ public final class Samples {
     }
 
 
-    private void setMapPosition(Model model, BoundingBox boundingBox) {
-        if (model != null && boundingBox != null) {
-            final Dimension dimension = model.mapViewDimension.getDimension();
-            final LatLong center = model.mapViewPosition.getCenter();
-            byte zoomLevel = model.mapViewPosition.getZoomLevel();
-            int tileSize = model.displayModel.getTileSize();
-
-            if (center != null && dimension != null && dimension.height> 0 && dimension.width > 0) {
-                if (zoomLevel == 0 || !boundingBox.contains(center)) {
-                    zoomLevel = LatLongUtils.zoomForBounds(dimension, boundingBox, tileSize);
-                    model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
-                }
-            }
-        }
-    }
 
     private static MapView createMapView() {
         return new MapView();

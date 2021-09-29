@@ -62,12 +62,14 @@ public class GtkGraphicContext implements GraphicContext {
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
         //System.out.println(bitmap.getWidth() + " x " +bitmap.getHeight());
 
+        context.save();
         GtkMatrix gtkMatrix = (GtkMatrix) matrix;
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
         context.setMatrix(gtkMatrix.matrix);
         context.setSourceSurface(gtkBitmap.getSurface(),0,0);
         context.paint();
         context.identityMatrix();
+        context.restore();
     }
 
     @Override

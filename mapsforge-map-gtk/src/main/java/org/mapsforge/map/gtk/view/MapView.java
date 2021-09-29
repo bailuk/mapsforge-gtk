@@ -25,6 +25,7 @@ import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
 import ch.bailu.gtk.GTK;
+import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.gtk.DrawingArea;
 
 public class MapView implements org.mapsforge.map.view.MapView{
@@ -60,15 +61,25 @@ public class MapView implements org.mapsforge.map.view.MapView{
         drawingArea.onDraw(context -> {
             final GraphicContext graphicContext = new GtkGraphicContext(context, dimension);
 
+            drawDiagonal(context);
+
             this.frameBuffer.draw(graphicContext);
+
+            //drawDiagonal(context);
+
             if (this.mapScaleBar != null) {
                 this.mapScaleBar.draw(graphicContext);
             }
             this.fpsCounter.draw(graphicContext);
+
+
+
             return GTK.TRUE;
         });
 
+
         drawingArea.onSizeAllocate(allocation -> {
+            System.out.println(allocation.getFieldX() + ":" + allocation.getFieldY() + ":" + allocation.getFieldWidth() + ":" + allocation.getFieldHeight());
             dimension = new Dimension(allocation.getFieldWidth(), allocation.getFieldHeight());
             if (dimension.width > 0 && dimension.height > 0) {
                 model.mapViewDimension.setDimension(dimension);
@@ -78,6 +89,12 @@ public class MapView implements org.mapsforge.map.view.MapView{
         new MouseEvents(this, drawingArea);
     }
 
+    private void drawDiagonal(Context context) {
+        context.setSourceRgb(0, 1, 1);
+        context.moveTo(5, 5);
+        context.lineTo(dimension.width - 5, dimension.height - 5);
+        context.stroke();
+    }
 
     @Override
     public void addLayer(Layer layer) {

@@ -1,7 +1,6 @@
 package org.mapsforge.samples.gtk;
 
 import org.mapsforge.core.graphics.GraphicFactory;
-import org.mapsforge.map.gtk.graphics.GtkGraphicContext;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.layer.hills.DiffuseLightShadingAlgorithm;
 import org.mapsforge.map.layer.hills.HillsRenderConfig;

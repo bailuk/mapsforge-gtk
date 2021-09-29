@@ -29,28 +29,21 @@ import ch.bailu.gtk.GTK;
 
 public class LayerConfig {
 
+    private final MapView mapView;
+
 
     private final RenderHillsConfig renderHillsConfig;
     private final RenderMapConfig renderMapConfig;
-    private Layer tileGridLayer;
-    private Layer tileCoordsLayer;
 
-    public LayerConfig(String[] args) {
+    public LayerConfig(String[] args, MapView mapView) {
+        this.mapView = mapView;
         renderMapConfig = new RenderMapConfig(args);
         renderHillsConfig = new RenderHillsConfig(args);
-
-
-
     }
 
     private void initMapScaleBar(MapView mapView) {
         mapView.getMapScaleBar().setVisible(true);
         mapView.getFpsCounter().setVisible(true);
-    }
-
-    private void initDebugLayers(MapView mapView) {
-        tileGridLayer = new TileGridLayer(GtkGraphicFactory.INSTANCE, mapView.getModel().displayModel);
-        tileCoordsLayer = new TileCoordinatesLayer(GtkGraphicFactory.INSTANCE, mapView.getModel().displayModel);
     }
 
 
@@ -82,8 +75,7 @@ public class LayerConfig {
         return new BoundingBox(LatLongUtils.LATITUDE_MIN, LatLongUtils.LONGITUDE_MIN, LatLongUtils.LATITUDE_MAX, LatLongUtils.LONGITUDE_MAX);
     }
 
-    public BoundingBox initLayers(MapView mapView) {
-        mapView.getMapScaleBar().setVisible(false);
+    public BoundingBox initLayers() {
 
         //if (showRasterMap || !renderMapConfig.hasMapFiles()) {
             return initRasterMap(mapView);
@@ -122,30 +114,49 @@ public class LayerConfig {
         return tileRendererLayer;
     }
 
-    public void setCoordsLayer(int active) {
-/*
-        if (coords.getActive() == GTK.TRUE) {
-            mapView.addLayer(tileCoordsLayer);
+    public void setCoordsLayer(boolean on) {
+        if (on) {
+            if (!findLayer(TileCoordinatesLayer.class)) {
+                mapView.addLayer(new TileCoordinatesLayer(GtkGraphicFactory.INSTANCE, mapView.getModel().displayModel));
+            }
         } else {
-            mapView.getLayerManager().getLayers().remove(tileCoordsLayer);
+            removeLayer(TileCoordinatesLayer.class);
         }
-*/
-
     }
 
-    public void setGridLayer(int active) {
-/*
-        if (grid.getActive() == GTK.TRUE) {
-            mapView.addLayer(tileGridLayer);
-        } else {
-            mapView.getLayerManager().getLayers().remove(tileGridLayer);
+    private boolean findLayer(Class clazz) {
+        for (Layer layer : mapView.getLayerManager().getLayers()) {
+            if (clazz.isInstance(layer)) {
+                return true;
+            }
         }
-*/
-
+        return false;
     }
 
-    public void setScaleBarLayer(int active) {
-        //mapView.getMapScaleBar().setVisible(GTK.is(scale.getActive()));
-        //mapView.repaint();
+
+    private boolean removeLayer(Class clazz) {
+        var layers = mapView.getLayerManager().getLayers();
+        for (Layer layer : layers) {
+            if (clazz.isInstance(layer)) {
+                layers.remove(layer);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setGridLayer(boolean on) {
+        if (on) {
+            if (!findLayer(TileGridLayer.class)) {
+                mapView.addLayer(new TileGridLayer(GtkGraphicFactory.INSTANCE, mapView.getModel().displayModel));
+            }
+        } else {
+            removeLayer(TileGridLayer.class);
+        }
+    }
+
+     public void setScaleBar(boolean on) {
+        mapView.getMapScaleBar().setVisible(on);
+        mapView.repaint();
     }
 }
