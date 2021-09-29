@@ -3,7 +3,6 @@ apply plugin: 'maven'
 
 dependencies {
     api project(":mapsforge-map-reader")
-    api 'com.formdev:svgSalamander:1.1.2.4'
     api 'ch.bailu.java-gtk:library:0.1.0-SNAPSHOT'
 
     testImplementation project(":mapsforge-themes")
