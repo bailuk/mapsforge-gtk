@@ -27,8 +27,6 @@ import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.exception.AllocationError;
 import ch.bailu.gtk.gdkpixbuf.Pixbuf;
 import ch.bailu.gtk.gio.ApplicationFlags;
-import ch.bailu.gtk.gio.Icon;
-import ch.bailu.gtk.gio.ThemedIcon;
 import ch.bailu.gtk.glib.SList;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
@@ -76,10 +74,9 @@ public final class Samples {
 
 
     public void onActivate(ApplicationWindow window, String args[]) {
-        var mapView = createMapView();
-        var header = createHeader(mapView);
+        final var mapView = new MapView();
 
-        window.setTitlebar(header);
+        window.setTitlebar(createHeader(mapView));
 
         try  {
             window.setIcon(Pixbuf.newFromFilePixbuf(new Str(APP_ICON)));
@@ -103,32 +100,27 @@ public final class Samples {
 
 
     private HeaderBar createHeader(MapView mapView) {
-        var header = new HeaderBar();
+        final var header = new HeaderBar();
         header.setShowCloseButton(1);
         header.setTitle(new Str(APP_NAME));
-        var button = new MenuButton();
-        var icon = new ThemedIcon(new Str("open-menu-symbolic"));
-        var image = Image.newFromGiconImage(new Icon(icon.getCPointer()), IconSize.BUTTON);
-        icon.unref();
 
-        var menu = createMenu();
-
-        button.add(image);
-        button.setPopup(menu);
-        header.packEnd(button);
+        final var menuButton = new MenuButton();
+        menuButton.add(Image.newFromIconNameImage(new Str("open-menu-symbolic"), IconSize.BUTTON));
+        menuButton.setPopup(createMenu());
+        header.packEnd(menuButton);
 
         var box = new Box(Orientation.HORIZONTAL, 0);
         box.getStyleContext().addClass(new Str("linked"));
 
-        var button1 = new Button();
-        button1.add(Image.newFromIconNameImage(new Str("zoom-in-symbolic"), IconSize.BUTTON));
-        button1.onClicked(() -> mapView.getModel().mapViewPosition.zoomIn());
-        box.add(button1);
+        final var zoomIn = new Button();
+        zoomIn.add(Image.newFromIconNameImage(new Str("zoom-in-symbolic"), IconSize.BUTTON));
+        zoomIn.onClicked(() -> mapView.getModel().mapViewPosition.zoomIn());
+        box.add(zoomIn);
 
-        var button2 = new Button();
-        button2.add(Image.newFromIconNameImage(new Str("zoom-out-symbolic"), IconSize.BUTTON));
-        button2.onClicked(() -> mapView.getModel().mapViewPosition.zoomOut());
-        box.add(button2);
+        final var zoomOut = new Button();
+        zoomOut.add(Image.newFromIconNameImage(new Str("zoom-out-symbolic"), IconSize.BUTTON));
+        zoomOut.onClicked(() -> mapView.getModel().mapViewPosition.zoomOut());
+        box.add(zoomOut);
 
         header.packStart(box);
         return header;
@@ -181,11 +173,4 @@ public final class Samples {
         config.setMenus(menus);
         return menus.menu;
     }
-
-
-
-    private static MapView createMapView() {
-        return new MapView();
-    }
-
 }
