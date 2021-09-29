@@ -25,9 +25,7 @@ import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.gdk.Rectangle;
 import ch.bailu.gtk.gtk.DrawingArea;
-import ch.bailu.gtk.gtk.Widget;
 
 public class MapView implements org.mapsforge.map.view.MapView{
 
@@ -42,7 +40,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
     private MapScaleBar mapScaleBar;
 
     private final DrawingArea drawingArea = new DrawingArea();
-
+    private Dimension dimension = new Dimension(0,0);
 
     public MapView() {
         this.model = new Model();
@@ -59,39 +57,23 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
         this.mapViewProjection = new MapViewProjection(this);
 
-
-
         drawingArea.onDraw(context -> {
-            GraphicContext graphicContext = new GtkGraphicContext(context, getWidth(), getHeight());
+            final GraphicContext graphicContext = new GtkGraphicContext(context, dimension);
 
             this.frameBuffer.draw(graphicContext);
-            //System.out.println("onDraw()");
-
             if (this.mapScaleBar != null) {
                 this.mapScaleBar.draw(graphicContext);
             }
-
             this.fpsCounter.draw(graphicContext);
-
-
             return GTK.TRUE;
         });
 
-
-
-        drawingArea.onSizeAllocate(new Widget.OnSizeAllocate() {
-            @Override
-            public void onSizeAllocate(Rectangle rectangle) {
-                int width = rectangle.getFieldWidth();
-                int height = rectangle.getFieldHeight();
-                System.out.println("onSizeAllocate(" + width + ", " + height + ")");
-
-                if (width >0 && height > 0) {
-                    model.mapViewDimension.setDimension(new Dimension(width, height));
-                }
+        drawingArea.onSizeAllocate(allocation -> {
+            dimension = new Dimension(allocation.getFieldWidth(), allocation.getFieldHeight());
+            if (dimension.width > 0 && dimension.height > 0) {
+                model.mapViewDimension.setDimension(dimension);
             }
         });
-
 
         new MouseEvents(this, drawingArea);
     }
@@ -139,7 +121,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public Dimension getDimension() {
-        return new Dimension(getWidth(), getHeight());
+        return dimension;
     }
 
     @Override
@@ -154,7 +136,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public int getHeight() {
-        return drawingArea.getAllocatedHeight();
+        return dimension.height;
     }
 
     @Override
@@ -179,7 +161,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public int getWidth() {
-        return drawingArea.getAllocatedWidth();
+        return dimension.width;
     }
 
     @Override

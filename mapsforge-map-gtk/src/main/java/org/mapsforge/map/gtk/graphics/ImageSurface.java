@@ -59,6 +59,4 @@ public abstract class ImageSurface {
             throw new NullPointerException();
         }
     }
-
-
 }

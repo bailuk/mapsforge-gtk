@@ -5,7 +5,6 @@ import com.kitfox.svg.SVGDiagram;
 import com.kitfox.svg.app.beans.SVGIcon;
 
 import org.mapsforge.core.graphics.GraphicUtils;
-import org.mapsforge.map.gtk.util.color.ARGB;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -20,7 +19,7 @@ import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 
 import ch.bailu.gtk.wrapper.Bytes;
-
+/*
 public class ImageConverter {
 
     private static final int TYPE = BufferedImage.TYPE_INT_ARGB_PRE;
@@ -52,6 +51,7 @@ public class ImageConverter {
             icon.setPreferredSize(new Dimension((int) bmpSize[0], (int) bmpSize[1]));
             icon.setSvgURI(uri);
             BufferedImage bufferedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), TYPE);
+
             icon.paintIcon(null, bufferedImage.createGraphics(), 0, 0);
 
             return bufferedImage;
@@ -97,8 +97,7 @@ public class ImageConverter {
 
     public static ImageSurface toImageSurface(BufferedImage in) throws IOException {
         throwIoExceptionOnNull(in);
-        in = to32bit(in);
-        return new LoadedImageSurface(toBytes(in), in.getWidth(), in.getHeight());
+        return new LoadedImageSurface(toBytes(to32bit(in)), in.getWidth(), in.getHeight());
     }
 
 
@@ -120,3 +119,4 @@ public class ImageConverter {
         return buffer;
     }
 }
+*/

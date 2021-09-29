@@ -1,71 +1,95 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
-import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.ResourceBitmap;
-import org.mapsforge.map.gtk.util.color.ARGB;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.imageio.ImageIO;
-
+import ch.bailu.gtk.GTK;
+import ch.bailu.gtk.bridge.Image;
+import ch.bailu.gtk.cairo.Cairo;
 import ch.bailu.gtk.cairo.Context;
+import ch.bailu.gtk.cairo.Format;
 import ch.bailu.gtk.cairo.Surface;
+import ch.bailu.gtk.exception.AllocationError;
+import ch.bailu.gtk.gdk.Gdk;
+import ch.bailu.gtk.gdk.Window;
+import ch.bailu.gtk.gdkpixbuf.Colorspace;
+import ch.bailu.gtk.gdkpixbuf.Gdkpixbuf;
+import ch.bailu.gtk.gdkpixbuf.Pixbuf;
 
 
-public class GtkBitmap implements Bitmap, ResourceBitmap {
+public  class GtkBitmap implements Bitmap, ResourceBitmap {
 
     private final static InstanceCount INSTANCE_COUNT = new InstanceCount();
 
-    private final ImageSurface imageSurface;
-    private BufferedImage bufferedImage;
+    private final Surface surface;
+    private final Context context;
+    final int width, height;
 
     private int refCount = 0;
 
-
     public GtkBitmap(InputStream inputStream, int hash, float scaleFactor, int width, int height, int percent) throws IOException {
-        bufferedImage = ImageConverter.streamToBufferedImage(inputStream, Integer.toString(hash), scaleFactor, width, height, percent);
-        imageSurface = ImageConverter.toImageSurface(bufferedImage);
-        INSTANCE_COUNT.increment();
+        this(load(inputStream, 20, 20));
     }
 
     public GtkBitmap(InputStream inputStream) throws IOException {
-        bufferedImage = ImageConverter.streamToBufferedImage(inputStream);
-        imageSurface = ImageConverter.toImageSurface(bufferedImage);
-        INSTANCE_COUNT.increment();
+        this(load(inputStream));
     }
 
-    public GtkBitmap(ImageSurface imageSurface) throws IOException {
-        this.imageSurface = imageSurface;
-        INSTANCE_COUNT.increment();
-    }
 
     public GtkBitmap(int width, int height, boolean isTransparent) {
-        this.imageSurface = new CreatedImageSurface(width, height);
+        this.width = width;
+        this.height = height;
+        surface = Cairo.imageSurfaceCreate(Format.ARGB32, width, height);
+        context = surface.createContext();
         INSTANCE_COUNT.increment();
     }
 
 
-    @Override
-    public void compress(OutputStream outputStream) throws IOException {
-        if (bufferedImage != null) {
-            ImageIO.write(bufferedImage, "png", outputStream);
-            bufferedImage = null;
-        } else {
-            System.out.println("GtkBitmap::compress() => no buffer");
+    private GtkBitmap(Pixbuf pixbuf) {
+        width = pixbuf.getWidth();
+        height = pixbuf.getHeight();
+        surface = Cairo.imageSurfaceCreate(Format.ARGB32, width, height);
+        context = surface.createContext();
+        Gdk.cairoSetSourcePixbuf(context,pixbuf,0,0);
+        context.paint();
+        pixbuf.unref();
+    }
+
+    private static Pixbuf load(InputStream stream, int width, int height) throws IOException {
+        try {
+            return Image.load(stream, width, height);
+        } catch (AllocationError allocationError) {
+            throw new IOException(allocationError.getMessage());
         }
     }
 
+    private static Pixbuf load(InputStream stream) throws IOException {
+        try {
+            return Image.load(stream);
+        } catch (AllocationError allocationError) {
+            throw new IOException(allocationError.getMessage());
+        }
+    }
+
+
     @Override
-    public void decrementRefCount() {
+    public synchronized  void compress(OutputStream outputStream) throws IOException {
+        mustHaveRefCount();
+        System.out.println("GtkBitmap::compress() => no buffer");
+    }
+
+    @Override
+    public synchronized  void decrementRefCount() {
         mustHaveRefCount();
         refCount--;
-        //System.out.println("- " + refCount);
         if (refCount < 0) {
-            imageSurface.destroy();
+            System.out.println("GtkBitmap::destroy()");
+            surface.destroy();
+            context.destroy();
             INSTANCE_COUNT.decrement();
         }
     }
@@ -77,45 +101,48 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     }
 
     @Override
-    public int getHeight() {
-        return imageSurface.getHeight();
+    public synchronized  int getHeight() {
+        return height;
     }
 
     @Override
-    public int getWidth() {
-        return imageSurface.getWidth();
+    public synchronized  int getWidth() {
+        return width;
     }
 
     @Override
-    public void incrementRefCount() {
-        imageSurface.mustExist();
+    public synchronized  void incrementRefCount() {
         mustHaveRefCount();
         refCount++;
-        //System.out.println("+ "+refCount);
     }
 
     @Override
-    public boolean isDestroyed() {
-        return imageSurface.isDestroyed();
+    public synchronized  boolean isDestroyed() {
+        return refCount < 0;
     }
 
     @Override
     public void scaleTo(int width, int height) {
+        mustHaveRefCount();
+
         if (width != this.getWidth() || height != this.getHeight())
             System.out.println("GtkBitmap::scaleTo()");
     }
 
     @Override
     public void setBackgroundColor(int color) {
-        GtkGraphicContext context = new GtkGraphicContext(imageSurface.getContext(), getWidth(), getHeight());
-        context.fillColor(color);
+        mustHaveRefCount();
+        new GtkGraphicContext(getContext(), getWidth(), getHeight()).fillColor(color);
+
     }
 
     public Context getContext() {
-        return imageSurface.getContext();
+        mustHaveRefCount();
+        return context;
     }
 
     public Surface getSurface() {
-        return imageSurface.getSurface();
+        mustHaveRefCount();
+        return surface;
     }
 }

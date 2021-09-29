@@ -8,6 +8,7 @@ import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.graphics.Style;
+import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
@@ -21,11 +22,16 @@ import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
 import ch.bailu.gtk.pango.Weight;
 import ch.bailu.gtk.pangocairo.Pangocairo;
+import ch.bailu.gtk.wrapper.Str;
 
 public class GtkGraphicContext implements GraphicContext {
 
     private final Context context;
     private final int width, height;
+
+    public GtkGraphicContext(Context context, Dimension dimension) {
+        this(context, dimension.width, dimension.height);
+    }
 
     public GtkGraphicContext(Context context, int width, int height) {
         this.context = context;
@@ -36,8 +42,10 @@ public class GtkGraphicContext implements GraphicContext {
     @Override
     public void drawBitmap(Bitmap bitmap, int left, int top) {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
+        context.save();
         context.setSourceSurface(gtkBitmap.getSurface(), left, top);
         context.paint();
+        context.restore();
 
     }
 
@@ -52,6 +60,8 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
+        //System.out.println(bitmap.getWidth() + " x " +bitmap.getHeight());
+
         GtkMatrix gtkMatrix = (GtkMatrix) matrix;
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
         context.setMatrix(gtkMatrix.matrix);
@@ -92,7 +102,7 @@ public class GtkGraphicContext implements GraphicContext {
         context.moveTo(x1, y1);
         context.lineTo(x2, y2);
         context.stroke();
-        System.out.println("GraphicContext::drawLine()");
+        //System.out.println("GraphicContext::drawLine()");
     }
 
     @Override
@@ -123,9 +133,12 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawText(String text, int x, int y, Paint paint) {
+        Str txt = new Str(text);
+        Str dsc = new Str("sans 10");
+
         Layout layout = Pangocairo.createLayout(context);
-        layout.setText(text, text.length());
-        FontDescription desc = Pango.fontDescriptionFromString("sans 10");
+        layout.setText(txt, text.length());
+        FontDescription desc = Pango.fontDescriptionFromString(dsc);
         layout.setFontDescription(desc);
         desc.free();
 
@@ -138,6 +151,9 @@ public class GtkGraphicContext implements GraphicContext {
 
         context.fillPreserve();
         context.stroke();
+
+        //txt.destroy();
+        //dsc.destroy();
     }
 
     @Override
@@ -226,7 +242,7 @@ public class GtkGraphicContext implements GraphicContext {
         context.rectangle(left,top,width,height);
         context.clip();
 
-        System.out.println("GraphicContext::setClip()");
+        //System.out.println("GraphicContext::setClip()");
     }
 
     @Override

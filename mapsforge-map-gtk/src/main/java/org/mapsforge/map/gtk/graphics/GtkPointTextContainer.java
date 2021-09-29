@@ -4,6 +4,8 @@ import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Display;
 import org.mapsforge.core.graphics.Filter;
+import org.mapsforge.core.graphics.GraphicFactory;
+import org.mapsforge.core.graphics.GraphicUtils;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Position;
@@ -11,6 +13,14 @@ import org.mapsforge.core.mapelements.PointTextContainer;
 import org.mapsforge.core.mapelements.SymbolContainer;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
+
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+import java.text.AttributedCharacterIterator;
+import java.text.AttributedString;
 
 public class GtkPointTextContainer extends PointTextContainer {
     /**
@@ -34,10 +44,11 @@ public class GtkPointTextContainer extends PointTextContainer {
 
     @Override
     public void draw(Canvas canvas, Point origin, Matrix matrix, Filter filter) {
-        GtkCanvas gtkCanvas = (GtkCanvas) canvas;
-        //gtkCanvas.fillColor(Color.BLUE);
+        Point point = this.xy.offset(-origin.x, -origin.y);
 
-        System.out.println("GtkPointTextContainer::draw()");
+        GtkCanvas gtkCanvas = (GtkCanvas) canvas;
+        gtkCanvas.drawText(text, (int)point.x,(int)point.y, paintBack);
+        gtkCanvas.drawText(text, (int)point.x,(int)point.y, paintFront);
     }
 
 
