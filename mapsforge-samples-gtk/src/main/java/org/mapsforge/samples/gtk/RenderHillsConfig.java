@@ -19,7 +19,7 @@ public class RenderHillsConfig {
     }
 
     private File getDemFolder(String[] args) {
-        if (args.length == 0) {
+        if (args.length > 0) {
             File demFolder = new File(args[0]);
             if (demFolder.exists() && demFolder.isDirectory() && demFolder.canRead()) {
                 return demFolder;
