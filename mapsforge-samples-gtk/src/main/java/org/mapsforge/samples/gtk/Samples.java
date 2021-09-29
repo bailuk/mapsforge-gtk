@@ -48,6 +48,10 @@ import ch.bailu.gtk.wrapper.Strs;
 
 public final class Samples {
 
+    private final static String APP_ID = "org.mapsforge.samples.gtk";
+    private final static String APP_NAME = "Mapsforge GTK3 Sample";
+    private final static String APP_ICON = "../docs/logo/Mapsforge.svg";
+
     private final Config config = new Config();
 
      /**
@@ -63,10 +67,10 @@ public final class Samples {
     }
 
     private Samples(String args[]) {
-        final Application app = new Application(new Str("org.mapsforge.samples.gtk"), ApplicationFlags.FLAGS_NONE);
+        final var app = new Application(new Str(APP_ID), ApplicationFlags.FLAGS_NONE);
 
         app.onActivate(() -> onActivate(new ApplicationWindow(app), args));
-        app.run(args.length, new Strs(args));
+        app.run(1, new Strs(new String[]{APP_NAME}));
     }
 
 
@@ -78,7 +82,7 @@ public final class Samples {
         window.setTitlebar(header);
 
         try  {
-            window.setIcon(Pixbuf.newFromFilePixbuf(new Str("../docs/logo/Mapsforge.svg")));
+            window.setIcon(Pixbuf.newFromFilePixbuf(new Str(APP_ICON)));
         } catch (AllocationError e) {
             System.out.println(e.getMessage());
         }
@@ -101,13 +105,13 @@ public final class Samples {
     private HeaderBar createHeader(MapView mapView) {
         var header = new HeaderBar();
         header.setShowCloseButton(1);
-        header.setTitle(new Str("Mapsforge GTK Sample application"));
+        header.setTitle(new Str(APP_NAME));
         var button = new MenuButton();
         var icon = new ThemedIcon(new Str("open-menu-symbolic"));
         var image = Image.newFromGiconImage(new Icon(icon.getCPointer()), IconSize.BUTTON);
         icon.unref();
 
-        var menu = createMenu(mapView);
+        var menu = createMenu();
 
         button.add(image);
         button.setPopup(menu);
@@ -141,19 +145,17 @@ public final class Samples {
             menu = new Menu();
 
             var raster = new RadioMenuItem(new SList(0));
-            var render = new RadioMenuItem(raster.getGroup());
+            var vector = new RadioMenuItem(raster.getGroup());
             raster.setLabel(new Str("Raster map"));
-            render.setLabel(new Str("Vector map"));
+            vector.setLabel(new Str("Vector map"));
             menu.append(raster);
-            menu.append(render);
+            menu.append(vector);
 
             var separator = new SeparatorMenuItem();
             menu.append(separator);
             scale = new CheckMenuItem();
             scale.setLabel(new Str("Scale bar"));
-            scale.onToggled(() -> {
-                config.setScaleBar(GTK.is(scale.getActive()));
-            });
+            scale.onToggled(() -> config.setScaleBar(GTK.is(scale.getActive())));
             menu.append(scale);
 
             fps = new CheckMenuItem();
@@ -174,12 +176,10 @@ public final class Samples {
             menu.showAll();
         }
     }
-    private Menu createMenu(MapView mapView) {
-        Menus menus = new Menus();
-
+    private Menu createMenu() {
+        var menus = new Menus();
         config.setMenus(menus);
         return menus.menu;
-
     }
 
 
