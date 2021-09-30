@@ -7,10 +7,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RenderMapConfig {
+public class VectorMapConfig {
     private final List<File> mapFiles = new ArrayList<>();
 
-    public RenderMapConfig(String[] args) {
+    public VectorMapConfig(String[] args) {
         for (String arg : args) {
             final File mapFile = new File(arg);
             if (mapFile.exists() && mapFile.isFile() && mapFile.canRead()) {

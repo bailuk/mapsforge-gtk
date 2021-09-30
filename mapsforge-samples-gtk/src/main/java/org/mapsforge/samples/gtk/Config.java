@@ -32,7 +32,11 @@ public class Config {
         menus.coords.setActive(GTK.is(coordsLayerOn.get()));
         menus.grid.setActive(GTK.is(gridLayerOn.get()));
         menus.fps.setActive(GTK.is(fpsLayerOn.get()));
+        menus.raster.setActive(GTK.is(rasterMapOn.get()));
+        menus.vector.setActive(GTK.is(!rasterMapOn.get()));
+        menus.vector.setSensitive(GTK.is(layerConfig.haveVectorMap()));
     }
+
 
     private class Bool {
         private final String key;
@@ -61,6 +65,21 @@ public class Config {
     private final Bool coordsLayerOn = new Bool("coordsLayerOn", false);
     private final Bool gridLayerOn = new Bool("gridLayerOn", false);
     private final Bool fpsLayerOn = new Bool("fpsLayerOn", false);
+    private final Bool rasterMapOn = new Bool("rasterMapOn", true);
+
+
+    public void setVectorMap() {
+        if (layerConfig.haveVectorMap()) {
+            if (rasterMapOn.set(false))
+                initMapLayer();
+        }
+    }
+
+    public void setRasterMap() {
+        if (rasterMapOn.set(true)) {
+            initMapLayer();
+        }
+    }
 
 
     public void setFpsLayer(boolean on) {
@@ -100,14 +119,27 @@ public class Config {
     }
 
     public void initMapView() {
-        final BoundingBox boundingBox = layerConfig.initLayers();
         mapView.getModel().init(preferences);
-        setMapPosition(mapView.getModel(), boundingBox);
+        initMapLayer();
 
         setScaleBar();
         setGridLayer();
         setCoordsLayer();
         setFpsLayer();
+    }
+
+    private void initMapLayer() {
+        if (rasterMapOn.get()) {
+            layerConfig.setVectorMap(false);
+            layerConfig.setRasterMap(true);
+        } else if (layerConfig.haveVectorMap()) {
+            layerConfig.setRasterMap(false);
+            layerConfig.setVectorMap(true);
+        } else {
+            layerConfig.setVectorMap(false);
+            layerConfig.setRasterMap(true);
+        }
+        setMapPosition(mapView.getModel(), layerConfig.getInitialBounding());
     }
 
     public void setScaleBar() {

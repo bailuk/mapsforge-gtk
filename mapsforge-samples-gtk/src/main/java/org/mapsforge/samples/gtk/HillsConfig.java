@@ -8,16 +8,13 @@ import org.mapsforge.map.layer.hills.MemoryCachingHgtReaderTileSource;
 
 import java.io.File;
 
-public class RenderHillsConfig {
-
-    //private final HillsRenderConfig config;
+public class HillsConfig {
 
     private final File folder;
 
 
-    public RenderHillsConfig(String[] args) {
+    public HillsConfig(String[] args) {
         folder = getDemFolder(args);
-        //config = createHillsCfg(getDemFolder(args), GtkGraphicFactory.INSTANCE);
     }
 
     private File getDemFolder(String[] args) {
@@ -30,19 +27,19 @@ public class RenderHillsConfig {
         return null;
     }
 
-    private HillsRenderConfig createHillsCfg(File folder, GraphicFactory factory) {
-        HillsRenderConfig result = null;
-
+    public HillsRenderConfig getConfig() {
         if (folder != null) {
-            MemoryCachingHgtReaderTileSource tileSource = new MemoryCachingHgtReaderTileSource(folder, new DiffuseLightShadingAlgorithm(), factory);
-            tileSource.setEnableInterpolationOverlap(true);
-            result = new org.mapsforge.map.layer.hills.HillsRenderConfig(tileSource);
-            result.indexOnThread();
+            return getHillsCfg(folder, GtkGraphicFactory.INSTANCE);
         }
+        return null;
+    }
+
+    private HillsRenderConfig getHillsCfg(File folder, GraphicFactory factory) {
+        MemoryCachingHgtReaderTileSource tileSource = new MemoryCachingHgtReaderTileSource(folder, new DiffuseLightShadingAlgorithm(), factory);
+        tileSource.setEnableInterpolationOverlap(true);
+        HillsRenderConfig result = new HillsRenderConfig(tileSource);
+        result.indexOnThread();
         return result;
     }
 
-    /*public HillsRenderConfig getConfig() {
-        return config;
-    }*/
 }

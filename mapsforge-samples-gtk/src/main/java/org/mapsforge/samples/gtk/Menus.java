@@ -15,16 +15,26 @@ public class Menus {
     public final CheckMenuItem coords;
     public final CheckMenuItem grid;
     public final CheckMenuItem fps;
+    public final RadioMenuItem raster, vector;
 
     public Menus(Config config) {
         menu = new Menu();
 
-        var raster = new RadioMenuItem(new SList(0));
-        var vector = new RadioMenuItem(raster.getGroup());
+        raster = new RadioMenuItem(new SList(0));
+        vector = new RadioMenuItem(raster.getGroup());
         raster.setLabel(new Str("Raster map"));
+        raster.onToggled(() -> {
+            if (GTK.is(raster.getActive())) config.setRasterMap();
+        });
+
         vector.setLabel(new Str("Vector map"));
+        vector.onToggled(() -> {
+            if (GTK.is(vector.getActive())) config.setVectorMap();
+        });
+
         menu.append(raster);
         menu.append(vector);
+
 
         var separator = new SeparatorMenuItem();
         menu.append(separator);

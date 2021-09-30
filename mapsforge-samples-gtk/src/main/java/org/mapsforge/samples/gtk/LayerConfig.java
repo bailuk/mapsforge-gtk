@@ -25,96 +25,23 @@ import org.mapsforge.map.rendertheme.InternalRenderTheme;
 import java.io.File;
 import java.util.UUID;
 
-import ch.bailu.gtk.GTK;
-
 public class LayerConfig {
 
     private final MapView mapView;
 
 
-    private final RenderHillsConfig renderHillsConfig;
-    private final RenderMapConfig renderMapConfig;
+    private final HillsConfig hillsConfig;
+    private final VectorMapConfig renderMapConfig;
+
+    private BoundingBox boundingBox = null;
 
     public LayerConfig(String[] args, MapView mapView) {
         this.mapView = mapView;
-        renderMapConfig = new RenderMapConfig(args);
-        renderHillsConfig = new RenderHillsConfig(args);
+        renderMapConfig = new VectorMapConfig(args);
+        hillsConfig = new HillsConfig(args);
     }
 
-    private void initMapScaleBar(MapView mapView) {
-        mapView.getMapScaleBar().setVisible(true);
-        mapView.getFpsCounter().setVisible(true);
-    }
 
-/*
-    private BoundingBox initRenderMap(MapView mapView) {
-        Layers layers = mapView.getLayerManager().getLayers();
-
-        TileCache tileCache = initTileCache(mapView, 512);
-        mapView.getModel().displayModel.setFixedTileSize(512);
-        MultiMapDataStore mapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
-
-        renderMapConfig.addMapDataStore(mapDataStore);
-        TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, renderHillsConfig.getConfig());
-        layers.add(tileRendererLayer);
-        return mapDataStore.boundingBox();
-
-    }
-
- */
-    private BoundingBox initRasterMap(MapView mapView) {
-        Layers layers = mapView.getLayerManager().getLayers();
-
-        TileCache tileCache = initTileCache(mapView, 256);
-        mapView.getModel().displayModel.setFixedTileSize(256);
-        OpenStreetMapMapnik tileSource = OpenStreetMapMapnik.INSTANCE;
-        tileSource.setUserAgent("mapsforge-samples-awt");
-        TileDownloadLayer tileDownloadLayer = createTileDownloadLayer(tileCache, mapView.getModel().mapViewPosition, tileSource);
-        layers.add(tileDownloadLayer);
-        tileDownloadLayer.start();
-        mapView.setZoomLevelMin(tileSource.getZoomLevelMin());
-        mapView.setZoomLevelMax(tileSource.getZoomLevelMax());
-        return new BoundingBox(LatLongUtils.LATITUDE_MIN, LatLongUtils.LONGITUDE_MIN, LatLongUtils.LATITUDE_MAX, LatLongUtils.LONGITUDE_MAX);
-    }
-
-    public BoundingBox initLayers() {
-
-        //if (showRasterMap || !renderMapConfig.hasMapFiles()) {
-            return initRasterMap(mapView);
-        //} else {
-        //    return initRenderMap(mapView);
-        //}
-    }
-
-    private TileCache initTileCache(MapView mapView, int tileSize) {
-        return GtkUtil.createTileCache(
-                tileSize,
-                mapView.getModel().frameBufferModel.getOverdrawFactor(),
-                512,
-                new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
-    }
-
-    private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, IMapViewPosition mapViewPosition, TileSource tileSource) {
-        return new TileDownloadLayer(tileCache, mapViewPosition, tileSource, GtkGraphicFactory.INSTANCE) {
-            @Override
-            public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
-                System.out.println("Tap on: " + tapLatLong);
-                return true;
-            }
-        };
-    }
-
-    private static TileRendererLayer createTileRendererLayer(TileCache tileCache, MapDataStore mapDataStore, IMapViewPosition mapViewPosition, HillsRenderConfig hillsRenderConfig) {
-        TileRendererLayer tileRendererLayer = new TileRendererLayer(tileCache, mapDataStore, mapViewPosition, false, true, false, GtkGraphicFactory.INSTANCE, hillsRenderConfig) {
-            @Override
-            public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
-                System.out.println("Tap on: " + tapLatLong);
-                return true;
-            }
-        };
-        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.DEFAULT);
-        return tileRendererLayer;
-    }
 
     public void setCoordsLayer(boolean on) {
         if (on) {
@@ -165,5 +92,94 @@ public class LayerConfig {
     public void setFpsLayer(boolean on) {
         mapView.getFpsCounter().setVisible(on);
         mapView.repaint();
+    }
+
+    public boolean haveVectorMap() {
+        return renderMapConfig.hasMapFiles();
+    }
+
+    public void setRasterMap(boolean on) {
+        if (on) {
+            if (!findLayer(TileDownloadLayer.class)) {
+                boundingBox = initRasterMap(mapView);
+            }
+        } else {
+            removeLayer(TileDownloadLayer.class);
+        }
+    }
+
+
+    private BoundingBox initRasterMap(MapView mapView) {
+        Layers layers = mapView.getLayerManager().getLayers();
+
+        TileCache tileCache = initTileCache(mapView, 256);
+        mapView.getModel().displayModel.setFixedTileSize(256);
+        OpenStreetMapMapnik tileSource = OpenStreetMapMapnik.INSTANCE;
+        tileSource.setUserAgent("mapsforge-samples-awt");
+        TileDownloadLayer tileDownloadLayer = createTileDownloadLayer(tileCache, mapView.getModel().mapViewPosition, tileSource);
+        layers.add(0,tileDownloadLayer);
+        tileDownloadLayer.start();
+        mapView.setZoomLevelMin(tileSource.getZoomLevelMin());
+        mapView.setZoomLevelMax(tileSource.getZoomLevelMax());
+        return new BoundingBox(LatLongUtils.LATITUDE_MIN, LatLongUtils.LONGITUDE_MIN, LatLongUtils.LATITUDE_MAX, LatLongUtils.LONGITUDE_MAX);
+    }
+
+    public void setVectorMap(boolean on) {
+        if (on) {
+            if (!findLayer(TileRendererLayer.class)) {
+                boundingBox = initRenderMap(mapView);
+            }
+        } else {
+            removeLayer(TileRendererLayer.class);
+        }
+
+    }
+
+    private BoundingBox initRenderMap(MapView mapView) {
+        Layers layers = mapView.getLayerManager().getLayers();
+
+        TileCache tileCache = initTileCache(mapView, 512);
+        mapView.getModel().displayModel.setFixedTileSize(512);
+        MultiMapDataStore mapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
+
+        renderMapConfig.addMapDataStore(mapDataStore);
+        TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsConfig.getConfig());
+        layers.add(0,tileRendererLayer);
+        return mapDataStore.boundingBox();
+    }
+
+
+    private TileCache initTileCache(MapView mapView, int tileSize) {
+        return GtkUtil.createTileCache(
+                tileSize,
+                mapView.getModel().frameBufferModel.getOverdrawFactor(),
+                512,
+                new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
+    }
+
+    private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, IMapViewPosition mapViewPosition, TileSource tileSource) {
+        return new TileDownloadLayer(tileCache, mapViewPosition, tileSource, GtkGraphicFactory.INSTANCE) {
+            @Override
+            public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
+                System.out.println("Tap on: " + tapLatLong);
+                return true;
+            }
+        };
+    }
+
+    private static TileRendererLayer createTileRendererLayer(TileCache tileCache, MapDataStore mapDataStore, IMapViewPosition mapViewPosition, HillsRenderConfig hillsRenderConfig) {
+        TileRendererLayer tileRendererLayer = new TileRendererLayer(tileCache, mapDataStore, mapViewPosition, false, true, false, GtkGraphicFactory.INSTANCE, hillsRenderConfig) {
+            @Override
+            public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
+                System.out.println("Tap on: " + tapLatLong);
+                return true;
+            }
+        };
+        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.DEFAULT);
+        return tileRendererLayer;
+    }
+
+    public BoundingBox getInitialBounding() {
+        return boundingBox;
     }
 }
