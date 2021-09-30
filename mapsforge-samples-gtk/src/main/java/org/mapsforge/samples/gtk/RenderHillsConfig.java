@@ -10,11 +10,14 @@ import java.io.File;
 
 public class RenderHillsConfig {
 
-    private final HillsRenderConfig config;
+    //private final HillsRenderConfig config;
+
+    private final File folder;
 
 
     public RenderHillsConfig(String[] args) {
-        config = createHillsCfg(getDemFolder(args), GtkGraphicFactory.INSTANCE);
+        folder = getDemFolder(args);
+        //config = createHillsCfg(getDemFolder(args), GtkGraphicFactory.INSTANCE);
     }
 
     private File getDemFolder(String[] args) {
@@ -39,7 +42,7 @@ public class RenderHillsConfig {
         return result;
     }
 
-    public HillsRenderConfig getConfig() {
+    /*public HillsRenderConfig getConfig() {
         return config;
-    }
+    }*/
 }

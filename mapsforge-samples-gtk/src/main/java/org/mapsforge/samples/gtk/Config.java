@@ -16,22 +16,22 @@ import ch.bailu.gtk.GTK;
 
 public class Config {
 
-    private MapView mapView = null;
-    private LayerConfig layerConfig = null;
+    private final MapView mapView ;
+    private final LayerConfig layerConfig;
 
     private final PreferencesFacade preferences = new JavaPreferences(Preferences.userNodeForPackage(Samples.class));
 
-    private Samples.Menus menus;
 
-    public void setMenus(Samples.Menus menus) {
-        this.menus = menus;
+    public Config(String[] args, MapView mapView) {
+        this.mapView = mapView;
+        this.layerConfig = new LayerConfig(args, mapView);
+    }
 
-        if (menus != null) {
-            menus.scale.setActive(GTK.is(scaleBarOn.get()));
-            menus.coords.setActive(GTK.is(coordsLayerOn.get()));
-            menus.grid.setActive(GTK.is(gridLayerOn.get()));
-            menus.fps.setActive(GTK.is(fpsLayerOn.get()));
-        }
+    public void setMenus(Menus menus) {
+        menus.scale.setActive(GTK.is(scaleBarOn.get()));
+        menus.coords.setActive(GTK.is(coordsLayerOn.get()));
+        menus.grid.setActive(GTK.is(gridLayerOn.get()));
+        menus.fps.setActive(GTK.is(fpsLayerOn.get()));
     }
 
     private class Bool {
@@ -70,9 +70,7 @@ public class Config {
     }
 
     private void setFpsLayer() {
-        if (layerConfig != null) {
-            layerConfig.setFpsLayer(fpsLayerOn.get());
-        }
+        layerConfig.setFpsLayer(fpsLayerOn.get());
     }
 
     public void setGridLayer(boolean on) {
@@ -82,9 +80,7 @@ public class Config {
     }
 
     private void setGridLayer() {
-        if (layerConfig != null) {
-            layerConfig.setGridLayer(gridLayerOn.get());
-        }
+        layerConfig.setGridLayer(gridLayerOn.get());
     }
 
     public void setCoordsLayer(boolean on) {
@@ -94,9 +90,7 @@ public class Config {
     }
 
     private void setCoordsLayer() {
-        if (layerConfig != null) {
-            layerConfig.setCoordsLayer(coordsLayerOn.get());
-        }
+        layerConfig.setCoordsLayer(coordsLayerOn.get());
     }
 
     public void setScaleBar(boolean on) {
@@ -105,10 +99,7 @@ public class Config {
         }
     }
 
-    public void initMapView(String [] args, MapView mapView) {
-        this.mapView = mapView;
-        this.layerConfig = new LayerConfig(args, mapView);
-
+    public void initMapView() {
         final BoundingBox boundingBox = layerConfig.initLayers();
         mapView.getModel().init(preferences);
         setMapPosition(mapView.getModel(), boundingBox);
@@ -120,13 +111,11 @@ public class Config {
     }
 
     public void setScaleBar() {
-        if (layerConfig != null) {
-            layerConfig.setScaleBar(scaleBarOn.get());
-        }
+        layerConfig.setScaleBar(scaleBarOn.get());
     }
 
     public void save() {
-        if (mapView != null) mapView.getModel().save(preferences);
+        mapView.getModel().save(preferences);
         preferences.save();
     }
 

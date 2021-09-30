@@ -124,12 +124,14 @@ public class FrameBufferHA3 extends FrameBuffer {
          */
         swapBitmaps();
 
+        System.out.println("ping");
         synchronized (this.matrix) {
             Bitmap b = this.odBitmap.lock();
             if (b != null) {
                 graphicContext.drawBitmap(b, this.matrix);
             }
         }
+        System.out.println("pong");
 
         /*
          * Release here so destroy() can free resources

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RenderMapConfig {
-    private List<File> mapFiles = new ArrayList<>();
+    private final List<File> mapFiles = new ArrayList<>();
 
     public RenderMapConfig(String[] args) {
         for (String arg : args) {

@@ -22,6 +22,7 @@ import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
 
 import java.io.IOException;
+import java.util.Map;
 
 import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.exception.AllocationError;
@@ -50,7 +51,6 @@ public final class Samples {
     private final static String APP_NAME = "Mapsforge GTK3 Sample";
     private final static String APP_ICON = "../docs/logo/Mapsforge.svg";
 
-    private final Config config = new Config();
 
      /**
      * Starts the {@code Samples}.
@@ -66,17 +66,17 @@ public final class Samples {
 
     private Samples(String args[]) {
         final var app = new Application(new Str(APP_ID), ApplicationFlags.FLAGS_NONE);
-
         app.onActivate(() -> onActivate(new ApplicationWindow(app), args));
         app.run(1, new Strs(new String[]{APP_NAME}));
     }
 
 
 
-    public void onActivate(ApplicationWindow window, String args[]) {
+    public void onActivate(ApplicationWindow window, String[] args) {
         final var mapView = new MapView();
+        final var config = new Config(args, mapView);
 
-        window.setTitlebar(createHeader(mapView));
+        window.setTitlebar(createHeader(mapView, new Menus(config).menu));
 
         try  {
             window.setIcon(Pixbuf.newFromFilePixbuf(new Str(APP_ICON)));
@@ -87,7 +87,7 @@ public final class Samples {
         window.setDefaultSize(1024, 768);
 
         window.onShow(() -> {
-            config.initMapView(args, mapView);
+            config.initMapView();
         });
 
         window.onDestroy(() -> {
@@ -99,14 +99,14 @@ public final class Samples {
     }
 
 
-    private HeaderBar createHeader(MapView mapView) {
+    private HeaderBar createHeader(MapView mapView, Menu menu) {
         final var header = new HeaderBar();
         header.setShowCloseButton(1);
         header.setTitle(new Str(APP_NAME));
 
         final var menuButton = new MenuButton();
         menuButton.add(Image.newFromIconNameImage(new Str("open-menu-symbolic"), IconSize.BUTTON));
-        menuButton.setPopup(createMenu());
+        menuButton.setPopup(menu);
         header.packEnd(menuButton);
 
         var box = new Box(Orientation.HORIZONTAL, 0);
@@ -126,51 +126,4 @@ public final class Samples {
         return header;
     }
 
-    public class Menus {
-        public final Menu menu;
-        public final CheckMenuItem scale;
-        public final CheckMenuItem coords;
-        public final CheckMenuItem grid;
-        public final CheckMenuItem fps;
-
-        public Menus() {
-            menu = new Menu();
-
-            var raster = new RadioMenuItem(new SList(0));
-            var vector = new RadioMenuItem(raster.getGroup());
-            raster.setLabel(new Str("Raster map"));
-            vector.setLabel(new Str("Vector map"));
-            menu.append(raster);
-            menu.append(vector);
-
-            var separator = new SeparatorMenuItem();
-            menu.append(separator);
-            scale = new CheckMenuItem();
-            scale.setLabel(new Str("Scale bar"));
-            scale.onToggled(() -> config.setScaleBar(GTK.is(scale.getActive())));
-            menu.append(scale);
-
-            fps = new CheckMenuItem();
-            fps.setLabel(new Str("Fps counter"));
-            fps.onToggled(() -> config.setFpsLayer(GTK.is(fps.getActive())));
-            menu.append(fps);
-
-            coords = new CheckMenuItem();
-            coords.setLabel(new Str("Tile coordinates layer"));
-            coords.onToggled(() -> config.setCoordsLayer(GTK.is(coords.getActive())));
-            menu.append(coords);
-
-            grid = new CheckMenuItem();
-            grid.setLabel(new Str("Tile grid layer"));
-            grid.onToggled(() -> config.setGridLayer(GTK.is(grid.getActive())));
-            menu.append(grid);
-
-            menu.showAll();
-        }
-    }
-    private Menu createMenu() {
-        var menus = new Menus();
-        config.setMenus(menus);
-        return menus.menu;
-    }
 }

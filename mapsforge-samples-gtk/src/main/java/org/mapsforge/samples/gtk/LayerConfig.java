@@ -46,7 +46,7 @@ public class LayerConfig {
         mapView.getFpsCounter().setVisible(true);
     }
 
-
+/*
     private BoundingBox initRenderMap(MapView mapView) {
         Layers layers = mapView.getLayerManager().getLayers();
 
@@ -60,6 +60,8 @@ public class LayerConfig {
         return mapDataStore.boundingBox();
 
     }
+
+ */
     private BoundingBox initRasterMap(MapView mapView) {
         Layers layers = mapView.getLayerManager().getLayers();
 
