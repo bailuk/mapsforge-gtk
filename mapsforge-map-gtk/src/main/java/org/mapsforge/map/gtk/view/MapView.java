@@ -25,9 +25,6 @@ import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.Pointer;
-import ch.bailu.gtk.cairo.Context;
-import ch.bailu.gtk.gdk.Gdk;
 import ch.bailu.gtk.glib.Glib;
 import ch.bailu.gtk.gtk.DrawingArea;
 
@@ -177,9 +174,15 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public void repaint() {
+        /**
+         * Repaint requests are coming from the main (UI) thread as well as from
+         * the layer manager worker thread.
+         * Functions from the gtk namespace do not support calls from outside the main (UI) thread.
+         * Glib.idleAdd will add a callback to the main (UI) threads event system.
+         * This callback will then call queueDraw() from within the main (UI) thread.
+         */
         redrawNeeded = true;
         Glib.idleAdd(l -> {
-
             if (redrawNeeded) {
                 redrawNeeded = false;
                 drawingArea.queueDraw();

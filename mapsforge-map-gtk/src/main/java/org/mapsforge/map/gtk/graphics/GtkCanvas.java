@@ -18,7 +18,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void destroy() {
-        System.out.println("GtkCanvas::destroy()");
+        //System.out.println("GtkCanvas::destroy()");
     }
 
     @Override
@@ -87,7 +87,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void drawCircle(int x, int y, int radius, Paint paint) {
-        System.out.println("GtkCanvas::drawCircle()");
+        graphicContext.drawCircle(x,y,radius,paint);
     }
 
     @Override

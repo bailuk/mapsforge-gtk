@@ -15,12 +15,9 @@ import org.mapsforge.map.gtk.util.color.Conv255;
 
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Operator;
-import ch.bailu.gtk.gdk.Gdk;
-import ch.bailu.gtk.gdk.RGBA;
 import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
-import ch.bailu.gtk.pango.Weight;
 import ch.bailu.gtk.pangocairo.Pangocairo;
 import ch.bailu.gtk.wrapper.Str;
 
@@ -94,16 +91,31 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawCircle(int x, int y, int radius, Paint paint) {
-        System.out.println("GraphicContext::drawCircle()");
+        GtkPaint gtkPaint = (GtkPaint) paint;
+
+        if (!paint.isTransparent()) {
+            context.save();
+            setColor(paint.getColor());
+            context.setLineWidth(paint.getStrokeWidth());
+            context.arc(x , y , radius, 0.0, 2 * Math.PI);
+            fillOrStroke(gtkPaint.style);
+            context.restore();
+        }
+        //System.out.println("GraphicContext::drawCircle()");
     }
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2, Paint paint) {
-        setColor(paint.getColor());
-        context.setLineWidth(paint.getStrokeWidth());
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.stroke();
+        if (!paint.isTransparent()) {
+            context.save();
+            setColor(paint.getColor());
+            context.setLineWidth(paint.getStrokeWidth());
+
+            context.moveTo(x1, y1);
+            context.lineTo(x2, y2);
+            context.stroke();
+            context.restore();
+        }
         //System.out.println("GraphicContext::drawLine()");
     }
 
@@ -118,12 +130,16 @@ public class GtkGraphicContext implements GraphicContext {
             setColor(paint.getColor());
             context.setLineWidth(paint.getStrokeWidth());
             p.exec(context);
-            if (gtkPaint.style == Style.FILL) {
-                context.fill();
-            } else {
-                context.stroke();
-            }
+            fillOrStroke(gtkPaint.style);
             context.restore();
+        }
+    }
+
+    private void fillOrStroke(Style style) {
+        if (style == Style.FILL) {
+            context.fill();
+        } else {
+            context.stroke();
         }
     }
 
@@ -165,38 +181,26 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void fillColor(Color color) {
-        switch (color) {
-            case RED:
-                fillColor(1f, 0f,0f, 1f);
-                break;
-            case BLUE:
-                fillColor(0f, 0f,1f, 1f);
-                break;
-            case BLACK:
-                fillColor(1f, 1f,1f, 1f);
-                break;
-            case GREEN:
-                fillColor(0f, 1f,0f, 1f);
-                break;
-            case WHITE:
-                fillColor(0f, 0f,0f, 1f);
-                break;
-            case TRANSPARENT:
-                fillColor(0f, 0f,0f, 0f);
-                break;
-        }
+        fillColor(GtkGraphicFactory.INSTANCE.createColor(color));
     }
-
 
     @Override
     public void fillColor(int color) {
         context.save();
         setColor(color);
-        context.setOperator(Operator.SOURCE);
+        context.setOperator(getSourceFromAlpha(color));
         context.paint();
         context.restore();
     }
 
+
+    private int getSourceFromAlpha(int color) {
+        if (ARGB.alpha(color) == 0) {
+            return Operator.CLEAR;
+        } else {
+            return Operator.SOURCE;
+        }
+    }
 
     private void setColor(int color) {
         ARGB argb = new ARGB(color);
@@ -207,13 +211,6 @@ public class GtkGraphicContext implements GraphicContext {
                 Conv255.toDouble(argb.alpha()));
     }
 
-    public void fillColor(double r, double g, double b, double a) {
-        context.save();
-        context.setSourceRgba(r,g,b,a);
-        context.setOperator(Operator.SOURCE);
-        context.paint();
-        context.restore();
-    }
 
     @Override
     public boolean isAntiAlias() {

@@ -54,17 +54,17 @@ public class GtkGraphicFactory implements GraphicFactory {
         //System.out.println("GtkGraphicFactory::createColor(enum)");
         switch (color) {
             case RED:
-                return new ARGB(255,255,0,0).toInt();
-            case BLUE:
-                return new ARGB(255,0,0,255).toInt();
-            case BLACK:
-                return new ARGB(255,255,255,255).toInt();
+                return 0xFFFF0000;
             case GREEN:
-                return new ARGB(255,0,255,0).toInt();
+                return 0xFF00FF00;
+            case BLUE:
+                return 0xFF0000FF;
+            case BLACK:
+                return 0xFF000000;
             case WHITE:
-                return new ARGB(255,0,0,0).toInt();
+                return 0xFFFFFFFF;
             case TRANSPARENT:
-                return new ARGB(0,0,0,0).toInt();
+                return 0;
         }
         return 0;
     }
@@ -114,7 +114,7 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public ResourceBitmap createResourceBitmap(InputStream inputStream, float scaleFactor, int width, int height, int percent, int hash) throws IOException {
-        System.out.println("GtkGraphicFactory::createResourceBitmap");
+        //System.out.println("GtkGraphicFactory::createResourceBitmap");
         return new GtkBitmap(inputStream, hash,  scaleFactor, width, height, percent);
     }
 

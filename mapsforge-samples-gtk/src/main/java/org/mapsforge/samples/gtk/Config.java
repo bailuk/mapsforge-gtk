@@ -25,6 +25,9 @@ public class Config {
     public Config(String[] args, MapView mapView) {
         this.mapView = mapView;
         this.layerConfig = new LayerConfig(args, mapView);
+        if (!layerConfig.haveVectorMap()) {
+            rasterMapOn.set(true);
+        }
     }
 
     public void setMenus(Menus menus) {

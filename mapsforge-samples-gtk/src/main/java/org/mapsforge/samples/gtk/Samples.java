@@ -23,27 +23,21 @@ import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
 
 import java.io.IOException;
-import java.util.Map;
 
 import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.exception.AllocationError;
 import ch.bailu.gtk.gdkpixbuf.Pixbuf;
 import ch.bailu.gtk.gio.ApplicationFlags;
-import ch.bailu.gtk.glib.Glib;
-import ch.bailu.gtk.glib.SList;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
 import ch.bailu.gtk.gtk.Box;
 import ch.bailu.gtk.gtk.Button;
-import ch.bailu.gtk.gtk.CheckMenuItem;
 import ch.bailu.gtk.gtk.HeaderBar;
 import ch.bailu.gtk.gtk.IconSize;
 import ch.bailu.gtk.gtk.Image;
 import ch.bailu.gtk.gtk.Menu;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.Orientation;
-import ch.bailu.gtk.gtk.RadioMenuItem;
-import ch.bailu.gtk.gtk.SeparatorMenuItem;
 import ch.bailu.gtk.wrapper.Str;
 import ch.bailu.gtk.wrapper.Strs;
 

@@ -87,7 +87,7 @@ public  class GtkBitmap implements Bitmap, ResourceBitmap {
         mustHaveRefCount();
         refCount--;
         if (refCount < 0) {
-            System.out.println("GtkBitmap::destroy()");
+            //System.out.println("GtkBitmap::destroy()");
             surface.destroy();
             context.destroy();
             INSTANCE_COUNT.decrement();

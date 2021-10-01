@@ -5,7 +5,7 @@ public class ARGB implements ColorInterface {
     private int a,r,g,b;
 
     public ARGB(int color) {
-        a = (color >> 24) & 0xff;
+        a = alpha(color);
         r = red(color);
         g = green(color);
         b = blue(color);
@@ -30,6 +30,9 @@ public class ARGB implements ColorInterface {
     }
 
 
+    public static int alpha(int color) {
+        return (color >> 24) & 0xff;
+    }
 
     public static int red(int color) {
         return (color >> 16) & 0xff;
@@ -67,4 +70,5 @@ public class ARGB implements ColorInterface {
         int result = (a & 0xff) << 24 | (r & 0xff) << 16 | (g & 0xff) << 8 | (b & 0xff);
         return result;
     }
+
 }

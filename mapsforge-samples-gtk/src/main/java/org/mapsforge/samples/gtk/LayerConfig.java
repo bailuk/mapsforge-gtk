@@ -41,8 +41,6 @@ public class LayerConfig {
         hillsConfig = new HillsConfig(args);
     }
 
-
-
     public void setCoordsLayer(boolean on) {
         if (on) {
             if (!findLayer(TileCoordinatesLayer.class)) {

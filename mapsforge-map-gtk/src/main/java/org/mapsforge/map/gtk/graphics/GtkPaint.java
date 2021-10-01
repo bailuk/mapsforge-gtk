@@ -10,11 +10,11 @@ import org.mapsforge.core.graphics.Join;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Point;
+import org.mapsforge.map.gtk.util.color.ARGB;
 
 public class GtkPaint implements Paint {
     private int color;
     private float strokeWidth;
-    private boolean transparent=false;
     private GtkBitmap bitmapShader;
     private Point bitmapShaderShift = null;
 
@@ -45,7 +45,8 @@ public class GtkPaint implements Paint {
     }
 
     public GtkPaint() {
-
+        this.style = Style.FILL;
+        this.color = GtkGraphicFactory.INSTANCE.createColor(Color.BLACK);
     }
 
     @Override
@@ -70,7 +71,7 @@ public class GtkPaint implements Paint {
 
     @Override
     public boolean isTransparent() {
-        return transparent;
+        return ARGB.alpha(color) == 0;
     }
 
     @Override
