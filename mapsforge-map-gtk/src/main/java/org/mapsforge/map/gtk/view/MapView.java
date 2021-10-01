@@ -25,7 +25,10 @@ import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
 import ch.bailu.gtk.GTK;
+import ch.bailu.gtk.Pointer;
 import ch.bailu.gtk.cairo.Context;
+import ch.bailu.gtk.gdk.Gdk;
+import ch.bailu.gtk.glib.Glib;
 import ch.bailu.gtk.gtk.DrawingArea;
 
 public class MapView implements org.mapsforge.map.view.MapView{
@@ -80,6 +83,9 @@ public class MapView implements org.mapsforge.map.view.MapView{
         });
 
         new MouseEvents(this, drawingArea);
+
+
+
     }
 
     @Override
@@ -167,9 +173,19 @@ public class MapView implements org.mapsforge.map.view.MapView{
         return dimension.width;
     }
 
+    private boolean redrawNeeded = false;
+
     @Override
     public void repaint() {
-        drawingArea.queueDraw();
+        redrawNeeded = true;
+        Glib.idleAdd(l -> {
+
+            if (redrawNeeded) {
+                redrawNeeded = false;
+                drawingArea.queueDraw();
+            }
+            return GTK.FALSE;
+        }, 0);
     }
 
     @Override

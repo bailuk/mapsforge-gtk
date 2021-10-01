@@ -17,6 +17,7 @@ package org.mapsforge.map.view;
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.model.Dimension;
+import org.mapsforge.core.util.Log;
 
 import java.util.logging.Logger;
 
@@ -141,6 +142,7 @@ class FrameBufferBitmapHA3 {
     }
 
     Bitmap lock() {
+        Log.log(this, "frameLock::in");
         synchronized (frameLock) {
             if (frameLock.isUnlocked()) {
                 createBitmapIfRequested();
@@ -148,14 +150,18 @@ class FrameBufferBitmapHA3 {
                     frameLock.lock();
                 }
             }
+            Log.log(this, "frameLock::out");
             return bitmap;
         }
+
     }
 
     void release() {
+        Log.log(this, "frameLock::release::in");
         synchronized (frameLock) {
             frameLock.unlock();
         }
+        Log.log(this, "frameLock::release::out");
     }
 
     static void swap(FrameBufferBitmapHA3 a, FrameBufferBitmapHA3 b) {

@@ -4,6 +4,7 @@
  * Copyright 2014 Ludwig M Brinckmann
  * Copyright 2014-2020 devemux86
  * Copyright 2017 usrusr
+ * Copyright 2021 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -28,6 +29,7 @@ import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.exception.AllocationError;
 import ch.bailu.gtk.gdkpixbuf.Pixbuf;
 import ch.bailu.gtk.gio.ApplicationFlags;
+import ch.bailu.gtk.glib.Glib;
 import ch.bailu.gtk.glib.SList;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
