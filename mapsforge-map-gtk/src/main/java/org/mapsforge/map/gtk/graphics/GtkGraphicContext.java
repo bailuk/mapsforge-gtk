@@ -14,6 +14,7 @@ import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
 
 import ch.bailu.gtk.cairo.Context;
+import ch.bailu.gtk.cairo.Extend;
 import ch.bailu.gtk.cairo.Operator;
 import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
@@ -124,14 +125,25 @@ public class GtkGraphicContext implements GraphicContext {
         if (!paint.isTransparent() && !path.isEmpty()) {
             GtkPaint gtkPaint = (GtkPaint) paint;
             GtkPath gtkPath = (GtkPath) path;
-            
-            context.save();
-            var res = setLineAndColor(gtkPaint);
-            context.setFillRule(gtkPath.getFillRule());
-            gtkPath.exec(context);
-            fillOrStroke(gtkPaint.getStyle());
-            context.restore();
-            destroyResources(res);
+            if (gtkPaint.getBitmapShader() == null) {
+                context.save();
+                var res = setLineAndColor(gtkPaint);
+                context.setFillRule(gtkPath.getFillRule());
+                gtkPath.exec(context);
+                fillOrStroke(gtkPaint.getStyle());
+                context.restore();
+                destroyResources(res);
+
+            } else {
+                context.save();
+                gtkPath.exec(context);
+                context.clip();
+                context.newPath();
+                context.setSourceSurface(gtkPaint.getBitmapShader().getSurface(),gtkPaint.getBitmapShaderShift().x,gtkPaint.getBitmapShaderShift().y);
+                context.getSource().setExtend(Extend.REPEAT);
+                context.paint();
+                context.restore();
+            }
         }
     }
 
@@ -165,8 +177,8 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawPathText(String text, Path path, Paint paint) {
-        this.drawPath(path, paint);
-        System.out.println("GraphicContext::drawPathText()");
+        GtkPath gtkPath = (GtkPath) path;
+        drawText(text, (int)gtkPath.getX(), (int)gtkPath.getY(), paint);
     }
 
     @Override
@@ -178,13 +190,13 @@ public class GtkGraphicContext implements GraphicContext {
         final FontDescription fontDescription = Pango.fontDescriptionFromString(strFont);
         final Layout layout = Pangocairo.createLayout(context);
 
-        layout.setText(strText, text.length());
+        layout.setText(strText, strText.getSize());
         layout.setFontDescription(fontDescription);
         layout.setAlignment(gtkPaint.getTextAlignment());
 
         context.save();
         context.setLineWidth(paint.getStrokeWidth());
-        context.moveTo(x,y - gtkPaint.getFontSize());
+        context.moveTo(x,y - gtkPaint.getFontSize()/100*130);
         Pangocairo.layoutPath(context,layout);
         setColor(paint.getColor());
         context.fillPreserve();
@@ -263,8 +275,6 @@ public class GtkGraphicContext implements GraphicContext {
         context.newPath();
         context.rectangle(left,top,width,height);
         context.clip();
-
-        //System.out.println("GraphicContext::setClip()");
     }
 
     @Override
@@ -304,7 +314,6 @@ public class GtkGraphicContext implements GraphicContext {
 
 
         context.clip();
-        //System.out.println("GraphicContext::setClipDifference()");
     }
 
     @Override

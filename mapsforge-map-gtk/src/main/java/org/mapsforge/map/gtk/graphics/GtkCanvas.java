@@ -31,9 +31,7 @@ public class GtkCanvas implements Canvas {
 
 
     @Override
-    public void destroy() {
-        //System.out.println("GtkCanvas::destroy()");
-    }
+    public void destroy() {}
 
     @Override
     public synchronized Dimension getDimension() {
@@ -52,7 +50,6 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void setBitmap(Bitmap bitmap) {
-        //System.out.println("GtkCanvas::setBitmap()");
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
         graphicContext = new GtkGraphicContext(gtkBitmap.getContext(), getWidth(), getHeight());
         dimension = new Dimension(bitmap.getWidth(), bitmap.getHeight());
@@ -61,7 +58,6 @@ public class GtkCanvas implements Canvas {
     @Override
     public synchronized void drawBitmap(Bitmap bitmap, int left, int top) {
         graphicContext.drawBitmap(bitmap, left, top);
-        //System.out.println("GtkCanvas::drawBitmap()");
     }
 
     @Override
@@ -75,7 +71,6 @@ public class GtkCanvas implements Canvas {
     @Override
     public synchronized void drawBitmap(Bitmap bitmap, Matrix matrix) {
         graphicContext.drawBitmap(bitmap, matrix);
-        //System.out.println("GtkCanvas::drawBitmap(matrix)");
     }
 
     @Override
@@ -84,7 +79,6 @@ public class GtkCanvas implements Canvas {
             System.out.println("GtkCanvas::drawBitmap(matrix, "+ alpha + ", " + filter + ")");
         }
         drawBitmap(bitmap, matrix);
-
     }
 
     @Override
@@ -116,7 +110,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void drawPathText(String text, Path path, Paint paint) {
-        graphicContext.drawPath(path, paint);
+        graphicContext.drawPathText(text, path, paint);
     }
 
     @Override

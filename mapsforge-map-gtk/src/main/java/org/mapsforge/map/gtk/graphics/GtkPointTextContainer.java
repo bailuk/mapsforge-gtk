@@ -1,12 +1,15 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Canvas;
+import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Display;
 import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.GraphicUtils;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
+import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.graphics.Position;
+import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.mapelements.PointTextContainer;
 import org.mapsforge.core.mapelements.SymbolContainer;
 import org.mapsforge.core.model.Point;
@@ -60,11 +63,29 @@ public class GtkPointTextContainer extends PointTextContainer {
         GtkCanvas gtkCanvas = (GtkCanvas) canvas;
         final Point pointAdjusted = this.xy.offset(-origin.x, -origin.y);
 
+        showBoundry(canvas, boundary, pointAdjusted);
+
         if (isMultiLine()) {
             drawMultiLine(gtkCanvas, pointAdjusted, filter);
         } else {
             drawSingleLine(gtkCanvas, pointAdjusted, filter);
         }
+    }
+
+    private void showBoundry(Canvas canvas, Rectangle boundary, Point offset) {
+        final Rectangle rect = boundary.shift(offset);
+
+        Path path = GtkGraphicFactory.INSTANCE.createPath();
+        path.moveTo((float) rect.left, (float)rect.top);
+        path.lineTo((float)rect.right, (float)rect.top);
+        path.lineTo((float)rect.right, (float)rect.bottom);
+        path.lineTo((float)rect.left, (float)rect.bottom);
+        path.lineTo((float)rect.left, (float)rect.top);
+        Paint paint = GtkGraphicFactory.INSTANCE.createPaint();
+        paint.setStyle(Style.STROKE);
+        paint.setColor(Color.RED);
+        paint.setStrokeWidth(2f);
+        canvas.drawPath(path, paint);
     }
 
     private void drawMultiLine(GtkCanvas gtkCanvas, Point point, Filter filter) {

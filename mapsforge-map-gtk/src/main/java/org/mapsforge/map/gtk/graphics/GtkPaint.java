@@ -21,7 +21,7 @@ public class GtkPaint implements Paint {
     private int color;
     private float strokeWidth;
     private GtkBitmap bitmapShader;
-    //private Point bitmapShaderShift = null;
+    private Point bitmapShaderShift = new Point(0,0);
 
     private FontFamily fontFamily;
     private FontStyle fontStyle;
@@ -37,8 +37,8 @@ public class GtkPaint implements Paint {
         GtkPaint other = (GtkPaint) paint;
         this.color = other.color;
         this.strokeWidth = other.strokeWidth;
-        //this.bitmapShader = other.bitmapShader;
-        //this.bitmapShaderShift = other.bitmapShaderShift;
+        this.bitmapShader = other.bitmapShader;
+        this.bitmapShaderShift = other.bitmapShaderShift;
         this.fontStyle = other.fontStyle;
         this.fontFamily = other.fontFamily;
         this.fontSize = other.fontSize;
@@ -76,20 +76,34 @@ public class GtkPaint implements Paint {
 
     @Override
     public boolean isTransparent() {
-        return ARGB.alpha(color) == 0;
+        return bitmapShader == null && ARGB.alpha(color) == 0;
     }
 
     @Override
     public void setBitmapShader(Bitmap bitmap) {
-        System.out.println("GtkPaint::setBitmapShader");
-        //bitmapShader = (GtkBitmap) bitmap;
+        if (bitmapShader != null) {
+            bitmapShader.decrementRefCount();
+            bitmapShader = null;
+        }
+        if (bitmap != null) {
+            bitmapShader = (GtkBitmap) bitmap;
+            bitmapShader.incrementRefCount();
+        }
+    }
+
+    public GtkBitmap getBitmapShader() {
+        return bitmapShader;
     }
 
     @Override
     public void setBitmapShaderShift(Point origin) {
-        System.out.println("GtkPaint::setBitmapShaderShift");
+        //System.out.println("GtkPaint::setBitmapShaderShift");
+        bitmapShaderShift = origin;
     }
 
+    public Point getBitmapShaderShift() {
+        return bitmapShaderShift;
+    }
     @Override
     public void setColor(Color color) {
         this.color = GtkGraphicFactory.INSTANCE.createColor(color);
