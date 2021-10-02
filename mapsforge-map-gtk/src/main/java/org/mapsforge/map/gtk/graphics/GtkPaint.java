@@ -12,40 +12,45 @@ import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.map.gtk.util.color.ARGB;
 
+import ch.bailu.gtk.cairo.CairoConstants;
+import ch.bailu.gtk.cairo.LineCap;
+import ch.bailu.gtk.cairo.LineJoin;
+import ch.bailu.gtk.pango.Alignment;
+
 public class GtkPaint implements Paint {
     private int color;
     private float strokeWidth;
     private GtkBitmap bitmapShader;
-    private Point bitmapShaderShift = null;
+    //private Point bitmapShaderShift = null;
 
     private FontFamily fontFamily;
     private FontStyle fontStyle;
-    private float textSize;
+    private float fontSize = 10;
+    private Align textAlign = Align.LEFT;
 
-    private Align textAlign;
-    Style style;
-    private float[] dashPathEffect;
-    private Cap strokeCap;
-    private Join strokeJoin;
+    private Style style;
+    private float[] dashes;
+    private int strokeCap;
+    private int strokeJoin;
 
     public GtkPaint(Paint paint) {
         GtkPaint other = (GtkPaint) paint;
         this.color = other.color;
         this.strokeWidth = other.strokeWidth;
-        this.bitmapShader = other.bitmapShader;
-        this.bitmapShaderShift = other.bitmapShaderShift;
+        //this.bitmapShader = other.bitmapShader;
+        //this.bitmapShaderShift = other.bitmapShaderShift;
         this.fontStyle = other.fontStyle;
         this.fontFamily = other.fontFamily;
-        this.textSize = other.textSize;
+        this.fontSize = other.fontSize;
         this.textAlign = other.textAlign;
         this.style = other.style;
-        this.dashPathEffect = other.dashPathEffect;
+        this.dashes = other.dashes;
         this.strokeCap = other.strokeCap;
         this.strokeJoin = other.strokeJoin;
     }
 
     public GtkPaint() {
-        this.style = Style.FILL;
+        this.style = Style.STROKE;
         this.color = GtkGraphicFactory.INSTANCE.createColor(Color.BLACK);
     }
 
@@ -61,12 +66,12 @@ public class GtkPaint implements Paint {
 
     @Override
     public int getTextHeight(String text) {
-        return 12;
+        return (int) (fontSize + 3f);
     }
 
     @Override
     public int getTextWidth(String text) {
-        return 20;
+        return (int) ((fontSize * text.length()) + 5f);
     }
 
     @Override
@@ -76,12 +81,13 @@ public class GtkPaint implements Paint {
 
     @Override
     public void setBitmapShader(Bitmap bitmap) {
-        bitmapShader = (GtkBitmap) bitmap;
+        System.out.println("GtkPaint::setBitmapShader");
+        //bitmapShader = (GtkBitmap) bitmap;
     }
 
     @Override
     public void setBitmapShaderShift(Point origin) {
-        bitmapShaderShift = origin;
+        System.out.println("GtkPaint::setBitmapShaderShift");
     }
 
     @Override
@@ -96,17 +102,53 @@ public class GtkPaint implements Paint {
 
     @Override
     public void setDashPathEffect(float[] strokeDasharray) {
-        dashPathEffect = strokeDasharray;
+        //System.out.println("GtkPaint::setDashPathEffect");
+        dashes = strokeDasharray;
+    }
+
+    public float[] getDashPathEffect() {
+        return dashes;
     }
 
     @Override
     public void setStrokeCap(Cap cap) {
-        strokeCap = cap;
+        switch (cap) {
+            case ROUND:
+                strokeCap = LineCap.ROUND;
+                break;
+            case SQUARE:
+                strokeCap = LineCap.SQUARE;
+                break;
+            case BUTT:
+            default:
+                strokeCap = LineCap.BUTT;
+                break;
+        }
+    }
+
+    public int getStrokeCap() {
+        return strokeCap;
     }
 
     @Override
     public void setStrokeJoin(Join join) {
-        strokeJoin = join;
+        switch (join) {
+            case BEVEL:
+                strokeJoin = LineJoin.BEVEL;
+                break;
+            case MITER:
+                strokeJoin = LineJoin.MITER;
+                break;
+            case ROUND:
+            default:
+                strokeJoin = LineJoin.ROUND;
+                break;
+        }
+    }
+
+
+    public int getStrokeJoin() {
+        return strokeJoin;
     }
 
     @Override
@@ -126,12 +168,71 @@ public class GtkPaint implements Paint {
 
     @Override
     public void setTextSize(float textSize) {
-        this.textSize = textSize;
+        this.fontSize = textSize;
     }
 
     @Override
     public void setTypeface(FontFamily fontFamily, FontStyle fontStyle) {
         this.fontFamily = fontFamily;
         this.fontStyle = fontStyle;
+    }
+
+    public String getFontDescription() {
+        StringBuilder result = new StringBuilder();
+        switch (fontFamily) {
+            case DEFAULT:
+            case SANS_SERIF:
+                result.append("sans");
+                break;
+            case MONOSPACE:
+                result.append("mono");
+                break;
+            case SERIF:
+                result.append("serif");
+                break;
+        }
+
+        switch (fontStyle) {
+            case BOLD:
+                result.append(" bold");
+                break;
+            case BOLD_ITALIC:
+                result.append(" bold italic");
+                break;
+            case ITALIC:
+                result.append(" italic");
+                break;
+            case NORMAL:
+                result.append(" normal");
+                break;
+        }
+
+        result.append(" ");
+        result.append(fontSize);
+        return result.toString();
+    }
+
+    public float getFontSize() {
+        return fontSize;
+    }
+
+    public int getTextAlignment() {
+        int result = Alignment.LEFT;
+        switch (textAlign) {
+            case CENTER:
+                result = Alignment.CENTER;
+                break;
+            case LEFT:
+                result = Alignment.LEFT;
+                break;
+            case RIGHT:
+                result = Alignment.RIGHT;
+                break;
+        }
+        return result;
+    }
+
+    public Style getStyle() {
+        return style;
     }
 }

@@ -1,10 +1,8 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Canvas;
-import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Display;
 import org.mapsforge.core.graphics.Filter;
-import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.graphics.GraphicUtils;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
@@ -13,14 +11,6 @@ import org.mapsforge.core.mapelements.PointTextContainer;
 import org.mapsforge.core.mapelements.SymbolContainer;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
-
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineBreakMeasurer;
-import java.awt.font.TextAttribute;
-import java.awt.font.TextLayout;
-import java.awt.geom.AffineTransform;
-import java.text.AttributedCharacterIterator;
-import java.text.AttributedString;
 
 public class GtkPointTextContainer extends PointTextContainer {
     /**
@@ -37,21 +27,76 @@ public class GtkPointTextContainer extends PointTextContainer {
      * @param position
      * @param maxTextWidth
      */
-    protected GtkPointTextContainer(Point point, Display display, int priority, String text, Paint paintFront, Paint paintBack, SymbolContainer symbolContainer, Position position, int maxTextWidth) {
+    protected GtkPointTextContainer(
+            Point point,
+            Display display,
+            int priority,
+            String text,
+            Paint paintFront,
+            Paint paintBack,
+            SymbolContainer symbolContainer,
+            Position position,
+            int maxTextWidth) {
         super(point, display, priority, text, paintFront, paintBack, symbolContainer, position, maxTextWidth);
         this.boundary = computeBoundary();
     }
 
     @Override
     public void draw(Canvas canvas, Point origin, Matrix matrix, Filter filter) {
-        Point point = this.xy.offset(-origin.x, -origin.y);
+        if (canDraw()) {
+            doDraw(canvas, origin, filter);
+        }
+    }
 
+    private boolean canDraw() {
+        return havePaint(paintBack) || havePaint(paintFront);
+    }
+
+    private boolean havePaint(Paint paint) {
+        return paint != null && !paint.isTransparent();
+    }
+
+    private void doDraw(Canvas canvas, Point origin, Filter filter) {
         GtkCanvas gtkCanvas = (GtkCanvas) canvas;
-        gtkCanvas.drawText(text, (int)point.x,(int)point.y, paintBack);
-        gtkCanvas.drawText(text, (int)point.x,(int)point.y, paintFront);
+        final Point pointAdjusted = this.xy.offset(-origin.x, -origin.y);
+
+        if (isMultiLine()) {
+            drawMultiLine(gtkCanvas, pointAdjusted, filter);
+        } else {
+            drawSingleLine(gtkCanvas, pointAdjusted, filter);
+        }
+    }
+
+    private void drawMultiLine(GtkCanvas gtkCanvas, Point point, Filter filter) {
+        System.out.println("GtkPaintTextContainer::drawMultiLine");
+        System.out.println(text);
     }
 
 
+    private void drawSingleLine(GtkCanvas canvas, Point point, Filter filter) {
+        drawSingleLine(canvas,point,filter,paintBack);
+        drawSingleLine(canvas,point,filter,paintFront);
+    }
+
+    private void drawSingleLine(GtkCanvas canvas, Point point, Filter filter, Paint paint) {
+        if (paint != null) {
+            int color = paint.getColor();
+            setFilterColor(paint, filter);
+            canvas.drawText(this.text, (int) (point.x + boundary.left), (int) (point.y + boundary.top + this.textHeight), paint);
+            paint.setColor(color);
+        }
+
+    }
+    private static void setFilterColor(Paint paint, Filter filter) {
+        if (paint != null) {
+            paint.setColor(GraphicUtils.filterColor(paint.getColor(),filter));
+        }
+    }
+
+
+    private boolean isMultiLine() {
+        return textWidth > maxTextWidth;
+    }
     private Rectangle computeBoundary() {
         int lines = this.textWidth / maxTextWidth + 1;
         double boxWidth = this.textWidth;
@@ -81,10 +126,8 @@ public class GtkPointTextContainer extends PointTextContainer {
             case LEFT:
                 return new Rectangle(-boxWidth, -boxHeight / 2f, 0, boxHeight / 2f);
             case RIGHT:
-                return new Rectangle(0, -boxHeight / 2f, boxWidth, boxHeight / 2f);
             default:
-                break;
+                return new Rectangle(0, -boxHeight / 2f, boxWidth, boxHeight / 2f);
         }
-        return null;
     }
 }

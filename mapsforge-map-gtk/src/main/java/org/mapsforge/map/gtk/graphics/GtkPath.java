@@ -1,3 +1,17 @@
+/*
+ * Copyright 2021 Lukas Bai
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.FillRule;
@@ -10,30 +24,29 @@ import ch.bailu.gtk.cairo.Context;
 
 public class GtkPath implements Path {
     private int fillRule = ch.bailu.gtk.cairo.FillRule.WINDING;
-
-    private final List<Command> commands = new ArrayList<>(20);
+    private final List<Command> commands = new ArrayList<>();
 
     private abstract static class Command {
-        public abstract void exec(Context ctx);
-    }
+        final float x, y;
 
-    private static class LineTo extends Command {
-        private final float x, y;
-        public LineTo(float x, float y) {
+        public Command(float x, float y) {
             this.x = x;
             this.y = y;
+        }
+        public abstract void exec(Context ctx);
+    }
+    private static class LineTo extends Command {
+        public LineTo(float x, float y) {
+            super(x,y);
         }
         @Override
         public void exec(Context c) {
             c.lineTo(x,y);
         }
     }
-
     private static class MoveTo extends Command {
-        private final float x, y;
         public MoveTo(float x, float y) {
-            this.x = x;
-            this.y = y;
+            super(x,y);
         }
         @Override
         public void exec(Context c) {
@@ -48,11 +61,13 @@ public class GtkPath implements Path {
         }
     }
 
+    public int getFillRule() {
+        return fillRule;
+    }
 
     @Override
     public void clear() {
         commands.clear();
-        //System.out.println("GtkPath::clear()");
     }
 
     @Override
@@ -63,20 +78,16 @@ public class GtkPath implements Path {
     @Override
     public boolean isEmpty() {
         return commands.isEmpty();
-        //System.out.println("GtkPath::isEmpty()");
-        //return false;
     }
 
     @Override
     public void lineTo(float x, float y) {
         commands.add(new LineTo(x, y));
-        //System.out.println("GtkPath::lineTo()");
     }
 
     @Override
     public void moveTo(float x, float y) {
         commands.add(new MoveTo(x,y));
-        //System.out.println("GtkPath::moveTo()");
     }
 
     @Override
@@ -84,9 +95,8 @@ public class GtkPath implements Path {
         if (fillRule == FillRule.EVEN_ODD) {
             this.fillRule = ch.bailu.gtk.cairo.FillRule.EVEN_ODD;
 
-        } else if (fillRule == FillRule.NON_ZERO) {
+        } else {
             this.fillRule = ch.bailu.gtk.cairo.FillRule.WINDING;
         }
-        //System.out.println("GtkPath::setFillRule()");
     }
 }

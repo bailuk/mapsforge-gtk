@@ -1,3 +1,17 @@
+/*
+ * Copyright 2021 Lukas Bai
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
@@ -93,25 +107,21 @@ public class GtkCanvas implements Canvas {
     @Override
     public synchronized void drawLine(int x1, int y1, int x2, int y2, Paint paint) {
         graphicContext.drawLine(x1,y1, x2, y2, paint);
-        //System.out.println("GtkCanvas::drawLine()");
     }
 
     @Override
     public synchronized void drawPath(Path path, Paint paint) {
         graphicContext.drawPath(path, paint);
-        //System.out.println("GtkCanvas::drawPath()");
     }
 
     @Override
     public synchronized void drawPathText(String text, Path path, Paint paint) {
         graphicContext.drawPath(path, paint);
-        //System.out.println("GtkCanvas::drawPathText()");
     }
 
     @Override
     public synchronized void drawText(String text, int x, int y, Paint paint) {
         graphicContext.drawText(text, x, y, paint);
-        //System.out.println("GtkCanvas::drawText()");
     }
 
     @Override
@@ -122,13 +132,11 @@ public class GtkCanvas implements Canvas {
     @Override
     public synchronized void fillColor(Color color) {
         graphicContext.fillColor(color);
-        //System.out.println("GtkCanvas::fillColor()");
     }
 
     @Override
     public synchronized void fillColor(int color) {
         graphicContext.fillColor(color);
-        //System.out.println("GtkCanvas::fillColor()");
     }
 
     @Override
@@ -146,7 +154,6 @@ public class GtkCanvas implements Canvas {
     @Override
     public synchronized void resetClip() {
         graphicContext.resetClip();
-        //System.out.println("GtkCanvas::resetClip()");
     }
 
     @Override
@@ -157,18 +164,16 @@ public class GtkCanvas implements Canvas {
     @Override
     public synchronized void setClip(int left, int top, int width, int height) {
         graphicContext.setClip(left, top,width,height);
-        //System.out.println("GtkCanvas::setclip()");
     }
 
     @Override
     public void setClip(int left, int top, int width, int height, boolean intersect) {
-        System.out.println("GtkCanvas::setClip()");
+        System.out.println("GtkCanvas::setClip(intersect)");
     }
 
     @Override
     public synchronized void setClipDifference(int left, int top, int width, int height) {
         graphicContext.setClipDifference(left,top,width, height);
-        //System.out.println("GtkCanvas::setClipDifference()");
     }
 
     @Override

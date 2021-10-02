@@ -19,6 +19,7 @@ import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
 import ch.bailu.gtk.pangocairo.Pangocairo;
+import ch.bailu.gtk.wrapper.Dbls;
 import ch.bailu.gtk.wrapper.Str;
 
 public class GtkGraphicContext implements GraphicContext {
@@ -91,54 +92,73 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawCircle(int x, int y, int radius, Paint paint) {
-        GtkPaint gtkPaint = (GtkPaint) paint;
-
         if (!paint.isTransparent()) {
+            GtkPaint gtkPaint = (GtkPaint) paint;
+            
             context.save();
-            setColor(paint.getColor());
-            context.setLineWidth(paint.getStrokeWidth());
+            var res = setLineAndColor(gtkPaint);
             context.arc(x , y , radius, 0.0, 2 * Math.PI);
-            fillOrStroke(gtkPaint.style);
+            fillOrStroke(gtkPaint.getStyle());
             context.restore();
+            destroyResources(res);
         }
-        //System.out.println("GraphicContext::drawCircle()");
     }
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2, Paint paint) {
         if (!paint.isTransparent()) {
+            GtkPaint gtkPaint = (GtkPaint) paint;
+            
             context.save();
-            setColor(paint.getColor());
-            context.setLineWidth(paint.getStrokeWidth());
-
+            var res = setLineAndColor(gtkPaint);
             context.moveTo(x1, y1);
             context.lineTo(x2, y2);
             context.stroke();
             context.restore();
+            destroyResources(res);
         }
-        //System.out.println("GraphicContext::drawLine()");
     }
 
     @Override
     public void drawPath(Path path, Paint paint) {
-        GtkPaint gtkPaint = (GtkPaint) paint;
-
-        if (!gtkPaint.isTransparent() && !path.isEmpty()) {
-            GtkPath p = (GtkPath) path;
+        if (!paint.isTransparent() && !path.isEmpty()) {
+            GtkPaint gtkPaint = (GtkPaint) paint;
+            GtkPath gtkPath = (GtkPath) path;
+            
             context.save();
-
-            setColor(paint.getColor());
-            context.setLineWidth(paint.getStrokeWidth());
-            p.exec(context);
-            fillOrStroke(gtkPaint.style);
+            var res = setLineAndColor(gtkPaint);
+            context.setFillRule(gtkPath.getFillRule());
+            gtkPath.exec(context);
+            fillOrStroke(gtkPaint.getStyle());
             context.restore();
+            destroyResources(res);
         }
+    }
+
+
+    private Dbls setLineAndColor(GtkPaint paint) {
+        float dashes[] = paint.getDashPathEffect();
+        Dbls res = null;
+
+        setColor(paint.getColor());
+        context.setLineWidth(paint.getStrokeWidth());
+        context.setLineCap(paint.getStrokeCap());
+        context.setLineJoin(paint.getStrokeJoin());
+        if (dashes != null && dashes.length > 0) {
+            res = new Dbls(dashes);
+            context.setDash(res, dashes.length, 0d);
+        }
+        return res;
+    }
+
+    private static void destroyResources(Dbls dbls) {
+        if (dbls != null) dbls.destroy();
     }
 
     private void fillOrStroke(Style style) {
         if (style == Style.FILL) {
             context.fill();
-        } else {
+        } else if (style == Style.STROKE){
             context.stroke();
         }
     }
@@ -151,27 +171,30 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawText(String text, int x, int y, Paint paint) {
-        Str txt = new Str(text);
-        Str dsc = new Str("sans 10");
 
-        Layout layout = Pangocairo.createLayout(context);
-        layout.setText(txt, text.length());
-        FontDescription desc = Pango.fontDescriptionFromString(dsc);
-        layout.setFontDescription(desc);
-        desc.free();
+        final GtkPaint gtkPaint = (GtkPaint) paint;
+        final Str strText = new Str(text);
+        final Str strFont = new Str(gtkPaint.getFontDescription());
+        final FontDescription fontDescription = Pango.fontDescriptionFromString(strFont);
+        final Layout layout = Pangocairo.createLayout(context);
 
+        layout.setText(strText, text.length());
+        layout.setFontDescription(fontDescription);
+        layout.setAlignment(gtkPaint.getTextAlignment());
+
+        context.save();
         context.setLineWidth(paint.getStrokeWidth());
-        context.moveTo(x,y-12);
+        context.moveTo(x,y - gtkPaint.getFontSize());
         Pangocairo.layoutPath(context,layout);
-        layout.unref();
-
         setColor(paint.getColor());
-
         context.fillPreserve();
         context.stroke();
+        context.restore();
 
-        //txt.destroy();
-        //dsc.destroy();
+        layout.unref();
+        fontDescription.free();
+        strText.destroy();
+        strFont.destroy();
     }
 
     @Override
