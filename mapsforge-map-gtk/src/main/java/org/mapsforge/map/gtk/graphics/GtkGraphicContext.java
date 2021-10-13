@@ -20,8 +20,9 @@ import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
 import ch.bailu.gtk.pangocairo.Pangocairo;
-import ch.bailu.gtk.wrapper.Dbls;
-import ch.bailu.gtk.wrapper.Str;
+import ch.bailu.gtk.type.Dbls;
+import ch.bailu.gtk.type.Str;
+
 
 public class GtkGraphicContext implements GraphicContext {
 

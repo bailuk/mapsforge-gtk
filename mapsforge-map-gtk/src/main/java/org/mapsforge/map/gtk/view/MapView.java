@@ -188,7 +188,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
                 drawingArea.queueDraw();
             }
             return GTK.FALSE;
-        }, 0);
+        }, null);
     }
 
     @Override

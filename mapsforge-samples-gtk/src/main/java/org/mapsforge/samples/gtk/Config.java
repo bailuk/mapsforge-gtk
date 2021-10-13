@@ -38,8 +38,8 @@ public class Config {
         menus.raster.setActive(GTK.is(rasterMapOn.get()));
         menus.vector.setActive(GTK.is(!rasterMapOn.get()));
         menus.vector.setSensitive(GTK.is(layerConfig.haveVectorMap()));
+        menus.debug.setActive(GTK.is(debugOn.get()));
     }
-
 
     private class Bool {
         private final String key;
@@ -69,6 +69,7 @@ public class Config {
     private final Bool gridLayerOn = new Bool("gridLayerOn", false);
     private final Bool fpsLayerOn = new Bool("fpsLayerOn", false);
     private final Bool rasterMapOn = new Bool("rasterMapOn", true);
+    private final Bool debugOn = new Bool("debugOn", true);
 
 
     public void setVectorMap() {
@@ -89,6 +90,14 @@ public class Config {
         if (fpsLayerOn.set(on)) {
             setFpsLayer();
         }
+    }
+
+    public boolean getDrawDebug() {
+        return debugOn.get();
+    }
+
+    public void setDrawDebug(boolean on) {
+        debugOn.set(on);
     }
 
     private void setFpsLayer() {

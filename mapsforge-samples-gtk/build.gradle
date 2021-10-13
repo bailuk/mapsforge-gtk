@@ -1,5 +1,8 @@
 apply plugin: 'application'
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 dependencies {
     implementation project(":mapsforge-map-gtk")
     implementation project(":mapsforge-themes")
@@ -7,11 +10,12 @@ dependencies {
     testImplementation "junit:junit:$jUnitVersion"
 }
 
-
 repositories {
     mavenLocal()
 }
+
 mainClassName = "org.mapsforge.samples.gtk.Samples"
+
 run {
     if (project.hasProperty("args")) {
         args project.getProperty("args").split(",")

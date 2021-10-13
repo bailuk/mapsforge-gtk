@@ -6,7 +6,7 @@ import ch.bailu.gtk.gtk.CheckMenuItem;
 import ch.bailu.gtk.gtk.Menu;
 import ch.bailu.gtk.gtk.RadioMenuItem;
 import ch.bailu.gtk.gtk.SeparatorMenuItem;
-import ch.bailu.gtk.wrapper.Str;
+import ch.bailu.gtk.type.Str;
 
 public class Menus {
 
@@ -15,6 +15,7 @@ public class Menus {
     public final CheckMenuItem coords;
     public final CheckMenuItem grid;
     public final CheckMenuItem fps;
+    public final CheckMenuItem debug;
     public final RadioMenuItem raster, vector;
 
     public Menus(Config config) {
@@ -35,8 +36,7 @@ public class Menus {
         menu.append(raster);
         menu.append(vector);
 
-
-        var separator = new SeparatorMenuItem();
+        SeparatorMenuItem separator = new SeparatorMenuItem();
         menu.append(separator);
         scale = new CheckMenuItem();
         scale.setLabel(new Str("Scale bar"));
@@ -57,6 +57,11 @@ public class Menus {
         grid.setLabel(new Str("Tile grid layer"));
         grid.onToggled(() -> config.setGridLayer(GTK.is(grid.getActive())));
         menu.append(grid);
+
+        debug = new CheckMenuItem();
+        debug.setLabel(new Str("Draw debug structures"));
+        debug.onToggled((() -> config.setDrawDebug(GTK.is(debug.getActive()))));
+        menu.append(debug);
 
         menu.showAll();
         config.setMenus(this);
