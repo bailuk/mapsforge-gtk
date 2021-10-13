@@ -4,6 +4,7 @@ import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.GraphicContext;
+import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
@@ -60,8 +61,6 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
-        //System.out.println(bitmap.getWidth() + " x " +bitmap.getHeight());
-
         context.save();
         GtkMatrix gtkMatrix = (GtkMatrix) matrix;
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
@@ -179,11 +178,20 @@ public class GtkGraphicContext implements GraphicContext {
     @Override
     public void drawPathText(String text, Path path, Paint paint) {
         GtkPath gtkPath = (GtkPath) path;
-        drawText(text, (int)gtkPath.getX(), (int)gtkPath.getY(), paint);
+        drawTextRotated(text,
+                (int)gtkPath.getXStart(),
+                (int)gtkPath.getYStart(),
+                (int)gtkPath.getXEnd(),
+                (int)gtkPath.getYEnd(),
+                paint);
     }
 
     @Override
     public void drawText(String text, int x, int y, Paint paint) {
+        drawTextWithAngle(text,x,y,paint, 0);
+    }
+
+    private void drawTextWithAngle(String text, int x, int y, Paint paint, double angle) {
 
         final GtkPaint gtkPaint = (GtkPaint) paint;
         final Str strText = new Str(text);
@@ -198,6 +206,7 @@ public class GtkGraphicContext implements GraphicContext {
         context.save();
         context.setLineWidth(paint.getStrokeWidth());
         context.moveTo(x,y - gtkPaint.getFontSize()/100*130);
+        context.rotate(angle);
         Pangocairo.layoutPath(context,layout);
         setColor(paint.getColor());
         context.fillPreserve();
@@ -212,7 +221,17 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawTextRotated(String text, int x1, int y1, int x2, int y2, Paint paint) {
-        System.out.println("GraphicContext::drawTextRotated()");
+        if (GtkGraphicFactory.DRAW_DEBUG) {
+            Paint red = GtkGraphicFactory.INSTANCE.createPaint();
+            red.setColor(Color.RED);
+            red.setStrokeWidth(2);
+            drawLine(x1,y1,x2,y2, red);
+        }
+        drawTextWithAngle(text, x1,y1, paint, getAngle(x1,y1, x2, y2));
+    }
+
+    public double getAngle(int x1, int y1, int x2, int y2) {
+        return Math.atan2(y2 - y1, x2 - x1) + 2 * Math.PI;
     }
 
     @Override
@@ -312,8 +331,6 @@ public class GtkGraphicContext implements GraphicContext {
         final int bx=0;
         final int by=this.height-bh;
         context.rectangle(bx, by, bw, bh);
-
-
         context.clip();
     }
 

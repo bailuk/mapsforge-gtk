@@ -16,7 +16,6 @@ package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.FillRule;
 import org.mapsforge.core.graphics.Path;
-import org.mapsforge.core.model.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class GtkPath implements Path {
     private int fillRule = ch.bailu.gtk.cairo.FillRule.WINDING;
     private final List<Command> commands = new ArrayList<>();
 
-    private float x, y;
+    private float xStart, yStart, xEnd, yEnd;
     private abstract static class Command {
         final float x, y;
 
@@ -85,22 +84,33 @@ public class GtkPath implements Path {
     @Override
     public void lineTo(float x, float y) {
         commands.add(new LineTo(x, y));
+        xEnd = x;
+        yEnd =y;
     }
 
     @Override
     public void moveTo(float x, float y) {
-        this.x = x;
-        this.y = y;
+        this.xStart = x;
+        this.yStart = y;
         commands.add(new MoveTo(x,y));
     }
 
-    public float getX() {
-        return x;
+    public float getXStart() {
+        return xStart;
     }
 
-    public float getY() {
-        return y;
+    public float getYStart() {
+        return yStart;
     }
+
+    public float getXEnd() {
+        return xEnd;
+    }
+
+    public float getYEnd() {
+        return yEnd;
+    }
+
     @Override
     public void setFillRule(FillRule fillRule) {
         if (fillRule == FillRule.EVEN_ODD) {

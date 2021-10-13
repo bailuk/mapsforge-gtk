@@ -30,28 +30,25 @@ import ch.bailu.gtk.gdk.RGBA;
 
 public class GtkGraphicFactory implements GraphicFactory {
     public static final GraphicFactory INSTANCE = new GtkGraphicFactory();
+    public static final boolean DRAW_DEBUG = true;
 
     @Override
     public Bitmap createBitmap(int width, int height) {
-        //System.out.println("GtkGraphicFactory::createBitmap(width,height)");
         return new GtkBitmap(width, height, false);
     }
 
     @Override
     public Bitmap createBitmap(int width, int height, boolean isTransparent) {
-        //System.out.println("GtkGraphicFactory::createBitmap(width, height, isTarnsparent)" + isTransparent);
         return new GtkBitmap(width, height, isTransparent);
     }
 
     @Override
     public Canvas createCanvas() {
-        //System.out.println("GtkGraphicFactory::createCanvas");
         return new GtkCanvas();
     }
 
     @Override
     public int createColor(Color color) {
-        //System.out.println("GtkGraphicFactory::createColor(enum)");
         switch (color) {
             case RED:
                 return 0xFFFF0000;
@@ -71,14 +68,12 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public int createColor(int alpha, int red, int green, int blue) {
-        //System.out.println("GtkGraphicFactory::createColor(int)");
         return new ARGB(alpha, red, green, blue).toInt();
     }
 
 
     @Override
     public Matrix createMatrix() {
-        //System.out.println("GtkGraphicFactory::createMatrix");
         return new GtkMatrix();
     }
 
@@ -90,37 +85,31 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public Paint createPaint() {
-        //System.out.println("GtkGraphicFactory::createPaint");
         return new GtkPaint();
     }
 
     @Override
     public Paint createPaint(Paint paint) {
-        //System.out.println("GtkGraphicFactory::createPaint");
         return new GtkPaint(paint);
     }
 
     @Override
     public Path createPath() {
-        //System.out.println("GtkGraphicFactory::createPath");
         return new GtkPath();
     }
 
     @Override
     public PointTextContainer createPointTextContainer(Point xy, Display display, int priority, String text, Paint paintFront, Paint paintBack, SymbolContainer symbolContainer, Position position, int maxTextWidth) {
-        //System.out.println("GtkGraphicFactory::createPointTextContainer");
         return new GtkPointTextContainer(xy, display, priority, text, paintFront, paintBack, symbolContainer, position, maxTextWidth);
     }
 
     @Override
     public ResourceBitmap createResourceBitmap(InputStream inputStream, float scaleFactor, int width, int height, int percent, int hash) throws IOException {
-        //System.out.println("GtkGraphicFactory::createResourceBitmap");
         return new GtkBitmap(inputStream, hash,  scaleFactor, width, height, percent);
     }
 
     @Override
     public TileBitmap createTileBitmap(InputStream inputStream, int tileSize, boolean isTransparent) throws IOException {
-        //System.out.println("GtkGraphicFactory::createTileBitmap");
         try {
             return new GtkTileBitmap(inputStream);
         } catch (AllocationError allocationError) {
@@ -131,7 +120,6 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public TileBitmap createTileBitmap(int tileSize, boolean isTransparent) {
-        //System.out.println("GtkGraphicFactory::createTileBitmap");
         return new GtkTileBitmap(tileSize, isTransparent);
     }
 
@@ -143,7 +131,6 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public ResourceBitmap renderSvg(InputStream inputStream, float scaleFactor, int width, int height, int percent, int hash) throws IOException {
-        //System.out.println("GtkGraphicFactory::renderSvg");
         return new GtkBitmap(inputStream, hash, scaleFactor, width, height, percent);
     }
 }
