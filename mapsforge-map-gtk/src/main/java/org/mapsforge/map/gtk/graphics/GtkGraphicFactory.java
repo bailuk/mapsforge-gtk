@@ -74,7 +74,7 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public Matrix createMatrix() {
-        return new GtkMatrix();
+        return new AwtMatrix();
     }
 
     @Override

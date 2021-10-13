@@ -1,7 +1,7 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Matrix;
-
+/*
 public class GtkMatrix implements Matrix {
     final ch.bailu.gtk.cairo.Matrix matrix = new ch.bailu.gtk.cairo.Matrix();
 
@@ -43,3 +43,4 @@ public class GtkMatrix implements Matrix {
         matrix.translate(translateX, translateY);
     }
 }
+*/

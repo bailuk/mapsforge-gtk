@@ -61,14 +61,18 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
-        context.save();
-        GtkMatrix gtkMatrix = (GtkMatrix) matrix;
+        AwtMatrix awtMatrix = (AwtMatrix) matrix;
+        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
-        context.setMatrix(gtkMatrix.matrix);
+
+        context.save();
+        context.setMatrix(cairoMatrix);
         context.setSourceSurface(gtkBitmap.getSurface(),0,0);
         context.paint();
         context.identityMatrix();
         context.restore();
+
+        cairoMatrix.destroy();
     }
 
     @Override

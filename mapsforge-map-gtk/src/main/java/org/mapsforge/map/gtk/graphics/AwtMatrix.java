@@ -12,13 +12,13 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mapsforge.map.awt.graphics;
+package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Matrix;
 
 import java.awt.geom.AffineTransform;
 
-class AwtMatrix implements Matrix {
+public class AwtMatrix implements Matrix {
     final AffineTransform affineTransform = new AffineTransform();
 
     @Override
