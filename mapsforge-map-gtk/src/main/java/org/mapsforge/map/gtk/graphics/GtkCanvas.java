@@ -179,4 +179,9 @@ public class GtkCanvas implements Canvas {
     public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude) {
         System.out.println("GtkCanvas::shadeBitmap()");
     }
+
+
+    public void drawDebugRect(Rectangle rect) {
+        graphicContext.drawDebugRect(rect);
+    }
 }

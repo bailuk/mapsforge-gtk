@@ -30,7 +30,14 @@ import ch.bailu.gtk.gdk.RGBA;
 
 public class GtkGraphicFactory implements GraphicFactory {
     public static final GraphicFactory INSTANCE = new GtkGraphicFactory();
-    public static final boolean DRAW_DEBUG = true;
+    public static boolean DRAW_DEBUG = true;
+
+    public static final Paint DEBUG_PAINT = new GtkPaint() {
+        {
+            setColor(Color.RED);
+            setStrokeWidth(2);
+        }
+    };
 
     @Override
     public Bitmap createBitmap(int width, int height) {

@@ -26,15 +26,15 @@ public class GtkPath implements Path {
     private int fillRule = ch.bailu.gtk.cairo.FillRule.WINDING;
     private final List<Command> commands = new ArrayList<>();
 
-    private float xStart, yStart, xEnd, yEnd;
     private abstract static class Command {
-        final float x, y;
+        public final float x, y;
 
         public Command(float x, float y) {
             this.x = x;
             this.y = y;
         }
         public abstract void exec(Context ctx);
+
     }
     private static class LineTo extends Command {
         public LineTo(float x, float y) {
@@ -84,31 +84,40 @@ public class GtkPath implements Path {
     @Override
     public void lineTo(float x, float y) {
         commands.add(new LineTo(x, y));
-        xEnd = x;
-        yEnd =y;
     }
 
     @Override
     public void moveTo(float x, float y) {
-        this.xStart = x;
-        this.yStart = y;
         commands.add(new MoveTo(x,y));
     }
 
     public float getXStart() {
-        return xStart;
+        if (commands.isEmpty()) {
+            return 0;
+        }
+        return commands.get(0).x;
     }
 
     public float getYStart() {
-        return yStart;
+        if (commands.isEmpty()) {
+            return 0;
+        }
+        return commands.get(0).y;
+
     }
 
     public float getXEnd() {
-        return xEnd;
+        if (commands.isEmpty()) {
+            return 0;
+        }
+        return commands.get(commands.size()-1).x;
     }
 
     public float getYEnd() {
-        return yEnd;
+        if (commands.isEmpty()) {
+            return 0;
+        }
+        return commands.get(commands.size()-1).y;
     }
 
     @Override

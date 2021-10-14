@@ -1,6 +1,7 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
+import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.GraphicContext;
@@ -10,9 +11,12 @@ import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Dimension;
+import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
+
+import javax.xml.stream.FactoryConfigurationError;
 
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Extend;
@@ -38,8 +42,8 @@ public class GtkGraphicContext implements GraphicContext {
         this.context = context;
         this.width = width;
         this.height = height;
-
     }
+
     @Override
     public void drawBitmap(Bitmap bitmap, int left, int top) {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
@@ -143,10 +147,17 @@ public class GtkGraphicContext implements GraphicContext {
                 gtkPath.exec(context);
                 context.clip();
                 context.newPath();
-                context.setSourceSurface(gtkPaint.getBitmapShader().getSurface(),gtkPaint.getBitmapShaderShift().x,gtkPaint.getBitmapShaderShift().y);
+                context.setSourceSurface(
+                        gtkPaint.getBitmapShader().getSurface(),
+                        gtkPaint.getBitmapShaderShift().x,
+                        gtkPaint.getBitmapShaderShift().y);
                 context.getSource().setExtend(Extend.REPEAT);
-                context.paint();
+                context.fill();
+
                 context.restore();
+                System.out.println("Extend Repeat");
+
+                drawDebugPath(gtkPath);
             }
         }
     }
@@ -182,6 +193,8 @@ public class GtkGraphicContext implements GraphicContext {
     @Override
     public void drawPathText(String text, Path path, Paint paint) {
         GtkPath gtkPath = (GtkPath) path;
+
+        drawDebugPath(gtkPath);
         drawTextRotated(text,
                 (int)gtkPath.getXStart(),
                 (int)gtkPath.getYStart(),
@@ -209,7 +222,8 @@ public class GtkGraphicContext implements GraphicContext {
 
         context.save();
         context.setLineWidth(paint.getStrokeWidth());
-        context.moveTo(x,y - gtkPaint.getFontSize()/100*130);
+        //context.moveTo(x,y - gtkPaint.getFontSize()/100*130);
+        context.moveTo(x+5,y+5);
         context.rotate(angle);
         Pangocairo.layoutPath(context,layout);
         setColor(paint.getColor());
@@ -225,16 +239,11 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawTextRotated(String text, int x1, int y1, int x2, int y2, Paint paint) {
-        if (GtkGraphicFactory.DRAW_DEBUG) {
-            Paint red = GtkGraphicFactory.INSTANCE.createPaint();
-            red.setColor(Color.RED);
-            red.setStrokeWidth(2);
-            drawLine(x1,y1,x2,y2, red);
-        }
+        drawDebugLine(x1, y1, x2, y2);
         drawTextWithAngle(text, x1,y1, paint, getAngle(x1,y1, x2, y2));
     }
 
-    public double getAngle(int x1, int y1, int x2, int y2) {
+    private double getAngle(int x1, int y1, int x2, int y2) {
         return Math.atan2(y2 - y1, x2 - x1) + 2 * Math.PI;
     }
 
@@ -346,5 +355,32 @@ public class GtkGraphicContext implements GraphicContext {
     @Override
     public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude) {
         System.out.println("GraphicContext::shadeBitmap()");
+    }
+
+    private void drawDebugLine(int x1, int y1, int x2, int y2) {
+        if (GtkGraphicFactory.DRAW_DEBUG) {
+            drawCircle(x1,y1, 5, GtkGraphicFactory.DEBUG_PAINT);
+            drawLine(x1,y1,x2,y2, GtkGraphicFactory.DEBUG_PAINT);
+        }
+    }
+
+    private void drawDebugPath(GtkPath path) {
+        if (GtkGraphicFactory.DRAW_DEBUG) {
+            drawCircle((int)path.getXStart(),(int)path.getYStart(), 5, GtkGraphicFactory.DEBUG_PAINT);
+            drawPath(path, GtkGraphicFactory.DEBUG_PAINT);
+        }
+    }
+
+
+    public void drawDebugRect(Rectangle rect) {
+        if (GtkGraphicFactory.DRAW_DEBUG) {
+            final Path path = GtkGraphicFactory.INSTANCE.createPath();
+            path.moveTo((float) rect.left, (float) rect.top);
+            path.lineTo((float) rect.right, (float) rect.top);
+            path.lineTo((float) rect.right, (float) rect.bottom);
+            path.lineTo((float) rect.left, (float) rect.bottom);
+            path.lineTo((float) rect.left, (float) rect.top);
+            drawPath(path, GtkGraphicFactory.DEBUG_PAINT);
+        }
     }
 }

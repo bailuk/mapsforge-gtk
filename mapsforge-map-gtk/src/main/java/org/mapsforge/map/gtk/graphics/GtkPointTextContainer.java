@@ -63,7 +63,7 @@ public class GtkPointTextContainer extends PointTextContainer {
         GtkCanvas gtkCanvas = (GtkCanvas) canvas;
         final Point pointAdjusted = this.xy.offset(-origin.x, -origin.y);
 
-        showBoundry(canvas, boundary, pointAdjusted);
+        gtkCanvas.drawDebugRect(boundary.shift(pointAdjusted));
 
         if (isMultiLine()) {
             drawMultiLine(gtkCanvas, pointAdjusted, filter);
@@ -72,21 +72,7 @@ public class GtkPointTextContainer extends PointTextContainer {
         }
     }
 
-    private void showBoundry(Canvas canvas, Rectangle boundary, Point offset) {
-        final Rectangle rect = boundary.shift(offset);
 
-        Path path = GtkGraphicFactory.INSTANCE.createPath();
-        path.moveTo((float) rect.left, (float)rect.top);
-        path.lineTo((float)rect.right, (float)rect.top);
-        path.lineTo((float)rect.right, (float)rect.bottom);
-        path.lineTo((float)rect.left, (float)rect.bottom);
-        path.lineTo((float)rect.left, (float)rect.top);
-        Paint paint = GtkGraphicFactory.INSTANCE.createPaint();
-        paint.setStyle(Style.STROKE);
-        paint.setColor(Color.RED);
-        paint.setStrokeWidth(2f);
-        canvas.drawPath(path, paint);
-    }
 
     private void drawMultiLine(GtkCanvas gtkCanvas, Point point, Filter filter) {
         System.out.println("GtkPaintTextContainer::drawMultiLine");

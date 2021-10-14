@@ -5,6 +5,7 @@ import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.util.LatLongUtils;
+import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.gtk.util.JavaPreferences;
 import org.mapsforge.map.gtk.view.MapView;
 import org.mapsforge.map.model.Model;
@@ -28,6 +29,7 @@ public class Config {
         if (!layerConfig.haveVectorMap()) {
             rasterMapOn.set(true);
         }
+        GtkGraphicFactory.DRAW_DEBUG = debugOn.get();
     }
 
     public void setMenus(Menus menus) {
@@ -92,12 +94,9 @@ public class Config {
         }
     }
 
-    public boolean getDrawDebug() {
-        return debugOn.get();
-    }
-
     public void setDrawDebug(boolean on) {
         debugOn.set(on);
+        GtkGraphicFactory.DRAW_DEBUG = on;
     }
 
     private void setFpsLayer() {
