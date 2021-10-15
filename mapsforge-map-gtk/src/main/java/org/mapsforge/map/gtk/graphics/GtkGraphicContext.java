@@ -1,31 +1,31 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
-import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.GraphicContext;
-import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Dimension;
-import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
+import org.w3c.dom.css.Rect;
 
-import javax.xml.stream.FactoryConfigurationError;
-
+import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Extend;
 import ch.bailu.gtk.cairo.Operator;
+import ch.bailu.gtk.gtk.Align;
 import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
+import ch.bailu.gtk.pango.WrapMode;
 import ch.bailu.gtk.pangocairo.Pangocairo;
 import ch.bailu.gtk.type.Dbls;
+import ch.bailu.gtk.type.Int;
 import ch.bailu.gtk.type.Str;
 
 
@@ -205,25 +205,23 @@ public class GtkGraphicContext implements GraphicContext {
 
     @Override
     public void drawText(String text, int x, int y, Paint paint) {
-        drawTextWithAngle(text,x,y,paint, 0);
+        GtkPaint gtkPaint = (GtkPaint) paint;
+        drawTextRotated(text,x, (int) (y-gtkPaint.getFontSize()/100*130),gtkPaint, 0);
     }
 
-    private void drawTextWithAngle(String text, int x, int y, Paint paint, double angle) {
-
-        final GtkPaint gtkPaint = (GtkPaint) paint;
+    private void drawTextRotated(String text, int x, int y, GtkPaint paint, double angle) {
         final Str strText = new Str(text);
-        final Str strFont = new Str(gtkPaint.getFontDescription());
+        final Str strFont = new Str(paint.getFontDescription());
         final FontDescription fontDescription = Pango.fontDescriptionFromString(strFont);
         final Layout layout = Pangocairo.createLayout(context);
 
-        layout.setText(strText, strText.getSize());
+        layout.setText(strText, strText.getSize()-1);
         layout.setFontDescription(fontDescription);
-        layout.setAlignment(gtkPaint.getTextAlignment());
+        layout.setAlignment(paint.getTextAlignment());
 
         context.save();
         context.setLineWidth(paint.getStrokeWidth());
-        //context.moveTo(x,y - gtkPaint.getFontSize()/100*130);
-        context.moveTo(x+5,y+5);
+        context.moveTo(x,y);
         context.rotate(angle);
         Pangocairo.layoutPath(context,layout);
         setColor(paint.getColor());
@@ -240,7 +238,7 @@ public class GtkGraphicContext implements GraphicContext {
     @Override
     public void drawTextRotated(String text, int x1, int y1, int x2, int y2, Paint paint) {
         drawDebugLine(x1, y1, x2, y2);
-        drawTextWithAngle(text, x1,y1, paint, getAngle(x1,y1, x2, y2));
+        drawTextRotated(text, x1,y1, (GtkPaint) paint, getAngle(x1,y1, x2, y2));
     }
 
     private double getAngle(int x1, int y1, int x2, int y2) {
@@ -382,5 +380,62 @@ public class GtkGraphicContext implements GraphicContext {
             path.lineTo((float) rect.left, (float) rect.top);
             drawPath(path, GtkGraphicFactory.DEBUG_PAINT);
         }
+    }
+
+    public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paint) {
+        drawDebugRect(boundary);
+        final Str strText = new Str(text);
+        final Str strFont = new Str(paint.getFontDescription());
+        final FontDescription fontDescription = Pango.fontDescriptionFromString(strFont);
+        final Layout layout = Pangocairo.createLayout(context);
+
+        layout.setText(strText, strText.getSize()-1);
+        layout.setFontDescription(fontDescription);
+        layout.setAlignment(paint.getTextAlignment());
+
+
+        context.save();
+        context.setLineWidth(paint.getStrokeWidth());
+
+        Rectangle rect = getRectangle(layout, (int) boundary.getCenterX(), (int) boundary.getCenterY());
+
+        int width = layout.getWidth();
+        if (rect.getWidth() > boundary.getWidth()) {
+            width = (int) ((width / rect.getWidth()) * boundary.getWidth());
+            layout.setWidth(width);
+            layout.setSingleParagraphMode(GTK.TRUE);
+            rect = getRectangle(layout, (int) boundary.getCenterX(), (int) boundary.getCenterY());
+        }
+
+
+        context.moveTo(rect.left, rect.top);
+
+        Pangocairo.layoutPath(context,layout);
+        setColor(paint.getColor());
+
+        context.fillPreserve();
+        context.stroke();
+        context.restore();
+
+        layout.unref();
+        fontDescription.free();
+        strText.destroy();
+        strFont.destroy();
+
+        drawDebugRect(rect);
+    }
+
+    private Rectangle getRectangle(Layout layout, int x, int y) {
+        Int w = new Int();
+        Int h = new Int();
+        layout.getPixelSize(w, h);
+
+        x = x-w.get()/2;
+        y = y-h.get()/2;
+
+        Rectangle rect = new Rectangle(x, y, x + w.get(), y + h.get());
+        w.destroy();
+        h.destroy();
+        return rect;
     }
 }

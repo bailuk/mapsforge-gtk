@@ -184,4 +184,8 @@ public class GtkCanvas implements Canvas {
     public void drawDebugRect(Rectangle rect) {
         graphicContext.drawDebugRect(rect);
     }
+
+    public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paintFront) {
+        graphicContext.drawTextIntoBoundary(text, boundary, paintFront);
+    }
 }
