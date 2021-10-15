@@ -12,20 +12,15 @@ import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
-import org.w3c.dom.css.Rect;
 
-import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Extend;
 import ch.bailu.gtk.cairo.Operator;
-import ch.bailu.gtk.gtk.Align;
 import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
-import ch.bailu.gtk.pango.WrapMode;
 import ch.bailu.gtk.pangocairo.Pangocairo;
 import ch.bailu.gtk.type.Dbls;
-import ch.bailu.gtk.type.Int;
 import ch.bailu.gtk.type.Str;
 
 
@@ -206,10 +201,10 @@ public class GtkGraphicContext implements GraphicContext {
     @Override
     public void drawText(String text, int x, int y, Paint paint) {
         GtkPaint gtkPaint = (GtkPaint) paint;
-        drawTextRotated(text,x, (int) (y-gtkPaint.getFontSize()/100*130),gtkPaint, 0);
+        drawTextRotated(text,x, (y), (int)(gtkPaint.getFontSize()/ 100* -130),gtkPaint, 0);
     }
 
-    private void drawTextRotated(String text, int x, int y, GtkPaint paint, double angle) {
+    private void drawTextRotated(String text, int x, int y, int yshift, GtkPaint paint, double angle) {
         final Str strText = new Str(text);
         final Str strFont = new Str(paint.getFontDescription());
         final FontDescription fontDescription = Pango.fontDescriptionFromString(strFont);
@@ -221,8 +216,13 @@ public class GtkGraphicContext implements GraphicContext {
 
         context.save();
         context.setLineWidth(paint.getStrokeWidth());
-        context.moveTo(x,y);
-        context.rotate(angle);
+
+        if (angle != 0) {
+            context.translate(x, y);
+            context.rotate(angle);
+            context.translate(-x, -y);
+        }
+        context.moveTo(x,y+yshift);
         Pangocairo.layoutPath(context,layout);
         setColor(paint.getColor());
         context.fillPreserve();
@@ -235,10 +235,16 @@ public class GtkGraphicContext implements GraphicContext {
         strFont.destroy();
     }
 
+    public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paint) {
+
+        drawTextRotated(text, (int)boundary.left, (int) boundary.top, 0, paint, 0);
+        drawDebugRect(boundary);
+    }
     @Override
     public void drawTextRotated(String text, int x1, int y1, int x2, int y2, Paint paint) {
+
         drawDebugLine(x1, y1, x2, y2);
-        drawTextRotated(text, x1,y1, (GtkPaint) paint, getAngle(x1,y1, x2, y2));
+        drawTextRotated(text, x1,y1, paint.getTextHeight("W")/-2, (GtkPaint) paint, getAngle(x1,y1, x2, y2));
     }
 
     private double getAngle(int x1, int y1, int x2, int y2) {
@@ -380,34 +386,5 @@ public class GtkGraphicContext implements GraphicContext {
             path.lineTo((float) rect.left, (float) rect.top);
             drawPath(path, GtkGraphicFactory.DEBUG_PAINT);
         }
-    }
-
-    public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paint) {
-        final Str strText = new Str(text);
-        final Str strFont = new Str(paint.getFontDescription());
-        final FontDescription fontDescription = Pango.fontDescriptionFromString(strFont);
-        final Layout layout = Pangocairo.createLayout(context);
-
-        layout.setText(strText, strText.getSize()-1);
-        layout.setFontDescription(fontDescription);
-        layout.setAlignment(paint.getTextAlignment());
-
-        context.save();
-        context.setLineWidth(paint.getStrokeWidth());
-        context.moveTo(boundary.left, boundary.top);
-
-        Pangocairo.layoutPath(context,layout);
-        setColor(paint.getColor());
-
-        context.fillPreserve();
-        context.stroke();
-        context.restore();
-
-        layout.unref();
-        fontDescription.free();
-        strText.destroy();
-        strFont.destroy();
-
-        drawDebugRect(boundary);
     }
 }

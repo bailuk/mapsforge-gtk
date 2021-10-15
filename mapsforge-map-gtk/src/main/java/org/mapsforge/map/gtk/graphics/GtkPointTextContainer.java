@@ -50,17 +50,13 @@ public class GtkPointTextContainer extends PointTextContainer {
     private boolean canDraw() {
         return havePaint(paintBack) || havePaint(paintFront);
     }
-
     private boolean havePaint(Paint paint) {
         return paint != null && !paint.isTransparent();
     }
 
     private void doDraw(Canvas canvas, Point origin, Filter filter) {
-        GtkCanvas gtkCanvas = (GtkCanvas) canvas;
+        final GtkCanvas gtkCanvas = (GtkCanvas) canvas;
         final Point pointAdjusted = this.xy.offset(-origin.x, -origin.y);
-
-
-
         final Rectangle boundary = this.boundary.shift(pointAdjusted);
         drawLines(gtkCanvas, boundary, filter);
     }
@@ -98,7 +94,7 @@ public class GtkPointTextContainer extends PointTextContainer {
     }
 
 
-    public Rectangle alignBoundary(Rectangle rect) {
+    private Rectangle alignBoundary(Rectangle rect) {
         return rect.shift(getAlignShift(rect.getWidth(), rect.getHeight()));
     }
 
