@@ -18,8 +18,8 @@ public class MultiLineText {
             length += word.length();
             if (length > maxLine && line.length() > 0) {
                 length = word.length();
-                line.setLength(0);
                 lines.add(line.toString());
+                line.setLength(0);
                 del = "";
             }
             line.append(del).append(word);
@@ -36,12 +36,11 @@ public class MultiLineText {
 
 
     public Rectangle getBoundary(int charWidth, int charHeight) {
-        Rectangle result = new Rectangle(0,0, charWidth * getMaxLineWidth(), charHeight * lines.size());
-        return result;
+        return new Rectangle(0,0, charWidth * getMaxLineLength(), charHeight * size());
     }
 
 
-    private int getMaxLineWidth() {
+    private int getMaxLineLength() {
         int result = 0;
         for (String line: lines) {
             result = Math.max(result, line.length());

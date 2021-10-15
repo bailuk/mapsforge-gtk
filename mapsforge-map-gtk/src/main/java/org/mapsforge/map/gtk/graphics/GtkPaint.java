@@ -66,12 +66,12 @@ public class GtkPaint implements Paint {
 
     @Override
     public int getTextHeight(String text) {
-        return (int) (fontSize + 3f);
+        return (int) (fontSize+5f);
     }
 
     @Override
     public int getTextWidth(String text) {
-        return (int) ((fontSize * text.length()) + 5f);
+        return (int) ((fontSize * text.length()));
     }
 
     @Override

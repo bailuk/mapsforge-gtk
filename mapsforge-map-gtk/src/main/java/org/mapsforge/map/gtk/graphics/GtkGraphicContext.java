@@ -383,7 +383,6 @@ public class GtkGraphicContext implements GraphicContext {
     }
 
     public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paint) {
-        drawDebugRect(boundary);
         final Str strText = new Str(text);
         final Str strFont = new Str(paint.getFontDescription());
         final FontDescription fontDescription = Pango.fontDescriptionFromString(strFont);
@@ -393,22 +392,9 @@ public class GtkGraphicContext implements GraphicContext {
         layout.setFontDescription(fontDescription);
         layout.setAlignment(paint.getTextAlignment());
 
-
         context.save();
         context.setLineWidth(paint.getStrokeWidth());
-
-        Rectangle rect = getRectangle(layout, (int) boundary.getCenterX(), (int) boundary.getCenterY());
-
-        int width = layout.getWidth();
-        if (rect.getWidth() > boundary.getWidth()) {
-            width = (int) ((width / rect.getWidth()) * boundary.getWidth());
-            layout.setWidth(width);
-            layout.setSingleParagraphMode(GTK.TRUE);
-            rect = getRectangle(layout, (int) boundary.getCenterX(), (int) boundary.getCenterY());
-        }
-
-
-        context.moveTo(rect.left, rect.top);
+        context.moveTo(boundary.left, boundary.top);
 
         Pangocairo.layoutPath(context,layout);
         setColor(paint.getColor());
@@ -422,20 +408,6 @@ public class GtkGraphicContext implements GraphicContext {
         strText.destroy();
         strFont.destroy();
 
-        drawDebugRect(rect);
-    }
-
-    private Rectangle getRectangle(Layout layout, int x, int y) {
-        Int w = new Int();
-        Int h = new Int();
-        layout.getPixelSize(w, h);
-
-        x = x-w.get()/2;
-        y = y-h.get()/2;
-
-        Rectangle rect = new Rectangle(x, y, x + w.get(), y + h.get());
-        w.destroy();
-        h.destroy();
-        return rect;
+        drawDebugRect(boundary);
     }
 }

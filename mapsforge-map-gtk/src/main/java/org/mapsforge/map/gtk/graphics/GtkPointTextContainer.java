@@ -59,7 +59,7 @@ public class GtkPointTextContainer extends PointTextContainer {
         GtkCanvas gtkCanvas = (GtkCanvas) canvas;
         final Point pointAdjusted = this.xy.offset(-origin.x, -origin.y);
 
-        //gtkCanvas.drawDebugRect(boundary.shift(pointAdjusted));
+
 
         final Rectangle boundary = this.boundary.shift(pointAdjusted);
         drawLines(gtkCanvas, boundary, filter);
@@ -74,9 +74,9 @@ public class GtkPointTextContainer extends PointTextContainer {
             Point shift = new Point(0, lineBoundary.getHeight());
 
             for (String line : lines.getLines()) {
-                drawTextIntoBoundary(gtkCanvas, line, boundary, (GtkPaint) paintBack, filter);
-                drawTextIntoBoundary(gtkCanvas, line, boundary, (GtkPaint) paintFront, filter);
-                boundary.shift(shift);
+                drawTextIntoBoundary(gtkCanvas, line, lineBoundary, (GtkPaint) paintBack, filter);
+                drawTextIntoBoundary(gtkCanvas, line, lineBoundary, (GtkPaint) paintFront, filter);
+                lineBoundary = lineBoundary.shift(shift);
             }
         }
     }
