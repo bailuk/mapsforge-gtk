@@ -16,6 +16,8 @@ import org.mapsforge.map.gtk.util.color.Conv255;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Extend;
 import ch.bailu.gtk.cairo.Operator;
+import ch.bailu.gtk.cairo.Pattern;
+import ch.bailu.gtk.cairo.Surface;
 import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
@@ -140,18 +142,13 @@ public class GtkGraphicContext implements GraphicContext {
             } else {
                 context.save();
                 gtkPath.exec(context);
-                context.clip();
-                context.newPath();
-                context.setSourceSurface(
-                        gtkPaint.getBitmapShader().getSurface(),
-                        gtkPaint.getBitmapShaderShift().x,
-                        gtkPaint.getBitmapShaderShift().y);
-                context.getSource().setExtend(Extend.REPEAT);
+                Surface surface = gtkPaint.getBitmapShader().getSurface();
+                Pattern pattern = Pattern.createForSurfacePattern(surface);
+                pattern.setExtend(Extend.REPEAT);
+                context.setSource(pattern);
                 context.fill();
-
                 context.restore();
-                System.out.println("Extend Repeat");
-
+                pattern.destroy();
                 drawDebugPath(gtkPath);
             }
         }

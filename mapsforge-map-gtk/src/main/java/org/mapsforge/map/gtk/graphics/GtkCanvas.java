@@ -180,11 +180,6 @@ public class GtkCanvas implements Canvas {
         System.out.println("GtkCanvas::shadeBitmap()");
     }
 
-
-    public void drawDebugRect(Rectangle rect) {
-        graphicContext.drawDebugRect(rect);
-    }
-
     public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paintFront) {
         graphicContext.drawTextIntoBoundary(text, boundary, paintFront);
     }
