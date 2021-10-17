@@ -38,10 +38,16 @@ public class GtkUtil {
      */
     public static TileCache createTileCache(int tileSize, double overdrawFactor, int capacity, File cacheDirectory) {
         int cacheSize = getMinimumCacheSize(tileSize, overdrawFactor);
-        return new InMemoryTileCache(cacheSize);
-        //TileCache firstLevelTileCache = new InMemoryTileCache(cacheSize);
-        //TileCache secondLevelTileCache = new FileSystemTileCache(capacity, cacheDirectory, GtkGraphicFactory.INSTANCE);
-        //return new TwoLevelTileCache(firstLevelTileCache, secondLevelTileCache);
+
+        if (GtkGraphicFactory.DRAW_DEBUG) {
+            return new InMemoryTileCache(cacheSize);
+
+        } else {
+            System.out.println(cacheDirectory.toString());
+            TileCache firstLevelTileCache = new InMemoryTileCache(cacheSize);
+            TileCache secondLevelTileCache = new FileSystemTileCache(capacity, cacheDirectory, GtkGraphicFactory.INSTANCE);
+            return new TwoLevelTileCache(firstLevelTileCache, secondLevelTileCache);
+        }
     }
 
     /**

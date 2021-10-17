@@ -44,9 +44,17 @@ import ch.bailu.gtk.type.Strs;
 
 public final class Samples {
 
-    private final static String APP_ID = "org.mapsforge.samples.gtk";
-    private final static String APP_NAME = "Mapsforge GTK3 Sample";
-    private final static String APP_ICON = "../docs/logo/Mapsforge.svg";
+    static {
+        try {
+            GTK.init();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private final static Str APP_ID   = new Str("org.mapsforge.samples.gtk");
+    private final static Str APP_NAME = new Str("Mapsforge GTK3 Sample");
+    private final static Str APP_ICON = new Str("../docs/logo/Mapsforge.svg");
 
 
      /**
@@ -56,15 +64,14 @@ public final class Samples {
      *             with possible SRTM hgt folder as 1st argument.
      */
     public static void main(final String[] args) throws IOException {
-        GTK.init();
         Parameters.SQUARE_FRAME_BUFFER = false;
         new Samples(args);
     }
 
     private Samples(String args[]) {
-        final Application app = new Application(new Str(APP_ID), ApplicationFlags.FLAGS_NONE);
+        final Application app = new Application(APP_ID, ApplicationFlags.FLAGS_NONE);
         app.onActivate(() -> onActivate(new ApplicationWindow(app), args));
-        app.run(1, new Strs(new String[]{APP_NAME}));
+        app.run(1, new Strs(new Str[]{APP_NAME}));
     }
 
 
@@ -76,7 +83,7 @@ public final class Samples {
         window.setTitlebar(createHeader(mapView, new Menus(config).menu));
 
         try  {
-            window.setIcon(Pixbuf.newFromFilePixbuf(new Str(APP_ICON)));
+            window.setIcon(Pixbuf.newFromFilePixbuf(APP_ICON));
         } catch (AllocationError e) {
             System.out.println(e.getMessage());
         }
@@ -99,7 +106,7 @@ public final class Samples {
     private HeaderBar createHeader(MapView mapView, Menu menu) {
         final HeaderBar header = new HeaderBar();
         header.setShowCloseButton(1);
-        header.setTitle(new Str(APP_NAME));
+        header.setTitle(APP_NAME);
 
         final MenuButton menuButton = new MenuButton();
         menuButton.add(Image.newFromIconNameImage(new Str("open-menu-symbolic"), IconSize.BUTTON));

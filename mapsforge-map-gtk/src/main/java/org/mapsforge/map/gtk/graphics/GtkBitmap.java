@@ -60,26 +60,20 @@ public  class GtkBitmap implements Bitmap, ResourceBitmap {
     }
 
     private static Pixbuf load(InputStream stream, int width, int height) throws IOException {
-        try {
-            return Image.load(stream, width, height);
-        } catch (AllocationError allocationError) {
-            throw new IOException(allocationError.getMessage());
-        }
+        return Image.load(stream, width, height);
     }
 
     private static Pixbuf load(InputStream stream) throws IOException {
-        try {
-            return Image.load(stream);
-        } catch (AllocationError allocationError) {
-            throw new IOException(allocationError.getMessage());
-        }
+        return Image.load(stream);
     }
 
 
     @Override
     public synchronized  void compress(OutputStream outputStream) throws IOException {
         mustHaveRefCount();
-        System.out.println("GtkBitmap::compress() => no buffer");
+        Pixbuf pixbuf = Gdk.pixbufGetFromSurface(surface, 0, 0, width, height);
+        Image.save(outputStream, pixbuf, "png");
+        pixbuf.unref();
     }
 
     @Override
@@ -87,7 +81,6 @@ public  class GtkBitmap implements Bitmap, ResourceBitmap {
         mustHaveRefCount();
         refCount--;
         if (refCount < 0) {
-            //System.out.println("GtkBitmap::destroy()");
             surface.destroy();
             context.destroy();
             INSTANCE_COUNT.decrement();

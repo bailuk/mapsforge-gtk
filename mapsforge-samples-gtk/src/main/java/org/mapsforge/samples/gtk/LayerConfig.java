@@ -151,7 +151,7 @@ public class LayerConfig {
         return GtkUtil.createTileCache(
                 tileSize,
                 mapView.getModel().frameBufferModel.getOverdrawFactor(),
-                512,
+                1024,
                 new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     }
 
