@@ -1,6 +1,10 @@
 apply plugin: 'java-library'
 apply plugin: 'maven'
 
+
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
+
 dependencies {
     api project(":mapsforge-map-reader")
     api 'ch.bailu.java-gtk:library:0.1.0-SNAPSHOT'
