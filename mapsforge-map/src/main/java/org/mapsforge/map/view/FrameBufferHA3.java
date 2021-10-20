@@ -17,8 +17,6 @@
  */
 package org.mapsforge.map.view;
 
-import static java.rmi.server.LogStream.log;
-
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.GraphicContext;
 import org.mapsforge.core.graphics.GraphicFactory;
@@ -26,7 +24,6 @@ import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.model.Point;
-import org.mapsforge.core.util.Log;
 import org.mapsforge.map.model.DisplayModel;
 import org.mapsforge.map.model.FrameBufferModel;
 
@@ -127,14 +124,12 @@ public class FrameBufferHA3 extends FrameBuffer {
          */
         swapBitmaps();
 
-        Log.log(this,"matrix::in");
         synchronized (this.matrix) {
             Bitmap b = this.odBitmap.lock();
             if (b != null) {
                 graphicContext.drawBitmap(b, this.matrix);
             }
         }
-        Log.log(this,"matrix::out");
 
         /*
          * Release here so destroy() can free resources
@@ -210,7 +205,6 @@ public class FrameBufferHA3 extends FrameBuffer {
          *  Swap bitmaps only if the layerManager is currently not working and
          *  has drawn a new bitmap since the last swap
          */
-        Log.log(this, "framesLock::swapBitmaps::in");
         synchronized (this.framesLock) {
             if (this.framesLock.isSoftLocked()) {
                 FrameBufferBitmapHA3.swap(this.odBitmap, this.lmBitmap);
@@ -218,6 +212,5 @@ public class FrameBufferHA3 extends FrameBuffer {
                 this.framesLock.unlock();
             }
         }
-        Log.log(this, "framesLock::swapBitmaps::out");
     }
 }

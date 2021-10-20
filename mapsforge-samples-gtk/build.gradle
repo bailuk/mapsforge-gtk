@@ -6,7 +6,6 @@ targetCompatibility = 11
 dependencies {
     implementation project(":mapsforge-map-gtk")
     implementation project(":mapsforge-themes")
-    implementation 'ch.bailu.java-gtk:library:0.1.0-SNAPSHOT'
     testImplementation "junit:junit:$jUnitVersion"
 }
 
@@ -14,7 +13,7 @@ repositories {
     mavenLocal()
 }
 
-mainClassName = "org.mapsforge.samples.gtk.Samples"
+mainClassName = "org.mapsforge.samples.gtk.SampleApp"
 
 run {
     if (project.hasProperty("args")) {

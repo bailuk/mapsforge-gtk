@@ -42,7 +42,7 @@ import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
 
 
-public final class Samples {
+public final class SampleApp {
 
     static {
         try {
@@ -65,10 +65,10 @@ public final class Samples {
      */
     public static void main(final String[] args) throws IOException {
         Parameters.SQUARE_FRAME_BUFFER = false;
-        new Samples(args);
+        new SampleApp(args);
     }
 
-    private Samples(String args[]) {
+    private SampleApp(String args[]) {
         final Application app = new Application(APP_ID, ApplicationFlags.FLAGS_NONE);
         app.onActivate(() -> onActivate(new ApplicationWindow(app), args));
         app.run(1, new Strs(new Str[]{APP_NAME}));

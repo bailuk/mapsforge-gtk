@@ -52,4 +52,5 @@ class AwtMatrix implements Matrix {
     public void translate(float translateX, float translateY) {
         this.affineTransform.translate(translateX, translateY);
     }
+
 }
