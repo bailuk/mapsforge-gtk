@@ -150,7 +150,6 @@ class FrameBufferBitmapHA3 {
             }
             return bitmap;
         }
-
     }
 
     void release() {
