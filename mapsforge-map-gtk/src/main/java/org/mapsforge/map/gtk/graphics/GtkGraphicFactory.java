@@ -1,10 +1,23 @@
+/*
+ * Copyright 2021 Lukas Bai
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Display;
-import org.mapsforge.core.graphics.GraphicContext;
 import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.graphics.HillshadingBitmap;
 import org.mapsforge.core.graphics.Matrix;
@@ -19,17 +32,17 @@ import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.map.gtk.util.color.ARGB;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.exception.AllocationError;
-import ch.bailu.gtk.gdk.RGBA;
 
 public class GtkGraphicFactory implements GraphicFactory {
     public static final GraphicFactory INSTANCE = new GtkGraphicFactory();
+
+    /**
+     * Draw debug structures (red squares and lines)
+     */
     public static boolean DRAW_DEBUG = true;
 
     public static final Paint DEBUG_PAINT = new GtkPaint() {

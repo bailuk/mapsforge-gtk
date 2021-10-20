@@ -7,7 +7,7 @@ import org.mapsforge.core.util.LatLongUtils;
 import org.mapsforge.map.datastore.MapDataStore;
 import org.mapsforge.map.datastore.MultiMapDataStore;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
-import org.mapsforge.map.gtk.util.GtkUtil;
+import org.mapsforge.map.gtk.util.TileCacheUtil;
 import org.mapsforge.map.gtk.view.MapView;
 import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.layer.Layers;
@@ -110,8 +110,9 @@ public class LayerConfig {
     private BoundingBox initRasterMap(MapView mapView) {
         Layers layers = mapView.getLayerManager().getLayers();
 
-        TileCache tileCache = initTileCache(mapView, 256);
         mapView.getModel().displayModel.setFixedTileSize(256);
+        TileCache tileCache = TileCacheUtil.createTileCache(mapView.getModel());
+
         OpenStreetMapMapnik tileSource = OpenStreetMapMapnik.INSTANCE;
         tileSource.setUserAgent("mapsforge-samples-awt");
         TileDownloadLayer tileDownloadLayer = createTileDownloadLayer(tileCache, mapView.getModel().mapViewPosition, tileSource);
@@ -136,23 +137,14 @@ public class LayerConfig {
     private BoundingBox initRenderMap(MapView mapView) {
         Layers layers = mapView.getLayerManager().getLayers();
 
-        TileCache tileCache = initTileCache(mapView, 512);
         mapView.getModel().displayModel.setFixedTileSize(512);
+        TileCache tileCache = TileCacheUtil.createTileCache(mapView.getModel());
         MultiMapDataStore mapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
 
         renderMapConfig.addMapDataStore(mapDataStore);
         TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsConfig.getConfig());
         layers.add(0,tileRendererLayer);
         return mapDataStore.boundingBox();
-    }
-
-
-    private TileCache initTileCache(MapView mapView, int tileSize) {
-        return GtkUtil.createTileCache(
-                tileSize,
-                mapView.getModel().frameBufferModel.getOverdrawFactor(),
-                1024,
-                new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     }
 
     private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, IMapViewPosition mapViewPosition, TileSource tileSource) {

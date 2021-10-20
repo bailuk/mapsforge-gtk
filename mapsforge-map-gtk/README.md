@@ -1,6 +1,9 @@
 # Mapsforge Map GTK
 GTK3 based implementation of the Mapsforge MapView. It is made with [java-gtk](https://github.com/bailuk/java-gtk)
 
+## Prerequisite
+Clone [java-gtk](https://github.com/bailuk/java-gtk) and run `./gradlew publishToMavenLocal` in project root.
+
 ## Compile and install
 ```bash
 # build
@@ -25,6 +28,7 @@ dependencies {
 ```kotlin
 package com.example.gtk.app
 
+
 import ch.bailu.gtk.GTK
 import ch.bailu.gtk.gio.ApplicationFlags
 import ch.bailu.gtk.gtk.Application
@@ -33,18 +37,14 @@ import ch.bailu.gtk.type.Str
 import ch.bailu.gtk.type.Strs
 import org.mapsforge.core.model.LatLong
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory
+import org.mapsforge.map.gtk.util.TileCacheUtil
 import org.mapsforge.map.gtk.view.MapView
-import org.mapsforge.map.layer.Layers
-import org.mapsforge.map.layer.cache.FileSystemTileCache
-import org.mapsforge.map.layer.cache.InMemoryTileCache
-import org.mapsforge.map.layer.cache.TwoLevelTileCache
 import org.mapsforge.map.layer.download.TileDownloadLayer
 import org.mapsforge.map.layer.download.tilesource.OpenStreetMapMapnik
-import java.io.File
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-    GTK.init();
+    GTK.init()
 
     val app = Application(Str("com.example.gtk.app"), ApplicationFlags.FLAGS_NONE)
 
@@ -52,26 +52,20 @@ fun main(args: Array<String>) {
         val window = ApplicationWindow(app)
         val mapView = MapView()
         window.add(mapView.drawingArea)
-        window.title = Str("MapView")
+        window.title = Str("Map")
         window.setSizeRequest(500,500)
 
         window.onShow {
-            val layers: Layers = mapView.layerManager.layers
+            OpenStreetMapMapnik.INSTANCE.userAgent = "mapsforge-samples-gtk"
 
-            val tmpDir = File(System.getProperty("java.io.tmpdir"))
-            val firstLevelTileCache = InMemoryTileCache(100)
-            val secondLevelTileCache =  FileSystemTileCache(1024, tmpDir, GtkGraphicFactory.INSTANCE)
-            val tileCache =  TwoLevelTileCache(firstLevelTileCache, secondLevelTileCache)
+            val tileCache = TileCacheUtil.createTileCache(mapView.model)
+            val tileDownloadLayer = TileDownloadLayer(tileCache, mapView.model.mapViewPosition, OpenStreetMapMapnik.INSTANCE, GtkGraphicFactory.INSTANCE)
 
-            val tileSource = OpenStreetMapMapnik.INSTANCE
-            tileSource.userAgent = "com-example-gtk-app"
-            val tileDownloadLayer = TileDownloadLayer(tileCache, mapView.model.mapViewPosition, tileSource, GtkGraphicFactory.INSTANCE)
-
-            layers.add(tileDownloadLayer)
+            mapView.layerManager.layers.add(tileDownloadLayer)
             tileDownloadLayer.start()
 
-            mapView.setZoomLevelMin(tileSource.zoomLevelMin)
-            mapView.setZoomLevelMax(tileSource.zoomLevelMax)
+            mapView.setZoomLevelMin(OpenStreetMapMapnik.INSTANCE.zoomLevelMin)
+            mapView.setZoomLevelMax(OpenStreetMapMapnik.INSTANCE.zoomLevelMax)
 
             mapView.setZoomLevel(14)
             mapView.model.mapViewPosition.center = LatLong(47.35,7.9)

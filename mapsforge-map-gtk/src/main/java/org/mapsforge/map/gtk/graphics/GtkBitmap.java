@@ -1,23 +1,33 @@
+/*
+ * Copyright 2021 Lukas Bai
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.ResourceBitmap;
+import org.mapsforge.map.gtk.util.InstanceCount;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.bridge.Image;
 import ch.bailu.gtk.cairo.Cairo;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Format;
 import ch.bailu.gtk.cairo.Surface;
-import ch.bailu.gtk.exception.AllocationError;
 import ch.bailu.gtk.gdk.Gdk;
-import ch.bailu.gtk.gdk.Window;
-import ch.bailu.gtk.gdkpixbuf.Colorspace;
-import ch.bailu.gtk.gdkpixbuf.Gdkpixbuf;
 import ch.bailu.gtk.gdkpixbuf.Pixbuf;
 
 

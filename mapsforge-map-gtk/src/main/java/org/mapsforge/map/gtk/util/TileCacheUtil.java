@@ -1,5 +1,6 @@
 /*
  * Copyright 2016-2017 devemux86
+ * Copyright 2021 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -19,16 +20,19 @@ import org.mapsforge.map.layer.cache.FileSystemTileCache;
 import org.mapsforge.map.layer.cache.InMemoryTileCache;
 import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.cache.TwoLevelTileCache;
+import org.mapsforge.map.model.Model;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
+import java.util.UUID;
 
-public class GtkUtil {
+public class TileCacheUtil {
     /**
-     * Utility function to create a two-level tile cache with the right size, using the size of the screen.
+     * Utility function to create a two-level tile cache with the provided dimensions.
      * <p>
      * Combine with <code>FrameBufferController.setUseSquareFrameBuffer(false);</code>
+     * If GtkGraphicFactory.DRAW_DEBUG is true only a in memory cache will be created.
      *
      * @param tileSize       the tile size
      * @param overdrawFactor the overdraw factor applied to the map view
@@ -43,11 +47,27 @@ public class GtkUtil {
             return new InMemoryTileCache(cacheSize);
 
         } else {
-            System.out.println(cacheDirectory.toString());
             TileCache firstLevelTileCache = new InMemoryTileCache(cacheSize);
             TileCache secondLevelTileCache = new FileSystemTileCache(capacity, cacheDirectory, GtkGraphicFactory.INSTANCE);
             return new TwoLevelTileCache(firstLevelTileCache, secondLevelTileCache);
         }
+    }
+
+    /**
+     * Creating a map cache. Gets the values for the
+     * cache dimension from the provided Model. A temporary directory will
+     * be used for the second level cache.
+     * If GtkGraphicFactory.DRAW_DEBUG is true only a in memory cache will be created.
+     * @param model the cache gets created for this models dimensions.
+     * @return a tile cache
+     */
+    public static TileCache createTileCache(Model model) {
+        final int tileSize = model.displayModel.getTileSize();
+        return createTileCache(
+                tileSize,
+                model.frameBufferModel.getOverdrawFactor(),
+                1024,
+                new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     }
 
     /**
@@ -65,7 +85,5 @@ public class GtkUtil {
                 * (2 + screenSize.getHeight() * overdrawFactor / tileSize)));
     }
 
-    private GtkUtil() {
-        // no-op, for privacy
-    }
+    private TileCacheUtil() {}
 }

@@ -12,24 +12,33 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mapsforge.map.gtk.util.color;
+package org.mapsforge.map.gtk.util;
 
 /**
- * Representation of a color
+ * Count instances of allocated resources. Util class for debugging.
+ * This is used to spot memory leaks
  */
-public interface ColorInterface {
+public class InstanceCount {
+    private int count = 0;
+    private int rapportCount = 0;
 
-    int GRAY = 0xFF7F7F7F;
-    int BLACK = 0xFF000000;
-    int MAGENTA = 0xFFFF00FF;
-    int WHITE = 0xFFFFFFFF;
-    int LTGRAY = 0xFFD3D3D3;
-    int DKGRAY = 0xFFD3D3D3;
+    public void increment() {
+        count++;
+        rapport();
+    }
 
-    int red();
-    int green();
-    int blue();
-    int alpha();
+    public void decrement() {
+        count--;
+        rapport();
+    }
 
-    int toInt();
+
+    public void rapport() {
+        if (rapportCount < 0) {
+            System.out.println("GtkBitmap::instances: " + count);
+            rapportCount = 50;
+        }
+        rapportCount--;
+
+    }
 }
