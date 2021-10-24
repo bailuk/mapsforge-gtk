@@ -64,6 +64,7 @@ public class GtkPaint implements Paint {
 
     public GtkPaint() {
         this.style = Style.STROKE;
+        this.fontFamily = FontFamily.DEFAULT;
         this.color = GtkGraphicFactory.INSTANCE.createColor(Color.BLACK);
     }
 
