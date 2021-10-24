@@ -43,6 +43,7 @@ import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
 import ch.bailu.gtk.GTK;
+import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.glib.Glib;
 import ch.bailu.gtk.gtk.DrawingArea;
 
@@ -85,6 +86,8 @@ public class MapView implements org.mapsforge.map.view.MapView{
             }
             this.fpsCounter.draw(graphicContext);
 
+            MapView.this.onDraw(context);
+
             return GTK.TRUE;
         });
 
@@ -102,6 +105,15 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
 
     }
+
+    /**
+     * This function does nothing. It is for overriding only.
+     * This function gets called after each redraw of the map view.
+     * Override this to draw into the foreground of the map view.
+     * @param context Cairo graphic context
+     */
+    public void onDraw(Context context) {}
+
 
     @Override
     public void addLayer(Layer layer) {

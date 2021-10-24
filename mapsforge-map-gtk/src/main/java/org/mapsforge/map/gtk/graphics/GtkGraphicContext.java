@@ -15,6 +15,7 @@
 package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
+import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
 import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.GraphicContext;
@@ -40,19 +41,19 @@ import ch.bailu.gtk.type.Dbls;
 import ch.bailu.gtk.type.Str;
 
 
-public class GtkGraphicContext implements GraphicContext {
+public class GtkGraphicContext implements GraphicContext, Canvas {
 
     private final Context context;
-    private final int width, height;
+    private final Dimension dimension;
 
     public GtkGraphicContext(Context context, Dimension dimension) {
-        this(context, dimension.width, dimension.height);
+        this.context = context;
+        this.dimension = dimension;
     }
 
     public GtkGraphicContext(Context context, int width, int height) {
         this.context = context;
-        this.width = width;
-        this.height = height;
+        dimension = new Dimension(width, height);
     }
 
     @Override
@@ -336,7 +337,7 @@ public class GtkGraphicContext implements GraphicContext {
         context.newPath();
 
         final int th=top;
-        final int tw=this.width;
+        final int tw=dimension.width;
         context.rectangle(0, 0, tw, th);
         context.clip();
 
@@ -348,16 +349,16 @@ public class GtkGraphicContext implements GraphicContext {
         context.clip();
 
         final int rh=lh;
-        final int rw=this.width-lw-width;
-        final int rx=this.width-rw;
+        final int rw=dimension.width-lw-width;
+        final int rx=dimension.width-rw;
         final int ry=th;
         context.rectangle(rx, ry, lw, rh);
         context.clip();
 
-        final int bh=this.height-height-th;
+        final int bh=dimension.height-height-th;
         final int bw=tw;
         final int bx=0;
-        final int by=this.height-bh;
+        final int by=dimension.height-bh;
         context.rectangle(bx, by, bw, bh);
         context.clip();
     }
@@ -398,4 +399,31 @@ public class GtkGraphicContext implements GraphicContext {
             drawPath(path, GtkGraphicFactory.DEBUG_PAINT);
         }
     }
+
+    /**
+     * Does nothing. Exists to satisfy Canvas interface
+     */
+    @Override
+    public void destroy() {}
+
+    @Override
+    public Dimension getDimension() {
+        return dimension;
+    }
+
+    @Override
+    public int getHeight() {
+        return dimension.height;
+    }
+
+    @Override
+    public int getWidth() {
+        return dimension.width;
+    }
+
+    /**
+     * Does nothing. Exists to satisfy Canvas interface
+     */
+    @Override
+    public void setBitmap(Bitmap bitmap) {}
 }
