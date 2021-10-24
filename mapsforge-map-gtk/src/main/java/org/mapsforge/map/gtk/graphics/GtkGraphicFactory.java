@@ -43,7 +43,7 @@ public class GtkGraphicFactory implements GraphicFactory {
     /**
      * Draw debug structures (red squares and lines)
      */
-    public static boolean DRAW_DEBUG = true;
+    public static boolean DRAW_DEBUG = false;
 
     public static final Paint DEBUG_PAINT = new GtkPaint() {
         {
