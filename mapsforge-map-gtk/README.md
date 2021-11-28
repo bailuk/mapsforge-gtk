@@ -26,9 +26,6 @@ dependencies {
 
 ## Hello world
 ```kotlin
-package com.example.gtk.app
-
-
 import ch.bailu.gtk.GTK
 import ch.bailu.gtk.gio.ApplicationFlags
 import ch.bailu.gtk.gtk.Application
