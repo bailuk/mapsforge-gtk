@@ -82,7 +82,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
 
         context.save();
-        context.setMatrix(cairoMatrix);
+        context.transform(cairoMatrix);
         context.setSourceSurface(gtkBitmap.getSurface(),0,0);
         context.paint();
         context.identityMatrix();

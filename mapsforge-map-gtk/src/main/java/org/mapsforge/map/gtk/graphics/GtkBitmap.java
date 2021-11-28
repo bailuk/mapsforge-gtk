@@ -129,7 +129,7 @@ public  class GtkBitmap implements Bitmap, ResourceBitmap {
         mustHaveRefCount();
 
         if (width != this.getWidth() || height != this.getHeight())
-            System.out.println("GtkBitmap::scaleTo()");
+            System.out.println("GtkBitmap::scaleTo("+ width + "," + height + ")");
     }
 
     @Override
