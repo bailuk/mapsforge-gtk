@@ -81,12 +81,12 @@ public class GtkPaint implements Paint {
 
     @Override
     public int getTextHeight(String text) {
-        return (int) (fontSize+5f);
+        return (int) (DisplayMetrics.instance().pointsToPixel(fontSize));
     }
 
     @Override
     public int getTextWidth(String text) {
-        return (int) ((fontSize * text.length()));
+        return (int) ((DisplayMetrics.instance().pointsToPixel(fontSize) * text.length()));
     }
 
     @Override
@@ -119,6 +119,7 @@ public class GtkPaint implements Paint {
     public Point getBitmapShaderShift() {
         return bitmapShaderShift;
     }
+
     @Override
     public void setColor(Color color) {
         this.color = GtkGraphicFactory.INSTANCE.createColor(color);

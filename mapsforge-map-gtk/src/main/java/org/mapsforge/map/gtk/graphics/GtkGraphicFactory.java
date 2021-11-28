@@ -31,6 +31,7 @@ import org.mapsforge.core.mapelements.SymbolContainer;
 import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.map.gtk.util.color.ARGB;
+import org.mapsforge.map.model.DisplayModel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,12 +46,17 @@ public class GtkGraphicFactory implements GraphicFactory {
      */
     public static boolean DRAW_DEBUG = false;
 
+    public GtkGraphicFactory() {
+        DisplayModel.setDeviceScaleFactor(DisplayMetrics.instance().getDensity());
+    }
+
     public static final Paint DEBUG_PAINT = new GtkPaint() {
         {
             setColor(Color.RED);
             setStrokeWidth(2);
         }
     };
+
 
     @Override
     public Bitmap createBitmap(int width, int height) {
