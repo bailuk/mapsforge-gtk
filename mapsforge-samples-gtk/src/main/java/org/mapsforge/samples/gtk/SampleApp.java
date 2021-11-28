@@ -69,7 +69,7 @@ public final class SampleApp {
     }
 
     private SampleApp(String args[]) {
-        final Application app = new Application(APP_ID, ApplicationFlags.FLAGS_NONE);
+        final Application app = new Application(APP_ID, 0);
         app.onActivate(() -> onActivate(new ApplicationWindow(app), args));
         app.run(1, new Strs(new Str[]{APP_NAME}));
     }
