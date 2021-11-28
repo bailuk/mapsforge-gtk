@@ -15,7 +15,6 @@
 package org.mapsforge.samples.gtk;
 
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.glib.SList;
 import ch.bailu.gtk.gtk.CheckMenuItem;
 import ch.bailu.gtk.gtk.Menu;
 import ch.bailu.gtk.gtk.RadioMenuItem;
@@ -35,7 +34,7 @@ public class Menus {
     public Menus(Config config) {
         menu = new Menu();
 
-        raster = new RadioMenuItem(new SList(0));
+        raster = new RadioMenuItem(null);
         vector = new RadioMenuItem(raster.getGroup());
         raster.setLabel(new Str("Raster map"));
         raster.onToggled(() -> {
