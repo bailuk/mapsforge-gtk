@@ -23,6 +23,7 @@ import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.LatLong;
+import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.controller.FrameBufferController;
 import org.mapsforge.map.controller.LayerManagerController;
 import org.mapsforge.map.controller.MapViewController;
@@ -40,8 +41,10 @@ import org.mapsforge.map.util.MapPositionUtil;
 import org.mapsforge.map.util.MapViewProjection;
 import org.mapsforge.map.view.FpsCounter;
 import org.mapsforge.map.view.FrameBuffer;
+import org.mapsforge.map.view.FrameBufferHA2;
 import org.mapsforge.map.view.FrameBufferHA3;
 
+import ch.bailu.gtk.Callback;
 import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.glib.Glib;
@@ -58,6 +61,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
     private final MapViewProjection mapViewProjection;
     private final Model model;
     private MapScaleBar mapScaleBar;
+    private final TouchGestureHandler touchGestureHandler;
 
     private final DrawingArea drawingArea = new DrawingArea();
     private Dimension dimension = new Dimension(0,0);
@@ -93,17 +97,18 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
 
         drawingArea.onSizeAllocate(allocation -> {
-            System.out.println(allocation.getFieldX() + ":" + allocation.getFieldY() + ":" + allocation.getFieldWidth() + ":" + allocation.getFieldHeight());
-            dimension = new Dimension(allocation.getFieldWidth(), allocation.getFieldHeight());
-            if (dimension.width > 0 && dimension.height > 0) {
+            final int width = allocation.getFieldWidth();
+            final int height = allocation.getFieldHeight();
+
+            if (width > 0 && height > 0) {
+                dimension = new Dimension(width, height);
                 model.mapViewDimension.setDimension(dimension);
             }
         });
 
         new MouseEvents(this, drawingArea);
 
-
-
+        this.touchGestureHandler = new TouchGestureHandler(this);
     }
 
     /**
@@ -129,6 +134,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
             this.mapScaleBar.destroy();
         }
         this.getModel().mapViewPosition.destroy();
+        touchGestureHandler.destory();
     }
 
     @Override
@@ -201,6 +207,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
     }
 
     private boolean redrawNeeded = false;
+    private final Callback.EmitterID emitterID = new Callback.EmitterID();
 
     @Override
     public void repaint() {
@@ -218,7 +225,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
                 drawingArea.queueDraw();
             }
             return GTK.FALSE;
-        }, null);
+        }, emitterID);
     }
 
     @Override
