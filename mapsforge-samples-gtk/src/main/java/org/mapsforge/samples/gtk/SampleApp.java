@@ -25,19 +25,17 @@ import org.mapsforge.map.gtk.view.MapView;
 import java.io.IOException;
 
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.exception.AllocationError;
-import ch.bailu.gtk.gdkpixbuf.Pixbuf;
+import ch.bailu.gtk.gio.ActionMap;
 import ch.bailu.gtk.gio.ApplicationFlags;
+import ch.bailu.gtk.gio.Menu;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
 import ch.bailu.gtk.gtk.Box;
 import ch.bailu.gtk.gtk.Button;
 import ch.bailu.gtk.gtk.HeaderBar;
-import ch.bailu.gtk.gtk.IconSize;
-import ch.bailu.gtk.gtk.Image;
-import ch.bailu.gtk.gtk.Menu;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.Orientation;
+import ch.bailu.gtk.gtk.PopoverMenu;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
 
@@ -53,7 +51,7 @@ public final class SampleApp {
     }
 
     private final static Str APP_ID   = new Str("org.mapsforge.samples.gtk");
-    private final static Str APP_NAME = new Str("Mapsforge GTK3 Sample");
+    private final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
     private final static Str APP_ICON = new Str("../docs/logo/Mapsforge.svg");
 
 
@@ -69,62 +67,67 @@ public final class SampleApp {
     }
 
     private SampleApp(String args[]) {
-        final Application app = new Application(APP_ID, 0);
-        app.onActivate(() -> onActivate(new ApplicationWindow(app), args));
+        final Application app = new Application(APP_ID, ApplicationFlags.FLAGS_NONE);
+        app.onActivate(() -> onActivate(new ApplicationWindow(app), new ActionMap(app.cast()), args));
         app.run(1, new Strs(new Str[]{APP_NAME}));
     }
 
 
 
-    public void onActivate(ApplicationWindow window, String[] args) {
+    public void onActivate(ApplicationWindow window, ActionMap actionMap, String[] args) {
         final MapView mapView = new MapView();
         final Config config = new Config(args, mapView);
 
-        window.setTitlebar(createHeader(mapView, new Menus(config).menu));
+        window.setTitle(APP_NAME);
 
+        System.out.println("SampleApp::onActivate()");
+
+        window.setTitlebar(createHeader(mapView, new Menus(config, actionMap).getMenuHelper()));
+
+/*
         try  {
             window.setIcon(Pixbuf.newFromFilePixbuf(APP_ICON));
         } catch (AllocationError e) {
             System.out.println(e.getMessage());
         }
-
+*/
         window.setDefaultSize(1024, 768);
 
         window.onShow(() -> {
+            System.out.println("SampleApp::onShow()");
             config.initMapView();
         });
 
         window.onDestroy(() -> {
+            System.out.println("SampleApp::onDestroy()");
             config.save();
             System.exit(0);
         });
-        window.add(mapView.getDrawingArea());
-        window.showAll();
+
+        window.setChild(mapView.getDrawingArea());
+        window.show();
+
     }
 
 
-    private HeaderBar createHeader(MapView mapView, Menu menu) {
+    private HeaderBar createHeader(MapView mapView, Menus.MenuHelper menu) {
+        System.out.println("SampleApp::createHeader()");
         final HeaderBar header = new HeaderBar();
-        header.setShowCloseButton(1);
-        header.setTitle(APP_NAME);
+        header.setShowTitleButtons(GTK.TRUE);
 
-        final MenuButton menuButton = new MenuButton();
-        menuButton.add(Image.newFromIconNameImage(new Str("open-menu-symbolic"), IconSize.BUTTON));
-        menuButton.setPopup(menu);
+        final MenuButton menuButton = menu.getMenuButton();
         header.packEnd(menuButton);
 
         Box box = new Box(Orientation.HORIZONTAL, 0);
         box.getStyleContext().addClass(new Str("linked"));
 
-        final Button zoomIn = new Button();
-        zoomIn.add(Image.newFromIconNameImage(new Str("zoom-in-symbolic"), IconSize.BUTTON));
+        final Button zoomIn = Button.newFromIconNameButton(new Str("zoom-in-symbolic"));
         zoomIn.onClicked(() -> mapView.getModel().mapViewPosition.zoomIn());
-        box.add(zoomIn);
+        box.append(zoomIn);
 
-        final Button zoomOut = new Button();
-        zoomOut.add(Image.newFromIconNameImage(new Str("zoom-out-symbolic"), IconSize.BUTTON));
+        final Button zoomOut = Button.newFromIconNameButton(new Str("zoom-out-symbolic"));
         zoomOut.onClicked(() -> mapView.getModel().mapViewPosition.zoomOut());
-        box.add(zoomOut);
+        box.append(zoomOut);
 
         header.packStart(box);
         return header;

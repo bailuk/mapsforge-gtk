@@ -23,7 +23,6 @@ import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.LatLong;
-import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.controller.FrameBufferController;
 import org.mapsforge.map.controller.LayerManagerController;
 import org.mapsforge.map.controller.MapViewController;
@@ -41,7 +40,6 @@ import org.mapsforge.map.util.MapPositionUtil;
 import org.mapsforge.map.util.MapViewProjection;
 import org.mapsforge.map.view.FpsCounter;
 import org.mapsforge.map.view.FrameBuffer;
-import org.mapsforge.map.view.FrameBufferHA2;
 import org.mapsforge.map.view.FrameBufferHA3;
 
 import ch.bailu.gtk.Callback;
@@ -61,7 +59,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
     private final MapViewProjection mapViewProjection;
     private final Model model;
     private MapScaleBar mapScaleBar;
-    private final TouchGestureHandler touchGestureHandler;
+    //private final TouchGestureHandler touchGestureHandler;
 
     private final DrawingArea drawingArea = new DrawingArea();
     private Dimension dimension = new Dimension(0,0);
@@ -81,34 +79,32 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
         this.mapViewProjection = new MapViewProjection(this);
 
-        drawingArea.onDraw(context -> {
-            final GraphicContext graphicContext = new GtkGraphicContext(context, dimension);
 
-            this.frameBuffer.draw(graphicContext);
-            if (this.mapScaleBar != null) {
-                this.mapScaleBar.draw(graphicContext);
+        drawingArea.setDrawFunc((drawing_area, cr, width, height, user_data) -> {
+            System.out.println("MapView::drawFunc()");
+            final GraphicContext graphicContext = new GtkGraphicContext(cr, dimension);
+
+            frameBuffer.draw(graphicContext);
+            if (mapScaleBar != null) {
+                mapScaleBar.draw(graphicContext);
             }
-            this.fpsCounter.draw(graphicContext);
+            fpsCounter.draw(graphicContext);
 
-            MapView.this.onDraw(context);
+            MapView.this.onDraw(cr);
+        }, new Callback.EmitterID(),null);
 
-            return GTK.TRUE;
-        });
-
-
-        drawingArea.onSizeAllocate(allocation -> {
-            final int width = allocation.getFieldWidth();
-            final int height = allocation.getFieldHeight();
-
+        drawingArea.onResize(((width, height) -> {
+            System.out.println("MapView::onResize()");
             if (width > 0 && height > 0) {
                 dimension = new Dimension(width, height);
                 model.mapViewDimension.setDimension(dimension);
             }
-        });
+        }));
 
         new MouseEvents(this, drawingArea);
+        // TODO this.touchGestureHandler = new TouchGestureHandler(this);
+        System.out.println("MapView::MapView()");
 
-        this.touchGestureHandler = new TouchGestureHandler(this);
     }
 
     /**
@@ -122,11 +118,13 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public void addLayer(Layer layer) {
+        System.out.println("MapView::addLayer()");
         this.layerManager.getLayers().add(layer);
     }
 
     @Override
     public void destroy() {
+        System.out.println("MapView::destroy()");
         this.layerManager.finish();
         this.frameBufferController.destroy();
         this.frameBuffer.destroy();
@@ -134,11 +132,12 @@ public class MapView implements org.mapsforge.map.view.MapView{
             this.mapScaleBar.destroy();
         }
         this.getModel().mapViewPosition.destroy();
-        touchGestureHandler.destory();
+        // TODO touchGestureHandler.destory();
     }
 
     @Override
     public void destroyAll() {
+        System.out.println("MapView::destroyAll()");
         for (Layer layer : this.layerManager.getLayers()) {
             this.layerManager.getLayers().remove(layer);
             layer.onDestroy();
@@ -157,52 +156,68 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public BoundingBox getBoundingBox() {
+        System.out.println("MapView::getBoundingBox()");
         return MapPositionUtil.getBoundingBox(this.model.mapViewPosition.getMapPosition(),
                 getDimension(), this.model.displayModel.getTileSize());
     }
 
     @Override
     public Dimension getDimension() {
+        System.out.println("MapView::getDimension()");
         return dimension;
     }
 
     @Override
     public FpsCounter getFpsCounter() {
+        System.out.println("MapView::getFpsCounter()");
         return this.fpsCounter;
     }
 
     @Override
     public FrameBuffer getFrameBuffer() {
+        System.out.println("MapView::getFrameBuffer()");
         return this.frameBuffer;
     }
 
     @Override
     public int getHeight() {
+        System.out.println("MapView::getHeight()");
+
         return dimension.height;
     }
 
     @Override
     public LayerManager getLayerManager() {
+        System.out.println("MapView::getLayerManager()");
+
         return this.layerManager;
     }
 
     @Override
     public MapScaleBar getMapScaleBar() {
+        System.out.println("MapView::getMapScaleBar()");
+
         return this.mapScaleBar;
     }
 
     @Override
     public MapViewProjection getMapViewProjection() {
+        System.out.println("MapView::getMapViewProjection()");
+
         return this.mapViewProjection;
     }
 
     @Override
     public Model getModel() {
+        System.out.println("MapView::getModel()");
+
         return this.model;
     }
 
     @Override
     public int getWidth() {
+        System.out.println("MapView::getWidth()");
+
         return dimension.width;
     }
 
@@ -211,6 +226,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public void repaint() {
+        System.out.println("MapView::repaint()");
         /**
          * Repaint requests are coming from the main (UI) thread as well as from
          * the layer manager worker thread.
@@ -230,11 +246,14 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public void setCenter(LatLong center) {
+        System.out.println("MapView::setCenter()");
         this.model.mapViewPosition.setCenter(center);
     }
 
     @Override
     public void setMapScaleBar(MapScaleBar mapScaleBar) {
+        System.out.println("MapView::setMapScaleBar()");
+
         if (this.mapScaleBar != null) {
             this.mapScaleBar.destroy();
         }
@@ -244,20 +263,27 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
     @Override
     public void setZoomLevel(byte zoomLevel) {
+        System.out.println("MapView::setZoomLevel()");
+
         this.model.mapViewPosition.setZoomLevel(zoomLevel);
     }
 
     @Override
     public void setZoomLevelMax(byte zoomLevelMax) {
+        System.out.println("MapView::setZoomLevelMax()");
+
         this.model.mapViewPosition.setZoomLevelMax(zoomLevelMax);
     }
 
     @Override
     public void setZoomLevelMin(byte zoomLevelMin) {
+        System.out.println("MapView::setZoomLevelMin()");
+
         this.model.mapViewPosition.setZoomLevelMin(zoomLevelMin);
     }
 
     public DrawingArea getDrawingArea() {
+        System.out.println("MapView::getDrawingArea()");
         return drawingArea;
     }
 }

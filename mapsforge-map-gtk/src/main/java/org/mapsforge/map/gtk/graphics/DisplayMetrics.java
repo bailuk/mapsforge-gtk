@@ -1,17 +1,12 @@
 package org.mapsforge.map.gtk.graphics;
 
-import ch.bailu.gtk.gdk.Screen;
 
 public class DisplayMetrics {
     private final float dpi;
     private static DisplayMetrics INSTANCE = null;
 
     public DisplayMetrics() {
-        float dpi = (float) Screen.getDefault().getResolution();
-        if (dpi <= 0f) {
-            dpi = 96f;
-        }
-        this.dpi = dpi;
+        dpi = 96f;
     }
 
     public static DisplayMetrics instance() {

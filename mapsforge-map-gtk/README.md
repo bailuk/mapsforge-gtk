@@ -1,5 +1,5 @@
 # Mapsforge Map GTK
-GTK3 based implementation of the Mapsforge MapView. It is made with [java-gtk](https://github.com/bailuk/java-gtk)
+GTK4 based implementation of the Mapsforge MapView. It is made with [java-gtk](https://github.com/bailuk/java-gtk)
 
 ## Prerequisite
 Clone [java-gtk](https://github.com/bailuk/java-gtk) and run `./gradlew publishToMavenLocal` in project root.
@@ -48,7 +48,7 @@ fun main(args: Array<String>) {
     app.onActivate {
         val window = ApplicationWindow(app)
         val mapView = MapView()
-        window.add(mapView.drawingArea)
+        window.setChild(mapView.drawingArea)
         window.title = Str("Map")
         window.setSizeRequest(500,500)
 
@@ -72,7 +72,7 @@ fun main(args: Array<String>) {
             exitProcess(0)
         }
 
-        window.showAll()
+        window.show()
     }
 
     app.run(args.size, Strs(args))

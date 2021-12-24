@@ -27,8 +27,6 @@ import org.mapsforge.map.model.common.PreferencesFacade;
 
 import java.util.prefs.Preferences;
 
-import ch.bailu.gtk.GTK;
-
 public class Config {
 
     private final MapView mapView ;
@@ -47,14 +45,14 @@ public class Config {
     }
 
     public void setMenus(Menus menus) {
-        menus.scale.setActive(GTK.is(scaleBarOn.get()));
-        menus.coords.setActive(GTK.is(coordsLayerOn.get()));
-        menus.grid.setActive(GTK.is(gridLayerOn.get()));
-        menus.fps.setActive(GTK.is(fpsLayerOn.get()));
-        menus.raster.setActive(GTK.is(rasterMapOn.get()));
-        menus.vector.setActive(GTK.is(!rasterMapOn.get()));
-        menus.vector.setSensitive(GTK.is(layerConfig.haveVectorMap()));
-        menus.debug.setActive(GTK.is(debugOn.get()));
+        System.out.println("Config::setMenus()");
+
+        menus.setChecked("scale",  scaleBarOn.get());
+        menus.setChecked("coords", coordsLayerOn.get());
+        menus.setChecked("grid",   gridLayerOn.get());
+        menus.setChecked("fps",    fpsLayerOn.get());
+        menus.setChecked("raster", rasterMapOn.get());
+        menus.setChecked("debug",  debugOn.get());
     }
 
     private class Bool {

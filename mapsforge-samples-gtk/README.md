@@ -1,5 +1,5 @@
-# GTK3 sample application
-Demonstrating the GTK3 based implementation of the Mapsforge MapView.
+# GTK4 sample application
+Demonstrating the GTK4 based implementation of the Mapsforge MapView.
 
 ## Compile and run
 ```bash
@@ -7,4 +7,4 @@ Demonstrating the GTK3 based implementation of the Mapsforge MapView.
 ```
 
 ## Screenshot
-![Desktop GTK3](../docs/images/desktop-gtk.png)
+![Desktop GTK4](../docs/images/desktop-gtk.png)

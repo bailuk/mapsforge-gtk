@@ -35,9 +35,9 @@ In other words, you are allowed to include Mapsforge library in your Android app
 | ------------- |
 |<img src="docs/images/android.png" width="1000">|
 
-| Desktop GTK3  |
+| Desktop GTK4  |
 | ------------- |
-|![Desktop GTK3](docs/images/desktop-gtk.png)|
+|![Desktop GTK4](docs/images/desktop-gtk.png)|
 
 | Desktop       |
 | ------------- |

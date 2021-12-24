@@ -12,109 +12,82 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+
 package org.mapsforge.map.gtk.view;
 
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.map.model.IMapViewPosition;
 
-import java.awt.Point;
-
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.gdk.EventButton;
-import ch.bailu.gtk.gdk.EventMask;
-import ch.bailu.gtk.gdk.EventMotion;
-import ch.bailu.gtk.gdk.EventScroll;
-import ch.bailu.gtk.gdk.EventType;
-import ch.bailu.gtk.gdk.GdkConstants;
-import ch.bailu.gtk.gdk.ModifierType;
-import ch.bailu.gtk.gdk.ScrollDirection;
 import ch.bailu.gtk.gtk.DrawingArea;
-import ch.bailu.gtk.gtk.Widget;
+import ch.bailu.gtk.gtk.EventControllerMotion;
+import ch.bailu.gtk.gtk.EventControllerScroll;
+import ch.bailu.gtk.gtk.EventControllerScrollFlags;
+import ch.bailu.gtk.gtk.GestureClick;
+import ch.bailu.gtk.gtk.GestureDrag;
 
-public class MouseEvents implements Widget.OnScrollEvent, Widget.OnMotionNotifyEvent, Widget.OnButtonPressEvent, Widget.OnButtonReleaseEvent {
+public class MouseEvents {
 
     private final MapView mapView;
-    private Point lastDragPoint = null;
 
+    private double mouseX = 0;
+    private double mouseY = 0;
+    private double dragX = 0;
+    private double dragY = 0;
 
     public MouseEvents(MapView mapView, DrawingArea drawingArea) {
         this.mapView = mapView;
 
-        drawingArea.onScrollEvent(this);
-        drawingArea.onMotionNotifyEvent(this);
-        drawingArea.onButtonPressEvent(this);
-        drawingArea.onButtonReleaseEvent(this);
-
-        drawingArea.addEvents(EventMask.BUTTON1_MOTION_MASK);
-        drawingArea.addEvents(EventMask.SCROLL_MASK);
-        drawingArea.addEvents(EventMask.BUTTON_PRESS_MASK);
-        drawingArea.addEvents(EventMask.BUTTON_RELEASE_MASK);
-
-    }
-
-
-    @Override
-    public int onMotionNotifyEvent(EventMotion eventMotion) {
-            if ((eventMotion.getFieldState() & ModifierType.BUTTON1_MASK) != 0) {
-                int x = (int) eventMotion.getFieldX();
-                int y = (int) eventMotion.getFieldY();
-                Point point = new Point(x,y);
-                if (lastDragPoint != null) {
-                    int moveHorizontal = point.x - lastDragPoint.x;
-                    int moveVertical = point.y - lastDragPoint.y;
-                    mapView.getModel().mapViewPosition.moveCenter(moveHorizontal, moveVertical);
-                }
-                lastDragPoint = point;
+        var scroller = new EventControllerScroll(EventControllerScrollFlags.VERTICAL | EventControllerScrollFlags.DISCRETE);
+        drawingArea.addController(scroller);
+        scroller.onScroll((dx, dy) -> {
+            if (dy < 0) {
+                zoomInAndCenter(mouseX, mouseY);
                 return GTK.TRUE;
+
+            } else if (dy > 0) {
+                zoomOut();
+                return GTK.TRUE;
+
             }
             return GTK.FALSE;
-    }
-
-    @Override
-    public int onScrollEvent(EventScroll eventScroll) {
-        int direction = eventScroll.getFieldDirection();
-
-        if (direction == ScrollDirection.UP) {
-            zoomInAndCenter((int)eventScroll.getFieldX(), (int)eventScroll.getFieldY());
-            return GTK.TRUE;
-
-        } else if (direction == ScrollDirection.DOWN) {
-            zoomOut();
-            return GTK.TRUE;
-
-        }
-        return GTK.FALSE;
-    }
+        });
 
 
+        var motion = new EventControllerMotion();
+        drawingArea.addController(motion);
+        motion.onMotion((x, y) -> {
+            mouseX = x;
+            mouseY = y;
+        });
 
-    @Override
-    public int onButtonPressEvent(EventButton eventButton) {
+        var drag = new GestureDrag();
+        drawingArea.addController(drag);
+        drag.onDragBegin((start_x, start_y) -> {
+            dragX = mouseX;
+            dragY = mouseY;
+        });
 
-        if (eventButton.getFieldButton() == GdkConstants.BUTTON_PRIMARY) {
-            if (eventButton.getFieldType() == EventType.DOUBLE_BUTTON_PRESS) {
-                zoomInAndCenter((int)eventButton.getFieldX(), (int)eventButton.getFieldY());
-                lastDragPoint = null;
-                return GTK.TRUE;
+        drag.onDragUpdate((offset_x, offset_y) -> {
+            double deltaX = mouseX - dragX;
+            double deltaY = mouseY - dragY;
+
+            mapView.getModel().mapViewPosition.moveCenter(deltaX, deltaY);
+            dragX = mouseX;
+            dragY = mouseY;
+        });
+
+        var click = new GestureClick();
+        drawingArea.addController(click);
+        click.onReleased((n_press, x, y) -> {
+            if (n_press == 2) {
+                zoomInAndCenter(x, y);
             }
-            lastDragPoint = new Point((int)eventButton.getFieldX(), (int)eventButton.getFieldY());
-            return GTK.TRUE;
-        }
-        return GTK.FALSE;
+        });
     }
 
-    @Override
-    public int onButtonReleaseEvent(EventButton eventButton) {
-        if (eventButton.getFieldButton() == GdkConstants.BUTTON_PRIMARY) {
-            lastDragPoint = null;
-            return GTK.TRUE;
-        }
-        return GTK.FALSE;
-    }
-
-
-
-    private void zoomInAndCenter(int x, int y) {
+    private void zoomInAndCenter(double x, double y) {
         IMapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
         if (mapViewPosition.getZoomLevel() < mapViewPosition.getZoomLevelMax()) {
             org.mapsforge.core.model.Point center = this.mapView.getModel().mapViewDimension.getDimension().getCenter();
@@ -136,5 +109,4 @@ public class MouseEvents implements Widget.OnScrollEvent, Widget.OnMotionNotifyE
             mapView.getModel().mapViewPosition.zoom((byte) -1);
         }
     }
-
 }

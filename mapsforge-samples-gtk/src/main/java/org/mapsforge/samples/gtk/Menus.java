@@ -15,69 +15,89 @@
 package org.mapsforge.samples.gtk;
 
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.gtk.CheckMenuItem;
-import ch.bailu.gtk.gtk.Menu;
-import ch.bailu.gtk.gtk.RadioMenuItem;
-import ch.bailu.gtk.gtk.SeparatorMenuItem;
+import ch.bailu.gtk.gio.ActionMap;
+import ch.bailu.gtk.gio.Menu;
+import ch.bailu.gtk.gio.MenuItem;
+import ch.bailu.gtk.gtk.MenuButton;
+import ch.bailu.gtk.gtk.PopoverMenu;
+import ch.bailu.gtk.helper.ActionHelper;
 import ch.bailu.gtk.type.Str;
 
 public class Menus {
 
-    public final Menu menu;
-    public final CheckMenuItem scale;
-    public final CheckMenuItem coords;
-    public final CheckMenuItem grid;
-    public final CheckMenuItem fps;
-    public final CheckMenuItem debug;
-    public final RadioMenuItem raster, vector;
+    private final MenuHelper menuHelper;
 
-    public Menus(Config config) {
-        menu = new Menu();
 
-        raster = new RadioMenuItem(null);
-        vector = new RadioMenuItem(raster.getGroup());
-        raster.setLabel(new Str("Raster map"));
-        raster.onToggled(() -> {
-            if (GTK.is(raster.getActive())) config.setRasterMap();
+    public Menus(Config config, ActionMap actionMap) {
+        System.out.println("Menus::Menus()");
+
+        menuHelper = new MenuHelper(actionMap, "app");
+
+        menuHelper.addCheckBoxMenu("Scale bar",
+                "scale", (isChecked)-> config.setScaleBar(isChecked));
+
+        menuHelper.addCheckBoxMenu("Tile coordinates",
+                "coord", (isChecked)-> config.setCoordsLayer(isChecked));
+
+        menuHelper.addCheckBoxMenu("Show grid",
+                "grid", (isChecked)-> config.setGridLayer(isChecked));
+
+        menuHelper.addCheckBoxMenu("Fps counter",
+                "fps", (isChecked)-> config.setFpsLayer(isChecked));
+
+        menuHelper.addCheckBoxMenu("Draw debug structures",
+                "debug", (isChecked)-> config.setDrawDebug(isChecked));
+
+        menuHelper.addCheckBoxMenu("Raster map",
+                "raster", (isChecked)-> {
+            if (isChecked) config.setRasterMap();
+            else config.setVectorMap();
         });
 
-        vector.setLabel(new Str("Vector map"));
-        vector.onToggled(() -> {
-            if (GTK.is(vector.getActive())) config.setVectorMap();
-        });
-
-        menu.append(raster);
-        menu.append(vector);
-
-        SeparatorMenuItem separator = new SeparatorMenuItem();
-        menu.append(separator);
-        scale = new CheckMenuItem();
-        scale.setLabel(new Str("Scale bar"));
-        scale.onToggled(() -> config.setScaleBar(GTK.is(scale.getActive())));
-        menu.append(scale);
-
-        fps = new CheckMenuItem();
-        fps.setLabel(new Str("Fps counter"));
-        fps.onToggled(() -> config.setFpsLayer(GTK.is(fps.getActive())));
-        menu.append(fps);
-
-        coords = new CheckMenuItem();
-        coords.setLabel(new Str("Tile coordinates layer"));
-        coords.onToggled(() -> config.setCoordsLayer(GTK.is(coords.getActive())));
-        menu.append(coords);
-
-        grid = new CheckMenuItem();
-        grid.setLabel(new Str("Tile grid layer"));
-        grid.onToggled(() -> config.setGridLayer(GTK.is(grid.getActive())));
-        menu.append(grid);
-
-        debug = new CheckMenuItem();
-        debug.setLabel(new Str("Draw debug structures"));
-        debug.onToggled((() -> config.setDrawDebug(GTK.is(debug.getActive()))));
-        menu.append(debug);
-
-        menu.showAll();
         config.setMenus(this);
     }
 
+    public void setChecked(String id, boolean isChecked) {
+        menuHelper.setChecked(id, isChecked);
+    }
+
+    public MenuHelper getMenuHelper() {
+        return menuHelper;
+    }
+
+
+    public static class MenuHelper {
+        private final ActionHelper actionHelper;
+        private final Menu menu = new Menu();
+        private final String name;
+
+        public MenuHelper(ActionMap actionMap, String name) {
+            this.name = name;
+            actionHelper = new ActionHelper(actionMap, name);
+        }
+
+        void addCheckBoxMenu(String label, String id, OnMenuChecked onMenuChecked) {
+            menu.appendItem(new MenuItem(new Str(label), new Str(this.name + "." + id)));
+            actionHelper.addBoolean(id, GTK.TRUE, (x) -> onMenuChecked.run(actionHelper.toggleChecked(id)));
+        }
+
+        public MenuButton getMenuButton() {
+            var result = new MenuButton();
+            result.setPopover(PopoverMenu.newFromModelPopoverMenu(menu));
+            return result;
+        }
+
+        public interface OnMenuSelected {
+            void run();
+        }
+
+        public interface OnMenuChecked {
+            void run(boolean isChecked);
+        }
+
+        public void setChecked(String action, boolean enabled) {
+            actionHelper.setChecked(action, enabled);
+        }
+
+    }
 }
