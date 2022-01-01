@@ -27,7 +27,6 @@ import java.io.IOException;
 import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.gio.ActionMap;
 import ch.bailu.gtk.gio.ApplicationFlags;
-import ch.bailu.gtk.gio.Menu;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
 import ch.bailu.gtk.gtk.Box;
@@ -35,7 +34,6 @@ import ch.bailu.gtk.gtk.Button;
 import ch.bailu.gtk.gtk.HeaderBar;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.Orientation;
-import ch.bailu.gtk.gtk.PopoverMenu;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
 
@@ -52,7 +50,6 @@ public final class SampleApp {
 
     private final static Str APP_ID   = new Str("org.mapsforge.samples.gtk");
     private final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
-    private final static Str APP_ICON = new Str("../docs/logo/Mapsforge.svg");
 
 
      /**
@@ -84,13 +81,6 @@ public final class SampleApp {
 
         window.setTitlebar(createHeader(mapView, new Menus(config, actionMap).getMenuHelper()));
 
-/*
-        try  {
-            window.setIcon(Pixbuf.newFromFilePixbuf(APP_ICON));
-        } catch (AllocationError e) {
-            System.out.println(e.getMessage());
-        }
-*/
         window.setDefaultSize(1024, 768);
 
         window.onShow(() -> {
