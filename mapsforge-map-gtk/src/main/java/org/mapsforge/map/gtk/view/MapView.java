@@ -79,8 +79,10 @@ public class MapView implements org.mapsforge.map.view.MapView{
 
         this.mapViewProjection = new MapViewProjection(this);
 
+        this.drawingArea.setVexpand(GTK.TRUE);
+        this.drawingArea.setHexpand(GTK.TRUE);
 
-        drawingArea.setDrawFunc((drawing_area, cr, width, height, user_data) -> {
+        this.drawingArea.setDrawFunc((drawing_area, cr, width, height, user_data) -> {
             System.out.println("MapView::drawFunc()");
             final GraphicContext graphicContext = new GtkGraphicContext(cr, dimension);
 
@@ -93,7 +95,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
             MapView.this.onDraw(cr);
         }, new Callback.EmitterID(),null);
 
-        drawingArea.onResize(((width, height) -> {
+        this.drawingArea.onResize(((width, height) -> {
             System.out.println("MapView::onResize()");
             if (width > 0 && height > 0) {
                 dimension = new Dimension(width, height);
