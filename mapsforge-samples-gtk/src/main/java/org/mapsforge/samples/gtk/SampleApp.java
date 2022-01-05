@@ -25,7 +25,6 @@ import org.mapsforge.map.gtk.view.MapView;
 import java.io.IOException;
 
 import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.gio.ActionMap;
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
@@ -34,6 +33,7 @@ import ch.bailu.gtk.gtk.Button;
 import ch.bailu.gtk.gtk.HeaderBar;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.Orientation;
+import ch.bailu.gtk.helper.ActionHelper;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
 
@@ -65,13 +65,13 @@ public final class SampleApp {
 
     private SampleApp(String args[]) {
         final Application app = new Application(APP_ID, ApplicationFlags.FLAGS_NONE);
-        app.onActivate(() -> onActivate(new ApplicationWindow(app), new ActionMap(app.cast()), args));
+        app.onActivate(() -> onActivate(new ApplicationWindow(app), new ActionHelper(app), args));
         app.run(1, new Strs(new Str[]{APP_NAME}));
     }
 
 
 
-    public void onActivate(ApplicationWindow window, ActionMap actionMap, String[] args) {
+    public void onActivate(ApplicationWindow window, ActionHelper actionHelper, String[] args) {
         final MapView mapView = new MapView();
         final Config config = new Config(args, mapView);
 
@@ -79,7 +79,7 @@ public final class SampleApp {
 
         System.out.println("SampleApp::onActivate()");
 
-        window.setTitlebar(createHeader(mapView, new Menus(config, actionMap).getMenuHelper()));
+        window.setTitlebar(createHeader(mapView, new Menus(config, actionHelper).getMenuHelper()));
 
         window.setDefaultSize(1024, 768);
 

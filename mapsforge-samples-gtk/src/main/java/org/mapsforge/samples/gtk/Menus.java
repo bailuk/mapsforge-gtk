@@ -28,10 +28,8 @@ public class Menus {
     private final MenuHelper menuHelper;
 
 
-    public Menus(Config config, ActionMap actionMap) {
-        System.out.println("Menus::Menus()");
-
-        menuHelper = new MenuHelper(actionMap, "app");
+    public Menus(Config config, ActionHelper actionHelper) {
+        menuHelper = new MenuHelper(actionHelper);
 
         menuHelper.addCheckBoxMenu("Scale bar",
                 "scale", (isChecked)-> config.setScaleBar(isChecked));
@@ -69,16 +67,15 @@ public class Menus {
     public static class MenuHelper {
         private final ActionHelper actionHelper;
         private final Menu menu = new Menu();
-        private final String name;
 
-        public MenuHelper(ActionMap actionMap, String name) {
-            this.name = name;
-            actionHelper = new ActionHelper(actionMap, name);
+
+        public MenuHelper(ActionHelper actionHelper) {
+            this.actionHelper = actionHelper;
         }
 
         void addCheckBoxMenu(String label, String id, OnMenuChecked onMenuChecked) {
-            menu.appendItem(new MenuItem(new Str(label), new Str(this.name + "." + id)));
-            actionHelper.addBoolean(id, GTK.TRUE, (x) -> onMenuChecked.run(actionHelper.toggleChecked(id)));
+            menu.appendItem(new MenuItem(new Str(label), new Str("app." + id)));
+            actionHelper.add(id, true, (param) -> onMenuChecked.run(actionHelper.getBooleanState(id)));
         }
 
         public MenuButton getMenuButton() {
@@ -96,7 +93,7 @@ public class Menus {
         }
 
         public void setChecked(String action, boolean enabled) {
-            actionHelper.setChecked(action, enabled);
+            actionHelper.changeState(action, enabled);
         }
 
     }
