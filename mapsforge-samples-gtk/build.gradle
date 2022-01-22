@@ -1,7 +1,7 @@
 apply plugin: 'application'
 
-sourceCompatibility = 11
-targetCompatibility = 11
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
 
 dependencies {
     implementation project(":mapsforge-map-gtk")
@@ -10,6 +10,7 @@ dependencies {
 }
 
 repositories {
+    maven { url 'https://jitpack.io' }
     mavenLocal()
 }
 

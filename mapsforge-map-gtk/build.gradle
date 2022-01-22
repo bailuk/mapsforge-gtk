@@ -7,7 +7,7 @@ java.targetCompatibility = JavaVersion.VERSION_11
 
 dependencies {
     api project(":mapsforge-map-reader")
-    api 'ch.bailu.java-gtk:library:0.1.0-SNAPSHOT'
+    api 'com.github.bailuk:java-gtk:572e13f6c3'
 
     testImplementation project(":mapsforge-themes")
     testImplementation "junit:junit:$jUnitVersion"
@@ -15,6 +15,7 @@ dependencies {
 
 
 repositories {
+    maven { url 'https://jitpack.io' }
     mavenLocal()
 }
 
