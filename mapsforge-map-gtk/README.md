@@ -1,9 +1,6 @@
 # Mapsforge Map GTK
 GTK4 based implementation of the Mapsforge MapView. It is made with [java-gtk](https://github.com/bailuk/java-gtk)
 
-## Prerequisite
-Clone [java-gtk](https://github.com/bailuk/java-gtk) and run `./gradlew publishToMavenLocal` in project root.
-
 ## Compile and install
 ```bash
 # build
@@ -16,6 +13,7 @@ Clone [java-gtk](https://github.com/bailuk/java-gtk) and run `./gradlew publishT
 ## Integrate using Gradle (build.gradle.kts)
 ```kotlin
 repositories {
+    maven { url = uri("https://jitpack.io") }
     mavenLocal()
 }
 
