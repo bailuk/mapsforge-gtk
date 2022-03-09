@@ -42,13 +42,15 @@ import org.mapsforge.map.view.FpsCounter;
 import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
-import ch.bailu.gtk.Callback;
+import javax.annotation.Nullable;
+
 import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.glib.Glib;
 import ch.bailu.gtk.gtk.DrawingArea;
+import ch.bailu.gtk.type.Pointer;
 
-public class MapView implements org.mapsforge.map.view.MapView{
+public class MapView implements org.mapsforge.map.view.MapView {
 
     private static final GraphicFactory GRAPHIC_FACTORY = GtkGraphicFactory.INSTANCE;
 
@@ -59,10 +61,9 @@ public class MapView implements org.mapsforge.map.view.MapView{
     private final MapViewProjection mapViewProjection;
     private final Model model;
     private MapScaleBar mapScaleBar;
-    //private final TouchGestureHandler touchGestureHandler;
 
     private final DrawingArea drawingArea = new DrawingArea();
-    private Dimension dimension = new Dimension(0,0);
+    private Dimension dimension = new Dimension(0, 0);
 
     public MapView() {
         this.model = new Model();
@@ -82,7 +83,7 @@ public class MapView implements org.mapsforge.map.view.MapView{
         this.drawingArea.setVexpand(GTK.TRUE);
         this.drawingArea.setHexpand(GTK.TRUE);
 
-        this.drawingArea.setDrawFunc((drawing_area, cr, width, height, user_data) -> {
+        DrawingArea.OnDrawingAreaDrawFunc drawFunc = (drawing_area, cr, width, height, user_data) -> {
             final GraphicContext graphicContext = new GtkGraphicContext(cr, dimension);
 
             frameBuffer.draw(graphicContext);
@@ -92,23 +93,27 @@ public class MapView implements org.mapsforge.map.view.MapView{
             fpsCounter.draw(graphicContext);
 
             MapView.this.onDraw(cr);
-        }, new Callback.EmitterID(),null);
+        };
 
-        this.drawingArea.onResize(((width, height) -> {
-            if (width > 0 && height > 0) {
-                dimension = new Dimension(width, height);
-                model.mapViewDimension.setDimension(dimension);
-            }
-        }));
+        this.drawingArea.setDrawFunc(drawFunc, null, data -> {});
 
-        new MouseEvents(this, drawingArea);
-        // TODO this.touchGestureHandler = new TouchGestureHandler(this);
+        this.drawingArea.onResize((MapView.this::onResize));
+
+        new GestureHandler(this, drawingArea);
+    }
+
+    public void onResize(int width, int height) {
+        if (width > 0 && height > 0) {
+            dimension = new Dimension(width, height);
+            model.mapViewDimension.setDimension(dimension);
+        }
     }
 
     /**
      * This function does nothing. It is for overriding only.
      * This function gets called after each redraw of the map view.
      * Override this to draw into the foreground of the map view.
+     *
      * @param context Cairo graphic context
      */
     public void onDraw(Context context) {}
@@ -201,11 +206,10 @@ public class MapView implements org.mapsforge.map.view.MapView{
     }
 
     private boolean redrawNeeded = false;
-    private final Callback.EmitterID emitterID = new Callback.EmitterID();
 
     @Override
     public void repaint() {
-        /**
+        /*
          * Repaint requests are coming from the main (UI) thread as well as from
          * the layer manager worker thread.
          * Functions from the gtk namespace do not support calls from outside the main (UI) thread.
@@ -213,14 +217,16 @@ public class MapView implements org.mapsforge.map.view.MapView{
          * This callback will then call queueDraw() from within the main (UI) thread.
          */
         redrawNeeded = true;
-        Glib.idleAdd(l -> {
-            if (redrawNeeded) {
-                redrawNeeded = false;
-                drawingArea.queueDraw();
-            }
-            return GTK.FALSE;
-        }, emitterID);
+        Glib.idleAdd(onSourceFunc, null);
     }
+
+    private Glib.OnSourceFunc onSourceFunc = user_data -> {
+        if (redrawNeeded) {
+            redrawNeeded = false;
+            drawingArea.queueDraw();
+        }
+        return GTK.FALSE;
+    };
 
     @Override
     public void setCenter(LatLong center) {

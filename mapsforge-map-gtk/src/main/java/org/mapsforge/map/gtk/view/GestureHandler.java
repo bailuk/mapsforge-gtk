@@ -17,6 +17,8 @@
 package org.mapsforge.map.gtk.view;
 
 import org.mapsforge.core.model.LatLong;
+import org.mapsforge.core.model.Point;
+import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.model.IMapViewPosition;
 
 import ch.bailu.gtk.GTK;
@@ -26,8 +28,9 @@ import ch.bailu.gtk.gtk.EventControllerScroll;
 import ch.bailu.gtk.gtk.EventControllerScrollFlags;
 import ch.bailu.gtk.gtk.GestureClick;
 import ch.bailu.gtk.gtk.GestureDrag;
+import ch.bailu.gtk.gtk.GestureZoom;
 
-public class MouseEvents {
+public class GestureHandler {
 
     private final MapView mapView;
 
@@ -36,9 +39,36 @@ public class MouseEvents {
     private double dragX = 0;
     private double dragY = 0;
 
-    public MouseEvents(MapView mapView, DrawingArea drawingArea) {
+    private double scaleFactor = 0;
+
+    private boolean singleClick = false;
+
+    public GestureHandler(MapView mapView, DrawingArea drawingArea) {
         this.mapView = mapView;
 
+        // Two finger zoom
+        var gestureZoom = new GestureZoom();
+        drawingArea.addController(gestureZoom);
+        gestureZoom.onScaleChanged(scale -> {
+            mapView.getModel().mapViewPosition.setScaleFactorAdjustment(scale);
+            scaleFactor = scale;
+        });
+
+        gestureZoom.onEnd(sequence -> {
+            double zoomLevelOffset = Math.log(scaleFactor) / Math.log(2);
+            byte zoomLevelDiff;
+
+            if (Math.abs(zoomLevelOffset) > 1) {
+                zoomLevelDiff = (byte) Math.round(zoomLevelOffset < 0 ? Math.floor(zoomLevelOffset) : Math.ceil(zoomLevelOffset));
+            } else {
+                zoomLevelDiff = (byte) Math.round(zoomLevelOffset);
+            }
+
+            mapView.getModel().mapViewPosition.zoom(zoomLevelDiff);
+        });
+
+
+        // Mouse wheel zoom
         var scroller = new EventControllerScroll(EventControllerScrollFlags.VERTICAL | EventControllerScrollFlags.DISCRETE);
         drawingArea.addController(scroller);
         scroller.onScroll((dx, dy) -> {
@@ -55,6 +85,7 @@ public class MouseEvents {
         });
 
 
+        // Get mouse position for scroll event (mouse wheel zoom)
         var motion = new EventControllerMotion();
         drawingArea.addController(motion);
         motion.onMotion((x, y) -> {
@@ -62,27 +93,48 @@ public class MouseEvents {
             mouseY = y;
         });
 
+
+        // Mouse and touch drag (move center of map)
         var drag = new GestureDrag();
+        drag.setButton(0);
         drawingArea.addController(drag);
         drag.onDragBegin((start_x, start_y) -> {
-            dragX = mouseX;
-            dragY = mouseY;
+            dragX = 0;
+            dragY = 0;
         });
 
         drag.onDragUpdate((offset_x, offset_y) -> {
-            double deltaX = mouseX - dragX;
-            double deltaY = mouseY - dragY;
+            double deltaX = offset_x - dragX;
+            double deltaY = offset_y - dragY;
 
             mapView.getModel().mapViewPosition.moveCenter(deltaX, deltaY);
-            dragX = mouseX;
-            dragY = mouseY;
+            dragX += deltaX;
+            dragY += deltaY;
         });
 
+
+        // mouse and touch "click"
         var click = new GestureClick();
         drawingArea.addController(click);
+        click.onPressed((i, v, v1) -> singleClick = i==1);
+        click.onStopped(() -> singleClick = false);
         click.onReleased((n_press, x, y) -> {
             if (n_press == 2) {
                 zoomInAndCenter(x, y);
+
+            } else if (n_press == 1 && singleClick) {
+                Point tapXY = new Point(x, y);
+                LatLong tapLatLong = mapView.getMapViewProjection().fromPixels(x,y);
+
+                for (int i = mapView.getLayerManager().getLayers().size()-1; i>=0; --i) {
+                    final Layer layer = mapView.getLayerManager().getLayers().get(i);
+                    final LatLong pos = layer.getPosition();
+
+                    if (pos != null) {
+                        Point layerXY = mapView.getMapViewProjection().toPixels(pos);
+                        layer.onTap(tapLatLong, layerXY, tapXY);
+                    }
+                }
             }
         });
     }
