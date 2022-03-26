@@ -1,6 +1,6 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0)
 
-|![Desktop GTK4](docs/images/desktop-gtk.png)|
+|![Desktop GTK4](doc/desktop-gtk.png)|
 
 
 # Mapsforge Map GTK
