@@ -68,11 +68,15 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
     @Override
     public void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
-        if (alpha != 1f || filter != Filter.NONE) {
+        if (filter != Filter.NONE) {
             System.out.println("GraphicContext::drawBitmap("+alpha+ ", " + filter.toString() + ")");
         }
-        drawBitmap(bitmap, left, top);
 
+        GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
+        context.save();
+        context.setSourceSurface(gtkBitmap.getSurface(), left, top);
+        context.paintWithAlpha(alpha);
+        context.restore();
     }
 
     @Override
@@ -93,10 +97,21 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
-        if (alpha != 1f || filter != Filter.NONE) {
+        if (filter != Filter.NONE) {
             System.out.println("GraphicContext::drawBitmap(matrix, "+alpha+ ", " + filter.toString() + ")");
         }
-        drawBitmap(bitmap, matrix);
+        AwtMatrix awtMatrix = (AwtMatrix) matrix;
+        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
+        GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
+
+        context.save();
+        context.transform(cairoMatrix);
+        context.setSourceSurface(gtkBitmap.getSurface(),0,0);
+        context.paintWithAlpha(alpha);
+        context.identityMatrix();
+        context.restore();
+
+        cairoMatrix.destroy();
     }
 
     @Override
@@ -107,7 +122,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
     @Override
     public void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha, Filter filter) {
-        drawBitmap(bitmap, srcLeft,srcTop);
+        drawBitmap(bitmap, srcLeft,srcTop, alpha, filter);
         System.out.println("GraphicContext::drawBitmap(6)");
     }
 
@@ -171,7 +186,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
 
     private Dbls setLineAndColor(GtkPaint paint) {
-        float dashes[] = paint.getDashPathEffect();
+        float[] dashes = paint.getDashPathEffect();
         Dbls res = null;
 
         setColor(paint.getColor());
@@ -336,30 +351,23 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         context.resetClip();
         context.newPath();
 
-        final int th=top;
         final int tw=dimension.width;
-        context.rectangle(0, 0, tw, th);
+        context.rectangle(0, 0, tw, top);
         context.clip();
 
-        final int lh=height;
-        final int lw=left;
         final int lx=0;
-        final int ly=th;
-        context.rectangle(lx, ly, lw, lh);
+        context.rectangle(lx, top, left, height);
         context.clip();
 
-        final int rh=lh;
-        final int rw=dimension.width-lw-width;
+        final int rw=dimension.width- left -width;
         final int rx=dimension.width-rw;
-        final int ry=th;
-        context.rectangle(rx, ry, lw, rh);
+        context.rectangle(rx, top, left, height);
         context.clip();
 
-        final int bh=dimension.height-height-th;
-        final int bw=tw;
+        final int bh=dimension.height-height- top;
         final int bx=0;
         final int by=dimension.height-bh;
-        context.rectangle(bx, by, bw, bh);
+        context.rectangle(bx, by, tw, bh);
         context.clip();
     }
 

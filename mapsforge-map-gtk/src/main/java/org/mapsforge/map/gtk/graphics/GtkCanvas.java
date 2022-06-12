@@ -62,10 +62,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
-        if (alpha != 1f || filter != Filter.NONE) {
-            System.out.println("GtkCanvas::drawBitmap(left, top, "+ alpha + ", " + filter + ")");
-        }
-        graphicContext.drawBitmap(bitmap, left, top);
+        graphicContext.drawBitmap(bitmap, left, top, alpha, filter);
     }
 
     @Override
@@ -75,10 +72,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
-        if (alpha != 1f || filter != Filter.NONE) {
-            System.out.println("GtkCanvas::drawBitmap(matrix, "+ alpha + ", " + filter + ")");
-        }
-        drawBitmap(bitmap, matrix);
+        graphicContext.drawBitmap(bitmap, matrix, alpha, filter);
     }
 
     @Override
@@ -89,8 +83,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha, Filter filter) {
-        drawBitmap(bitmap, srcLeft, srcTop);
-        System.out.println("GtkCanvas::drawBitmap(rect)");
+        drawBitmap(bitmap, dstLeft, dstTop, alpha, filter);
     }
 
     @Override
