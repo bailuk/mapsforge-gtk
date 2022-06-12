@@ -124,20 +124,31 @@ public class GestureHandler {
 
             } else if (n_press == 1 && singleClick) {
                 Point tapXY = new Point(x, y);
-                LatLong tapLatLong = mapView.getMapViewProjection().fromPixels(x,y);
+                LatLong tapGeo = toLatLong(tapXY);
 
                 for (int i = mapView.getLayerManager().getLayers().size()-1; i>=0; --i) {
                     final Layer layer = mapView.getLayerManager().getLayers().get(i);
-                    final LatLong pos = layer.getPosition();
-
-                    if (pos != null) {
-                        Point layerXY = mapView.getMapViewProjection().toPixels(pos);
-                        layer.onTap(tapLatLong, layerXY, tapXY);
-                    }
+                    layer.onTap(tapGeo, toPixel(layer.getPosition()), tapXY);
                 }
             }
         });
+
     }
+
+    private LatLong toLatLong(Point point) {
+        if (point != null) {
+            return mapView.getMapViewProjection().fromPixels(point.x, point.y);
+        }
+        return null;
+    }
+
+    private Point toPixel(LatLong latLong) {
+        if (latLong != null) {
+            return mapView.getMapViewProjection().toPixels(latLong);
+        }
+        return null;
+    }
+
 
     private void zoomInAndCenter(double x, double y) {
         IMapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
