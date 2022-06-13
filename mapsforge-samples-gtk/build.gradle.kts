@@ -17,6 +17,7 @@ dependencies {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     repositories {
         maven { url = uri("https://jitpack.io") }
