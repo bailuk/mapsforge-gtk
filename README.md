@@ -7,7 +7,7 @@ GTK4 based implementation of the Mapsforge MapView. It is made with [java-gtk](h
 
 ## Screenshot
 
-![Desktop GTK4](doc/desktop-gtk.png)
+![Desktop GTK4](doc/screenshot.png)
 
 
 ## Compile and install
