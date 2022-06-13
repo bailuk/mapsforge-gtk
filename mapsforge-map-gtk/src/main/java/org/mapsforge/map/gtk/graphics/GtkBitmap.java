@@ -67,6 +67,7 @@ public  class GtkBitmap implements Bitmap, ResourceBitmap {
         Gdk.cairoSetSourcePixbuf(context,pixbuf,0,0);
         context.paint();
         pixbuf.unref();
+        INSTANCE_COUNT.increment();
     }
 
     private static Pixbuf load(InputStream stream, int width, int height) throws IOException {
