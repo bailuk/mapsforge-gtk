@@ -31,7 +31,7 @@ import ch.bailu.gtk.gdk.Gdk;
 import ch.bailu.gtk.gdkpixbuf.Pixbuf;
 
 
-public  class GtkBitmap implements Bitmap, ResourceBitmap {
+public class GtkBitmap implements Bitmap, ResourceBitmap {
 
     private final static InstanceCount INSTANCE_COUNT = new InstanceCount();
 
