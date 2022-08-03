@@ -40,13 +40,14 @@ repositories {
 dependencies {
 
     val mapsForgeVersion: String by project
+    val javaGtkVersion: String by project
+
     implementation("org.mapsforge:mapsforge-map-reader:$mapsForgeVersion")
 
-    api("ch.bailu.java-gtk:java-gtk:0.1-SNAPSHOT")
-    //api("com.github.bailuk:java-gtk:0.1")
+    // api("ch.bailu.java-gtk:java-gtk:${javaGtkVersion}-SNAPSHOT")
+    api("com.github.bailuk:java-gtk:$javaGtkVersion")
 
     val junitVersion: String by project
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
 
 }
-
