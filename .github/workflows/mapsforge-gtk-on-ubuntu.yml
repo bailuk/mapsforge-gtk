@@ -19,7 +19,7 @@ jobs:
         distribution: 'adopt'
 
     - name: Install gtk4
-      run: apt-get -y install libgtk-4-1
+      run: sudo apt-get -y install libgtk-4-1
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
