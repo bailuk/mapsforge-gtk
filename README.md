@@ -1,4 +1,5 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0)
+[![JitPack](https://jitpack.io/v/bailuk/mapsforge-gtk.svg)](https://jitpack.io/#bailuk/mapsforge-gtk)
 
 # Mapsforge GTK
 
@@ -22,9 +23,3 @@ GTK4 based implementation of the Mapsforge MapView. It is made with [java-gtk](h
 # run sample
 ./gradlew mapsforge-map-samples-gtk:run
 ```
-
-
-## Starter project
-
-See [doc/starter](doc/starter) for a small starter sample project. 
-
