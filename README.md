@@ -1,4 +1,5 @@
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0)
+[![Build on debian](https://github.com/bailuk/mapsforge-gtk/actions/workflows/build-on-debian.yml/badge.svg)](https://github.com/bailuk/mapsforge-gtk/actions/workflows/build-on-debian.yml)
 [![JitPack](https://jitpack.io/v/bailuk/mapsforge-gtk.svg)](https://jitpack.io/#bailuk/mapsforge-gtk)
 
 # Mapsforge GTK
