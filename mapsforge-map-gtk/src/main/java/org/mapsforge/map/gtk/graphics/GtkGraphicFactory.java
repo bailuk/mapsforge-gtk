@@ -137,9 +137,8 @@ public class GtkGraphicFactory implements GraphicFactory {
     @Override
     public TileBitmap createTileBitmap(InputStream inputStream, int tileSize, boolean isTransparent) throws IOException {
         try {
-            return new GtkTileBitmap(inputStream);
+            return new GtkTileBitmap(inputStream, tileSize);
         } catch (AllocationError allocationError) {
-
             return null;
         }
     }
@@ -150,7 +149,7 @@ public class GtkGraphicFactory implements GraphicFactory {
     }
 
     @Override
-    public InputStream platformSpecificSources(String relativePathPrefix, String src) throws IOException {
+    public InputStream platformSpecificSources(String relativePathPrefix, String src) {
         System.out.println("GtkGraphicFactory::platformSpecificSources");
         return null;
     }

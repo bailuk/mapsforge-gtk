@@ -42,11 +42,11 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     private int refCount = 0;
 
     public GtkBitmap(InputStream inputStream, int hash, float scaleFactor, int width, int height, int percent) throws IOException {
-        this(load(inputStream, 20, 20));
+        this(load(inputStream, width, height));
     }
 
-    public GtkBitmap(InputStream inputStream) throws IOException {
-        this(load(inputStream));
+    public GtkBitmap(InputStream inputStream, int size) throws IOException {
+        this(load(inputStream, size, size));
     }
 
 

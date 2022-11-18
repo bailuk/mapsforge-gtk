@@ -26,8 +26,9 @@ public class GtkTileBitmap extends GtkBitmap implements TileBitmap {
     private long timestamp = System.currentTimeMillis();
 
 
-    public GtkTileBitmap(InputStream inputStream) throws IOException, AllocationError {
-        super(inputStream);
+    public GtkTileBitmap(InputStream inputStream, int size) throws IOException, AllocationError {
+        super(inputStream, size);
+        System.out.println("GtkTileBitmap " + size);
     }
 
     public GtkTileBitmap(int tileSize) {

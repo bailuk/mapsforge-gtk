@@ -42,13 +42,10 @@ import org.mapsforge.map.view.FpsCounter;
 import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
-import javax.annotation.Nullable;
-
 import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.glib.Glib;
 import ch.bailu.gtk.gtk.DrawingArea;
-import ch.bailu.gtk.type.Pointer;
 
 public class MapView implements org.mapsforge.map.view.MapView {
 
