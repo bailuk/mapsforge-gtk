@@ -85,7 +85,6 @@ public class Config {
     private final Bool rasterMapOn = new Bool("rasterMapOn", true);
     private final Bool debugOn = new Bool("debugOn", true);
 
-
     public void setVectorMap() {
         if (layerConfig.haveVectorMap()) {
             if (rasterMapOn.set(false))
@@ -98,7 +97,6 @@ public class Config {
             initMapLayer();
         }
     }
-
 
     public void setFpsLayer(boolean on) {
         if (fpsLayerOn.set(on)) {
@@ -125,14 +123,14 @@ public class Config {
         layerConfig.setGridLayer(gridLayerOn.get());
     }
 
-    public void setCoordsLayer(boolean on) {
+    public void setCoordLayer(boolean on) {
         if (coordLayerOn.set(on)) {
-            setCoordsLayer();
+            setCoordLayer();
         }
     }
 
-    private void setCoordsLayer() {
-        layerConfig.setCoordsLayer(coordLayerOn.get());
+    private void setCoordLayer() {
+        layerConfig.setCoordLayer(coordLayerOn.get());
     }
 
     public void setScaleBar(boolean on) {
@@ -147,7 +145,7 @@ public class Config {
 
         setScaleBar();
         setGridLayer();
-        setCoordsLayer();
+        setCoordLayer();
         setFpsLayer();
     }
 
@@ -173,7 +171,6 @@ public class Config {
         mapView.getModel().save(preferences);
         preferences.save();
     }
-
 
     private void setMapPosition(Model model, BoundingBox boundingBox) {
         if (model != null && boundingBox != null) {

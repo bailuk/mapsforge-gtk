@@ -31,21 +31,11 @@ public class Menus {
     public Menus(Config config, Application app) {
         menuHelper = new MenuHelper(app);
 
-        menuHelper.addToggleItem("Scale bar",
-                "scale", config::setScaleBar);
-
-        menuHelper.addToggleItem("Tile coordinates",
-                "coord", config::setCoordsLayer);
-
-        menuHelper.addToggleItem("Show grid",
-                "grid", config::setGridLayer);
-
-        menuHelper.addToggleItem("Fps counter",
-                "fps", config::setFpsLayer);
-
-        menuHelper.addToggleItem("Draw debug structures",
-                "debug", config::setDrawDebug);
-
+        menuHelper.addToggleItem("Scale bar", "scale", config::setScaleBar);
+        menuHelper.addToggleItem("Tile coordinates", "coord", config::setCoordLayer);
+        menuHelper.addToggleItem("Show grid", "grid", config::setGridLayer);
+        menuHelper.addToggleItem("Fps counter", "fps", config::setFpsLayer);
+        menuHelper.addToggleItem("Draw debug structures", "debug", config::setDrawDebug);
         menuHelper.addToggleItem("Raster map",
                 "raster", (isChecked)-> {
             if (isChecked) config.setRasterMap();
