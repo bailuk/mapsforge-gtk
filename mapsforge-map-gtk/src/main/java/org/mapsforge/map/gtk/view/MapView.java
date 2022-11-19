@@ -91,9 +91,9 @@ public class MapView implements org.mapsforge.map.view.MapView {
             MapView.this.onDraw(cr);
         };
 
-        this.drawingArea.setDrawFunc(drawFunc, null, (self, data) -> {});
-
+        this.drawingArea.setDrawFunc(drawFunc, null, (self, data) -> drawingArea.unregisterCallbacks());
         this.drawingArea.onResize((MapView.this::onResize));
+        this.drawingArea.onDestroy(drawingArea::disconnectSignals);
 
         new GestureHandler(this, drawingArea);
     }

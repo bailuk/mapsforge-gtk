@@ -148,7 +148,6 @@ public class GestureHandler {
         return null;
     }
 
-
     private void zoomInAndCenter(double x, double y) {
         IMapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
         if (mapViewPosition.getZoomLevel() < mapViewPosition.getZoomLevelMax()) {
@@ -171,4 +170,5 @@ public class GestureHandler {
             mapView.getModel().mapViewPosition.zoom((byte) -1);
         }
     }
+
 }

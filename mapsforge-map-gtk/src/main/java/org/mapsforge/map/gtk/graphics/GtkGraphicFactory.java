@@ -46,6 +46,8 @@ public class GtkGraphicFactory implements GraphicFactory {
      */
     public static boolean DRAW_DEBUG = false;
 
+    private static final int DEFAULT_SVG_SIZE = 20;
+
     public GtkGraphicFactory() {
         DisplayModel.setDeviceScaleFactor(DisplayMetrics.instance().getDensity());
     }
@@ -156,6 +158,6 @@ public class GtkGraphicFactory implements GraphicFactory {
 
     @Override
     public ResourceBitmap renderSvg(InputStream inputStream, float scaleFactor, int width, int height, int percent, int hash) throws IOException {
-        return new GtkBitmap(inputStream, hash, scaleFactor, width, height, percent);
+        return new GtkBitmap(inputStream, hash, scaleFactor, width == 0 ? DEFAULT_SVG_SIZE : width, height == 0 ? DEFAULT_SVG_SIZE : height, percent);
     }
 }

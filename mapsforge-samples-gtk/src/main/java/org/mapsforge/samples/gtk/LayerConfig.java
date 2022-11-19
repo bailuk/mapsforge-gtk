@@ -52,7 +52,7 @@ public class LayerConfig {
         hillsConfig = new HillsConfig(args);
     }
 
-    public void setCoordsLayer(boolean on) {
+    public void setCoordLayer(boolean on) {
         if (on) {
             if (!findLayer(TileCoordinatesLayer.class)) {
                 mapView.addLayer(new TileCoordinatesLayer(GtkGraphicFactory.INSTANCE, mapView.getModel().displayModel));
@@ -148,7 +148,7 @@ public class LayerConfig {
     private BoundingBox initRenderMap(MapView mapView) {
         Layers layers = mapView.getLayerManager().getLayers();
 
-        mapView.getModel().displayModel.setFixedTileSize(512);
+        mapView.getModel().displayModel.setFixedTileSize(256);
         TileCache tileCache = TileCacheUtil.createTileCache(mapView.getModel());
         MultiMapDataStore mapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
 
