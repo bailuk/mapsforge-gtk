@@ -22,8 +22,6 @@ package org.mapsforge.samples.gtk;
 import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
 
-import java.io.IOException;
-
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
@@ -66,20 +64,11 @@ public final class SampleApp {
         final Config config = new Config(args, mapView);
 
         window.setTitle(APP_NAME);
-
-        System.out.println("SampleApp::onActivate()");
-
         window.setTitlebar(createHeader(mapView, new Menus(config, app).getMenuHelper()));
-
         window.setDefaultSize(1024, 768);
 
-        window.onShow(() -> {
-            System.out.println("SampleApp::onShow()");
-            config.initMapView();
-        });
-
+        window.onShow(config::initMapView);
         window.onDestroy(() -> {
-            System.out.println("SampleApp::onDestroy()");
             config.save();
             System.exit(0);
         });
@@ -91,21 +80,20 @@ public final class SampleApp {
 
 
     private HeaderBar createHeader(MapView mapView, Menus.MenuHelper menu) {
-        System.out.println("SampleApp::createHeader()");
         final HeaderBar header = new HeaderBar();
         header.setShowTitleButtons(true);
 
-        final MenuButton menuButton = menu.getMenuButton();
+        final MenuButton menuButton = menu.createMenuButton();
         header.packEnd(menuButton);
 
         Box box = new Box(Orientation.HORIZONTAL, 0);
-        box.getStyleContext().addClass(new Str("linked"));
+        box.getStyleContext().addClass("linked");
 
-        final Button zoomIn = Button.newFromIconNameButton(new Str("zoom-in-symbolic"));
+        final Button zoomIn = Button.newFromIconNameButton("zoom-in-symbolic");
         zoomIn.onClicked(() -> mapView.getModel().mapViewPosition.zoomIn());
         box.append(zoomIn);
 
-        final Button zoomOut = Button.newFromIconNameButton(new Str("zoom-out-symbolic"));
+        final Button zoomOut = Button.newFromIconNameButton("zoom-out-symbolic");
         zoomOut.onClicked(() -> mapView.getModel().mapViewPosition.zoomOut());
         box.append(zoomOut);
 

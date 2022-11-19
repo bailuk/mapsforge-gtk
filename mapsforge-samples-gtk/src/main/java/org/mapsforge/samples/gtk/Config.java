@@ -48,7 +48,7 @@ public class Config {
         System.out.println("Config::setMenus()");
 
         menus.setChecked("scale",  scaleBarOn.get());
-        menus.setChecked("coords", coordsLayerOn.get());
+        menus.setChecked("coord",  coordLayerOn.get());
         menus.setChecked("grid",   gridLayerOn.get());
         menus.setChecked("fps",    fpsLayerOn.get());
         menus.setChecked("raster", rasterMapOn.get());
@@ -79,7 +79,7 @@ public class Config {
 
 
     private final Bool scaleBarOn = new Bool("scaleBarOn", false);
-    private final Bool coordsLayerOn = new Bool("coordsLayerOn", false);
+    private final Bool coordLayerOn = new Bool("coordLayerOn", false);
     private final Bool gridLayerOn = new Bool("gridLayerOn", false);
     private final Bool fpsLayerOn = new Bool("fpsLayerOn", false);
     private final Bool rasterMapOn = new Bool("rasterMapOn", true);
@@ -126,13 +126,13 @@ public class Config {
     }
 
     public void setCoordsLayer(boolean on) {
-        if (coordsLayerOn.set(on)) {
+        if (coordLayerOn.set(on)) {
             setCoordsLayer();
         }
     }
 
     private void setCoordsLayer() {
-        layerConfig.setCoordsLayer(coordsLayerOn.get());
+        layerConfig.setCoordsLayer(coordLayerOn.get());
     }
 
     public void setScaleBar(boolean on) {

@@ -19,6 +19,8 @@ import ch.bailu.gtk.gio.MenuItem;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.PopoverMenu;
+import ch.bailu.gtk.lib.handler.CallbackHandler;
+import ch.bailu.gtk.lib.handler.SignalHandler;
 import ch.bailu.gtk.lib.handler.action.ActionHandler;
 
 public class Menus {
@@ -29,27 +31,32 @@ public class Menus {
     public Menus(Config config, Application app) {
         menuHelper = new MenuHelper(app);
 
-        menuHelper.addCheckBoxMenu("Scale bar",
+        menuHelper.addToggleItem("Scale bar",
                 "scale", config::setScaleBar);
 
-        menuHelper.addCheckBoxMenu("Tile coordinates",
+        menuHelper.addToggleItem("Tile coordinates",
                 "coord", config::setCoordsLayer);
 
-        menuHelper.addCheckBoxMenu("Show grid",
+        menuHelper.addToggleItem("Show grid",
                 "grid", config::setGridLayer);
 
-        menuHelper.addCheckBoxMenu("Fps counter",
+        menuHelper.addToggleItem("Fps counter",
                 "fps", config::setFpsLayer);
 
-        menuHelper.addCheckBoxMenu("Draw debug structures",
+        menuHelper.addToggleItem("Draw debug structures",
                 "debug", config::setDrawDebug);
 
-        menuHelper.addCheckBoxMenu("Raster map",
+        menuHelper.addToggleItem("Raster map",
                 "raster", (isChecked)-> {
             if (isChecked) config.setRasterMap();
             else config.setVectorMap();
         });
 
+        menuHelper.addItem("Dump resources", "dump", () -> {
+            ActionHandler.dump(System.out);
+            CallbackHandler.dump(System.out);
+            SignalHandler.dump(System.out);
+        });
         config.setMenus(this);
     }
 
@@ -70,28 +77,24 @@ public class Menus {
             this.app = app;
         }
 
-        void addCheckBoxMenu(String label, String id, ActionHandler.OnToggled onToggled) {
+        void addToggleItem(String label, String id, ActionHandler.OnToggled onToggled) {
             menu.appendItem(new MenuItem(label, "app." + id));
             ActionHandler.get(app, id, true).onToggle(onToggled);
         }
 
-        public MenuButton getMenuButton() {
+        void addItem(String label, String id, ActionHandler.OnActivate onActivate) {
+            menu.appendItem(new MenuItem(label, "app." + id));
+            ActionHandler.get(app, id).onActivate(onActivate);
+        }
+
+        public MenuButton createMenuButton() {
             var result = new MenuButton();
             result.setPopover(PopoverMenu.newFromModelPopoverMenu(menu));
             return result;
         }
 
-        public interface OnMenuSelected {
-            void run();
-        }
-
-        public interface OnMenuChecked {
-            void run(boolean isChecked);
-        }
-
         public void setChecked(String actionName, boolean state) {
             ActionHandler.get(app, actionName).changeBoolean(state);
         }
-
     }
 }
