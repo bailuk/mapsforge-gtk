@@ -42,7 +42,6 @@ import org.mapsforge.map.view.FpsCounter;
 import org.mapsforge.map.view.FrameBuffer;
 import org.mapsforge.map.view.FrameBufferHA3;
 
-import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.glib.Glib;
 import ch.bailu.gtk.gtk.DrawingArea;
@@ -77,10 +76,10 @@ public class MapView implements org.mapsforge.map.view.MapView {
 
         this.mapViewProjection = new MapViewProjection(this);
 
-        this.drawingArea.setVexpand(GTK.TRUE);
-        this.drawingArea.setHexpand(GTK.TRUE);
+        this.drawingArea.setVexpand(true);
+        this.drawingArea.setHexpand(true);
 
-        DrawingArea.OnDrawingAreaDrawFunc drawFunc = (drawing_area, cr, width, height, user_data) -> {
+        DrawingArea.OnDrawingAreaDrawFunc drawFunc = (self, drawing_area, cr, width, height, user_data) -> {
             final GraphicContext graphicContext = new GtkGraphicContext(cr, dimension);
 
             frameBuffer.draw(graphicContext);
@@ -92,7 +91,7 @@ public class MapView implements org.mapsforge.map.view.MapView {
             MapView.this.onDraw(cr);
         };
 
-        this.drawingArea.setDrawFunc(drawFunc, null, data -> {});
+        this.drawingArea.setDrawFunc(drawFunc, null, (self, data) -> {});
 
         this.drawingArea.onResize((MapView.this::onResize));
 
@@ -217,12 +216,12 @@ public class MapView implements org.mapsforge.map.view.MapView {
         Glib.idleAdd(onSourceFunc, null);
     }
 
-    private Glib.OnSourceFunc onSourceFunc = user_data -> {
+    private Glib.OnSourceFunc onSourceFunc = (self, user_data) -> {
         if (redrawNeeded) {
             redrawNeeded = false;
             drawingArea.queueDraw();
         }
-        return GTK.FALSE;
+        return false;
     };
 
     @Override

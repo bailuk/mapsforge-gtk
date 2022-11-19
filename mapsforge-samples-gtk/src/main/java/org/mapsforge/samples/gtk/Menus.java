@@ -14,37 +14,35 @@
  */
 package org.mapsforge.samples.gtk;
 
-import ch.bailu.gtk.GTK;
-import ch.bailu.gtk.gio.ActionMap;
 import ch.bailu.gtk.gio.Menu;
 import ch.bailu.gtk.gio.MenuItem;
+import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.PopoverMenu;
-import ch.bailu.gtk.helper.ActionHelper;
-import ch.bailu.gtk.type.Str;
+import ch.bailu.gtk.lib.handler.action.ActionHandler;
 
 public class Menus {
 
     private final MenuHelper menuHelper;
 
 
-    public Menus(Config config, ActionHelper actionHelper) {
-        menuHelper = new MenuHelper(actionHelper);
+    public Menus(Config config, Application app) {
+        menuHelper = new MenuHelper(app);
 
         menuHelper.addCheckBoxMenu("Scale bar",
-                "scale", (isChecked)-> config.setScaleBar(isChecked));
+                "scale", config::setScaleBar);
 
         menuHelper.addCheckBoxMenu("Tile coordinates",
-                "coord", (isChecked)-> config.setCoordsLayer(isChecked));
+                "coord", config::setCoordsLayer);
 
         menuHelper.addCheckBoxMenu("Show grid",
-                "grid", (isChecked)-> config.setGridLayer(isChecked));
+                "grid", config::setGridLayer);
 
         menuHelper.addCheckBoxMenu("Fps counter",
-                "fps", (isChecked)-> config.setFpsLayer(isChecked));
+                "fps", config::setFpsLayer);
 
         menuHelper.addCheckBoxMenu("Draw debug structures",
-                "debug", (isChecked)-> config.setDrawDebug(isChecked));
+                "debug", config::setDrawDebug);
 
         menuHelper.addCheckBoxMenu("Raster map",
                 "raster", (isChecked)-> {
@@ -65,17 +63,16 @@ public class Menus {
 
 
     public static class MenuHelper {
-        private final ActionHelper actionHelper;
         private final Menu menu = new Menu();
+        private final Application app;
 
-
-        public MenuHelper(ActionHelper actionHelper) {
-            this.actionHelper = actionHelper;
+        public MenuHelper(Application app) {
+            this.app = app;
         }
 
-        void addCheckBoxMenu(String label, String id, OnMenuChecked onMenuChecked) {
-            menu.appendItem(new MenuItem(new Str(label), new Str("app." + id)));
-            actionHelper.add(id, true, (param) -> onMenuChecked.run(actionHelper.getBooleanState(id)));
+        void addCheckBoxMenu(String label, String id, ActionHandler.OnToggled onToggled) {
+            menu.appendItem(new MenuItem(label, "app." + id));
+            ActionHandler.get(app, id, true).onToggle(onToggled);
         }
 
         public MenuButton getMenuButton() {
@@ -92,8 +89,8 @@ public class Menus {
             void run(boolean isChecked);
         }
 
-        public void setChecked(String action, boolean enabled) {
-            actionHelper.changeState(action, enabled);
+        public void setChecked(String actionName, boolean state) {
+            ActionHandler.get(app, actionName).changeBoolean(state);
         }
 
     }

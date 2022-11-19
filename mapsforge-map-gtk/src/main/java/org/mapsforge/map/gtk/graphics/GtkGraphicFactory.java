@@ -36,7 +36,7 @@ import org.mapsforge.map.model.DisplayModel;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ch.bailu.gtk.exception.AllocationError;
+import ch.bailu.gtk.type.exception.AllocationError;
 
 public class GtkGraphicFactory implements GraphicFactory {
     public static final GraphicFactory INSTANCE = new GtkGraphicFactory();

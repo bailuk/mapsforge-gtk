@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import ch.bailu.gtk.bridge.Image;
 import ch.bailu.gtk.cairo.Cairo;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Format;
 import ch.bailu.gtk.cairo.Surface;
 import ch.bailu.gtk.gdk.Gdk;
 import ch.bailu.gtk.gdkpixbuf.Pixbuf;
+import ch.bailu.gtk.lib.bridge.Image;
 
 
 public class GtkBitmap implements Bitmap, ResourceBitmap {
