@@ -221,6 +221,7 @@ public class MapView implements org.mapsforge.map.view.MapView {
             redrawNeeded = false;
             drawingArea.queueDraw();
         }
+        self.unregister(); // Remove Java callback reference
         return false;
     };
 
