@@ -14,12 +14,11 @@
  */
 package org.mapsforge.samples.gtk;
 
-import ch.bailu.gtk.gio.Menu;
-import ch.bailu.gtk.gio.MenuItem;
+import org.mapsforge.samples.gtk.util.MenuHelper;
+
 import ch.bailu.gtk.gtk.Application;
-import ch.bailu.gtk.gtk.MenuButton;
-import ch.bailu.gtk.gtk.PopoverMenu;
 import ch.bailu.gtk.lib.handler.CallbackHandler;
+import ch.bailu.gtk.lib.handler.ClassHandler;
 import ch.bailu.gtk.lib.handler.SignalHandler;
 import ch.bailu.gtk.lib.handler.action.ActionHandler;
 
@@ -31,22 +30,25 @@ public class Menus {
     public Menus(Config config, Application app) {
         menuHelper = new MenuHelper(app);
 
-        menuHelper.addToggleItem("Scale bar", "scale", config::setScaleBar);
-        menuHelper.addToggleItem("Tile coordinates", "coord", config::setCoordLayer);
-        menuHelper.addToggleItem("Show grid", "grid", config::setGridLayer);
-        menuHelper.addToggleItem("Fps counter", "fps", config::setFpsLayer);
-        menuHelper.addToggleItem("Draw debug structures", "debug", config::setDrawDebug);
-        menuHelper.addToggleItem("Raster map",
-                "raster", (isChecked)-> {
+        menuHelper.appendToggleItem("Scale bar", "scale", config::setScaleBar);
+        menuHelper.appendToggleItem("Raster map", "raster", (isChecked)-> {
             if (isChecked) config.setRasterMap();
             else config.setVectorMap();
         });
 
-        menuHelper.addItem("Dump resources", "dump", () -> {
-            ActionHandler.dump(System.out);
-            CallbackHandler.dump(System.out);
-            SignalHandler.dump(System.out);
-        });
+        menuHelper.push();
+        menuHelper.appendToggleItem("Tile coordinates", "coord", config::setCoordLayer);
+        menuHelper.appendToggleItem("Show grid", "grid", config::setGridLayer);
+        menuHelper.appendToggleItem("Fps counter", "fps", config::setFpsLayer);
+        menuHelper.appendToggleItem("Draw debug structures", "debug", config::setDrawDebug);
+        menuHelper.appendSection("Debug");
+
+        menuHelper.push();
+        menuHelper.appendItem("ActionHandler", "dump-action-handler", () -> ActionHandler.dump(System.out));
+        menuHelper.appendItem("CallbackHandler", "dump-callback-handler", () -> CallbackHandler.dump(System.out));
+        menuHelper.appendItem("SignalHandler", "dump-signal-handler", () -> SignalHandler.dump(System.out));
+        menuHelper.appendItem("ClassHandler", "dump-class-handler", () -> ClassHandler.dump(System.out));
+        menuHelper.appendSection("Dump resources");
         config.setMenus(this);
     }
 
@@ -59,32 +61,4 @@ public class Menus {
     }
 
 
-    public static class MenuHelper {
-        private final Menu menu = new Menu();
-        private final Application app;
-
-        public MenuHelper(Application app) {
-            this.app = app;
-        }
-
-        void addToggleItem(String label, String id, ActionHandler.OnToggled onToggled) {
-            menu.appendItem(new MenuItem(label, "app." + id));
-            ActionHandler.get(app, id, true).onToggle(onToggled);
-        }
-
-        void addItem(String label, String id, ActionHandler.OnActivate onActivate) {
-            menu.appendItem(new MenuItem(label, "app." + id));
-            ActionHandler.get(app, id).onActivate(onActivate);
-        }
-
-        public MenuButton createMenuButton() {
-            var result = new MenuButton();
-            result.setPopover(PopoverMenu.newFromModelPopoverMenu(menu));
-            return result;
-        }
-
-        public void setChecked(String actionName, boolean state) {
-            ActionHandler.get(app, actionName).changeBoolean(state);
-        }
-    }
 }

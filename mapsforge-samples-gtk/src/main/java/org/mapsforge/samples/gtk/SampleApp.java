@@ -21,6 +21,7 @@ package org.mapsforge.samples.gtk;
 
 import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
+import org.mapsforge.samples.gtk.util.MenuHelper;
 
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.Application;
@@ -79,7 +80,7 @@ public final class SampleApp {
     }
 
 
-    private HeaderBar createHeader(MapView mapView, Menus.MenuHelper menu) {
+    private HeaderBar createHeader(MapView mapView, MenuHelper menu) {
         final HeaderBar header = new HeaderBar();
         header.setShowTitleButtons(true);
 
