@@ -21,7 +21,7 @@ package org.mapsforge.samples.gtk;
 
 import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
-import org.mapsforge.samples.gtk.util.MenuHelper;
+import org.mapsforge.samples.gtk.lib.MenuHelper;
 
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.Application;

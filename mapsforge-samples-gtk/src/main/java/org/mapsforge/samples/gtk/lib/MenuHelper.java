@@ -1,4 +1,4 @@
-package org.mapsforge.samples.gtk.util;
+package org.mapsforge.samples.gtk.lib;
 
 import java.util.Stack;
 

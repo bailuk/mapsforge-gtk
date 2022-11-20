@@ -14,7 +14,8 @@
  */
 package org.mapsforge.samples.gtk;
 
-import org.mapsforge.samples.gtk.util.MenuHelper;
+import org.mapsforge.samples.gtk.lib.FileDialog;
+import org.mapsforge.samples.gtk.lib.MenuHelper;
 
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.lib.handler.CallbackHandler;
@@ -34,6 +35,13 @@ public class Menus {
         menuHelper.appendToggleItem("Raster map", "raster", (isChecked)-> {
             if (isChecked) config.setRasterMap();
             else config.setVectorMap();
+        });
+        menuHelper.appendItem("Open reaster map...", "open-raster-map", () -> {
+            new FileDialog().title("Open raster map").onResponse((path) -> {
+                System.out.println(path);
+            }).show(app.getActiveWindow());
+
+
         });
 
         menuHelper.push();
