@@ -21,7 +21,8 @@ package org.mapsforge.samples.gtk;
 
 import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
-import org.mapsforge.samples.gtk.lib.MenuHelper;
+import org.mapsforge.samples.gtk.config.Config;
+import org.mapsforge.samples.gtk.config.MainMenu;
 
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.Application;
@@ -38,7 +39,7 @@ import ch.bailu.gtk.type.Strs;
 public final class SampleApp {
 
     private final static Str APP_ID   = new Str("org.mapsforge.samples.gtk");
-    private final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
+    public final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
 
 
      /**
@@ -58,14 +59,12 @@ public final class SampleApp {
         app.run(1, new Strs(new Str[]{APP_NAME}));
     }
 
-
-
     public void onActivate(ApplicationWindow window, Application app, String[] args) {
         final MapView mapView = new MapView();
-        final Config config = new Config(args, mapView);
+        final Config config = new Config(args, window, app, mapView);
 
         window.setTitle(APP_NAME);
-        window.setTitlebar(createHeader(mapView, new Menus(config, app).getMenuHelper()));
+        window.setTitlebar(createHeader(mapView, new MainMenu().createMenuButton()));
         window.setDefaultSize(1024, 768);
 
         window.onShow(config::initMapView);
@@ -80,11 +79,10 @@ public final class SampleApp {
     }
 
 
-    private HeaderBar createHeader(MapView mapView, MenuHelper menu) {
+    private HeaderBar createHeader(MapView mapView, MenuButton menuButton) {
         final HeaderBar header = new HeaderBar();
         header.setShowTitleButtons(true);
 
-        final MenuButton menuButton = menu.createMenuButton();
         header.packEnd(menuButton);
 
         Box box = new Box(Orientation.HORIZONTAL, 0);

@@ -24,19 +24,19 @@ import ch.bailu.gtk.lib.util.SizeLog;
  */
 public class InstanceCount {
     private final SizeLog sizeLog = new SizeLog(GtkBitmap.class.getSimpleName());
-    private int size = 0;
+    private int count = 0;
 
     public synchronized void increment() {
-        size++;
+        count++;
         rapport();
     }
 
     public synchronized void decrement() {
-        size--;
+        count--;
         rapport();
     }
 
     public void rapport() {
-        sizeLog.log(size);
+        sizeLog.log(count);
     }
 }

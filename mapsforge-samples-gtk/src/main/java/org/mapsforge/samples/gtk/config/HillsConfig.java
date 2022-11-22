@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mapsforge.samples.gtk;
+package org.mapsforge.samples.gtk.config;
 
 import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;

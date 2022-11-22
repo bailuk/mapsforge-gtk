@@ -88,7 +88,7 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     }
 
     @Override
-    public synchronized  void decrementRefCount() {
+    public synchronized void decrementRefCount() {
         mustHaveRefCount();
         refCount--;
         if (refCount < 0) {

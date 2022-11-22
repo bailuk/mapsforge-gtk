@@ -1,4 +1,4 @@
-package org.mapsforge.samples.gtk.lib;
+package org.mapsforge.samples.gtk.config;
 
 import java.util.Stack;
 
@@ -10,32 +10,18 @@ import ch.bailu.gtk.gtk.PopoverMenu;
 import ch.bailu.gtk.lib.handler.action.ActionHandler;
 
 public class MenuHelper {
-    private final Application app;
     private final Stack<Menu> menu = new Stack<>();
 
-    public MenuHelper(Application app) {
+    public MenuHelper() {
         push();
-        this.app = app;
     }
 
-    public void appendToggleItem(String label, String id, ActionHandler.OnToggled onToggled) {
+    public void appendToggleItem(String label, Key id) {
         menu.peek().appendItem(new MenuItem(label, "app." + id));
-        ActionHandler.get(app, id, true).onToggle(onToggled);
     }
 
-    public void appendItem(String label, String id, ActionHandler.OnActivate onActivate) {
+    public void appendItem(String label, Key id) {
         menu.peek().appendItem(new MenuItem(label, "app." + id));
-        ActionHandler.get(app, id).onActivate(onActivate);
-    }
-
-    public MenuButton createMenuButton() {
-        var result = new MenuButton();
-        result.setPopover(PopoverMenu.newFromModelPopoverMenu(menu.firstElement()));
-        return result;
-    }
-
-    public void setChecked(String actionName, boolean state) {
-        ActionHandler.get(app, actionName).changeBoolean(state);
     }
 
     public void push() {
@@ -55,5 +41,11 @@ public class MenuHelper {
             var menu = this.menu.pop();
             this.menu.peek().appendSubmenu(name, menu);
         }
+    }
+
+    public MenuButton createMenuButton() {
+        var result = new MenuButton();
+        result.setPopover(PopoverMenu.newFromModelPopoverMenu(menu.firstElement()));
+        return result;
     }
 }
