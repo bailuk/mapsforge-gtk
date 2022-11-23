@@ -39,7 +39,7 @@ import ch.bailu.gtk.type.Strs;
 public final class SampleApp {
 
     private final static Str APP_ID   = new Str("org.mapsforge.samples.gtk");
-    public final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
+    public  final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
 
 
      /**
