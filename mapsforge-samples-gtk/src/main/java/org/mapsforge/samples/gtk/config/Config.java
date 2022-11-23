@@ -14,14 +14,12 @@
  */
 package org.mapsforge.samples.gtk.config;
 
-import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.util.LatLongUtils;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.gtk.view.MapView;
-import org.mapsforge.map.model.Model;
 import org.mapsforge.samples.gtk.SampleApp;
 import org.mapsforge.samples.gtk.lib.FileDialog;
 
@@ -51,7 +49,8 @@ public class Config {
 
         actionHelper = new ActionHelper(app);
         actionHelper.onActivate(Key.openVectorMap, this::openVectorMap);
-        actionHelper.onActivate(Key.frameVectorMap, this::frameVectorMap);
+        actionHelper.onActivate(Key.frameMap, this::frameMap);
+        actionHelper.onActivate(Key.centerMap, this::centerMap);
         actionHelper.onActivate(Key.dumpActionHandler, () -> ActionHandler.dump(System.out));
         actionHelper.onActivate(Key.dumpCallbackHandler, () -> CallbackHandler.dump(System.out));
         actionHelper.onActivate(Key.dumpSignalHandler, () -> SignalHandler.dump(System.out));
@@ -63,38 +62,40 @@ public class Config {
         actionHelper.onToggle(Key.displayFpsCounter, false, this::setFpsLayer);
         actionHelper.onToggle(Key.enableVectorMap, false, this::initMapLayer);
         actionHelper.onToggle(Key.enableDrawDebug, false, this::setDrawDebug);
+
+        actionHelper.setEnabled(Key.enableVectorMap, layerConfig.haveVectorMap());
     }
 
     public void openVectorMap() {
         new FileDialog()
                 .pattern("Vector map", "*.map")
-                .pattern("All files", "*")
                 .title("Open vector map")
                 .onResponse((path) -> {
-            if (layerConfig.setVectorMap(new File(path))) {
-                PreferencesHelper.setString(Key.vectorMapPath, path);
-                window.setTitle(SampleApp.APP_NAME + layerConfig.getTitleExtra());
-                initMapLayer(true);
-                actionHelper.setBoolean(Key.vectorMapPath, true);
-                setVectorMapEnabled();
-            }
-        }).show(window);
+                    if (layerConfig.setVectorMap(new File(path))) {
+                        PreferencesHelper.setString(Key.vectorMapPath, path);
+                        initVectorMapLayer();
+                        frameMap();
+                        actionHelper.setBoolean(Key.enableVectorMap, true);
+                        PreferencesHelper.setBoolean(Key.enableVectorMap, true);
+                        window.setTitle(SampleApp.APP_NAME + layerConfig.getTitleExtra());
+                    }
+                    actionHelper.setEnabled(Key.enableVectorMap, layerConfig.haveVectorMap());
+                }).show(window);
     }
 
-    public void setDrawDebug(boolean on) {
+    private void setDrawDebug(boolean on) {
         GtkGraphicFactory.DRAW_DEBUG = on;
     }
 
-    public void setFpsLayer(boolean v) {
+    private void setFpsLayer(boolean v) {
         layerConfig.setFpsLayer(v);
     }
 
-    public void setGridLayer(boolean v) {
+    private void setGridLayer(boolean v) {
         layerConfig.setGridLayer(v);
     }
 
-
-    public void setCoordLayer(boolean v) {
+    private void setCoordLayer(boolean v) {
         layerConfig.setCoordLayer(v);
     }
 
@@ -109,28 +110,22 @@ public class Config {
         setFpsLayer(PreferencesHelper.getBoolean(Key.displayFpsCounter));
     }
 
-    public void initMapLayer(boolean vector) {
+    private void initVectorMapLayer() {
+        layerConfig.setVectorMap(false);
+        initMapLayer(true);
+    }
+
+    private void initMapLayer(boolean vector) {
         if (vector && layerConfig.haveVectorMap()) {
             layerConfig.setRasterMap(false);
             layerConfig.setVectorMap(true);
-            frameVectorMap();
         } else {
             layerConfig.setVectorMap(false);
             layerConfig.setRasterMap(true);
         }
     }
 
-    public void setVectorMapEnabled() {
-        var enabled = layerConfig.haveVectorMap();
-        actionHelper.setEnabled(Key.enableVectorMap, enabled);
-        actionHelper.setEnabled(Key.frameVectorMap, enabled);
-    }
-
-    public void frameVectorMap() {
-        setMapPosition(mapView.getModel(), layerConfig.getInitialBounding());
-    }
-
-    public void setScaleBar(boolean v) {
+    private void setScaleBar(boolean v) {
         layerConfig.setScaleBar(v);
     }
 
@@ -139,18 +134,32 @@ public class Config {
         PreferencesHelper.PREFERENCES.save();
     }
 
-    private void setMapPosition(Model model, BoundingBox boundingBox) {
+    private void centerMap() {
+        var model = mapView.getModel();
+        var boundingBox = layerConfig.getInitialBounding();
+
+        if (model != null && boundingBox != null) {
+            final LatLong center = model.mapViewPosition.getCenter();
+            byte zoomLevel = model.mapViewPosition.getZoomLevel();
+
+            if (center != null) {
+               model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
+            }
+        }
+    }
+
+    private void frameMap() {
+        var model = mapView.getModel();
+        var boundingBox = layerConfig.getInitialBounding();
+
         if (model != null && boundingBox != null) {
             final Dimension dimension = model.mapViewDimension.getDimension();
             final LatLong center = model.mapViewPosition.getCenter();
-            byte zoomLevel = model.mapViewPosition.getZoomLevel();
             int tileSize = model.displayModel.getTileSize();
 
-            if (center != null && dimension != null && dimension.height> 0 && dimension.width > 0) {
-                if (zoomLevel == 0 || !boundingBox.contains(center)) {
-                    zoomLevel = LatLongUtils.zoomForBounds(dimension, boundingBox, tileSize);
-                    model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
-                }
+            if (center != null && dimension != null && dimension.height > 0 && dimension.width > 0) {
+                var zoomLevel = LatLongUtils.zoomForBounds(dimension, boundingBox, tileSize);
+                model.mapViewPosition.setMapPosition(new MapPosition(boundingBox.getCenterPoint(), zoomLevel));
             }
         }
     }

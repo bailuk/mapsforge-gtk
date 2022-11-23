@@ -103,11 +103,10 @@ public class FileDialog {
             initialPath.destroy();
         });
         dialog.onResponse((response) -> {
-            String path = "";
             if (response == ResponseType.OK) {
-                path = getPath(dialog);
+                var path = getPath(dialog);
+                onResponseCallback.onResponse(path);
             }
-            onResponseCallback.onResponse(path);
             dialog.close();
         });
         dialog.show();

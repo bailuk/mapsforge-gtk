@@ -48,7 +48,7 @@ public class VectorMapConfig {
         return !mapFiles.isEmpty() || mapFile != null;
     }
 
-    public void addMapDataStore(MultiMapDataStore mapDataStore) {
+    public void addMapFilesToDataStore(MultiMapDataStore mapDataStore) {
         for (File file : mapFiles) {
             mapDataStore.addMapDataStore(new MapFile(file), false, false);
         }

@@ -76,7 +76,6 @@ public class LayerConfig {
         return false;
     }
 
-
     private boolean removeLayer(Class clazz) {
         var layers = mapView.getLayerManager().getLayers();
         for (Layer layer : layers) {
@@ -160,7 +159,7 @@ public class LayerConfig {
         TileCache tileCache = TileCacheUtil.createTileCache(mapView.getModel());
         MultiMapDataStore mapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
 
-        vectorMapConfig.addMapDataStore(mapDataStore);
+        vectorMapConfig.addMapFilesToDataStore(mapDataStore);
         TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsConfig.getConfig());
         layers.add(0,tileRendererLayer);
         return mapDataStore.boundingBox();

@@ -14,5 +14,6 @@ public enum Key {
     dumpClassHandler,
     vectorMapPath,
     openVectorMap,
-    frameVectorMap
+    centerMap,
+    frameMap
 }

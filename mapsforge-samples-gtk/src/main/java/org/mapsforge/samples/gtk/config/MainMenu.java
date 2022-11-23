@@ -23,10 +23,12 @@ public class MainMenu {
         menuHelper = new MenuHelper();
 
         menuHelper.appendToggleItem("Scale bar", Key.scale);
+        menuHelper.appendItem("Frame map", Key.frameMap);
+        menuHelper.appendItem("Center map", Key.centerMap);
+
         menuHelper.push();
         menuHelper.appendItem("Open...", Key.openVectorMap);
         menuHelper.appendToggleItem("Enable", Key.enableVectorMap);
-        menuHelper.appendItem("Frame", Key.frameVectorMap);
         menuHelper.appendSection("Vector map");
 
         menuHelper.push();
