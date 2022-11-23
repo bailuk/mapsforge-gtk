@@ -1,9 +1,13 @@
 package org.mapsforge.samples.gtk.lib;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import ch.bailu.gtk.gio.File;
 import ch.bailu.gtk.gtk.FileChooser;
 import ch.bailu.gtk.gtk.FileChooserAction;
 import ch.bailu.gtk.gtk.FileChooserDialog;
+import ch.bailu.gtk.gtk.FileFilter;
 import ch.bailu.gtk.gtk.ResponseType;
 import ch.bailu.gtk.gtk.Window;
 import ch.bailu.gtk.type.Str;
@@ -15,6 +19,7 @@ public class FileDialog {
     private String ok = "OK";
     private String initialPath = "";
     private OnResponse onResponseCallback = path -> {};
+    private Map<String, FileFilter> filterMap = new HashMap<>();
 
     private int action = FileChooserAction.OPEN;
 
@@ -47,6 +52,26 @@ public class FileDialog {
         return this;
     }
 
+    public FileDialog mimeType(String name, String mimeType) {
+        if (!filterMap.containsKey(name)) {
+            var filter = new FileFilter();
+            filter.setName(name);
+            filterMap.put(name, filter);
+        }
+        filterMap.get(name).addMimeType(mimeType);
+        return this;
+    }
+
+    public FileDialog pattern(String name, String pattern) {
+        if (!filterMap.containsKey(name)) {
+            var filter = new FileFilter();
+            filter.setName(name);
+            filterMap.put(name, filter);
+        }
+        filterMap.get(name).addPattern(pattern);
+        return this;
+    }
+
     public FileDialog onResponse(OnResponse response) {
         this.onResponseCallback = response;
         return this;
@@ -68,9 +93,12 @@ public class FileDialog {
         var initialPath = new Str(this.initialPath);
 
         setInitialPath(dialog, initialPath);
+        var chooser = new FileChooser(dialog.cast());
+        filterMap.keySet().forEach((key) -> chooser.addFilter(filterMap.get(key)));
+
         dialog.addButton(cancel, ResponseType.CANCEL);
         dialog.addButton(ok, ResponseType.OK);
-        dialog.onDestroy(() -> {
+                dialog.onDestroy(() -> {
             dialog.disconnectSignals();
             initialPath.destroy();
         });

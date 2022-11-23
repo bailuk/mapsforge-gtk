@@ -45,9 +45,9 @@ public class Config {
         this.window = window;
         this.mapView = mapView;
         this.layerConfig = new LayerConfig(args, mapView);
-        if (!layerConfig.haveVectorMap()) {
-            PreferencesHelper.setBoolean(Key.enableVectorMap, true);
-        }
+
+        layerConfig.setVectorMap(new File(PreferencesHelper.getString(Key.vectorMapPath)));
+        window.setTitle(SampleApp.APP_NAME + layerConfig.getTitleExtra());
 
         actionHelper = new ActionHelper(app);
         actionHelper.onActivate(Key.openVectorMap, this::openVectorMap);
@@ -66,12 +66,17 @@ public class Config {
     }
 
     public void openVectorMap() {
-        new FileDialog().title("Open vector map").onResponse((path) -> {
+        new FileDialog()
+                .pattern("Vector map", "*.map")
+                .pattern("All files", "*")
+                .title("Open vector map")
+                .onResponse((path) -> {
             if (layerConfig.setVectorMap(new File(path))) {
                 PreferencesHelper.setString(Key.vectorMapPath, path);
                 window.setTitle(SampleApp.APP_NAME + layerConfig.getTitleExtra());
                 initMapLayer(true);
                 actionHelper.setBoolean(Key.vectorMapPath, true);
+                setVectorMapEnabled();
             }
         }).show(window);
     }
@@ -106,13 +111,19 @@ public class Config {
 
     public void initMapLayer(boolean vector) {
         if (vector && layerConfig.haveVectorMap()) {
-            layerConfig.setVectorMap(true);
             layerConfig.setRasterMap(false);
+            layerConfig.setVectorMap(true);
             frameVectorMap();
         } else {
             layerConfig.setVectorMap(false);
             layerConfig.setRasterMap(true);
         }
+    }
+
+    public void setVectorMapEnabled() {
+        var enabled = layerConfig.haveVectorMap();
+        actionHelper.setEnabled(Key.enableVectorMap, enabled);
+        actionHelper.setEnabled(Key.frameVectorMap, enabled);
     }
 
     public void frameVectorMap() {

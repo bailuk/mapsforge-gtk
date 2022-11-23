@@ -63,7 +63,6 @@ public final class SampleApp {
         final MapView mapView = new MapView();
         final Config config = new Config(args, window, app, mapView);
 
-        window.setTitle(APP_NAME);
         window.setTitlebar(createHeader(mapView, new MainMenu().createMenuButton()));
         window.setDefaultSize(1024, 768);
 

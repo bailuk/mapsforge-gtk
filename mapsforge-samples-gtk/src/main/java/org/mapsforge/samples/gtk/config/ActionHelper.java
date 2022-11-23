@@ -26,4 +26,8 @@ public class ActionHelper {
     public void setBoolean(Key key, boolean value) {
         ActionHandler.get(app, key.name()).changeBoolean(value);
     }
+
+    public void setEnabled(Key key, boolean value) {
+        ActionHandler.get(app, key.name()).setEnabled(value);
+    }
 }
