@@ -24,3 +24,28 @@ GTK4 based implementation of the Mapsforge MapView. It is made with [java-gtk](h
 # run sample
 ./gradlew mapsforge-map-samples-gtk:run
 ```
+
+
+## Integration
+
+Library is available via [JitPack](https://jitpack.io).  
+Minimal example application: [mapsforge-samples-gtk/src/main/java/HelloMap.java](mapsforge-samples-gtk/src/main/java/HelloMap.java)
+
+```kotlin
+// build.gradle.kts
+plugins {
+    application
+}
+
+repositories {
+    maven { url = uri("https://jitpack.io") }
+}
+
+dependencies {
+    implementation("com.github.bailuk:mapsforge-gtk:0.2.0")
+}
+
+application {
+    mainClass.set("HelloMap")
+}
+```
