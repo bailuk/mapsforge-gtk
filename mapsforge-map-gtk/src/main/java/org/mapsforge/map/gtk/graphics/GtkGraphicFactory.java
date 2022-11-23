@@ -36,7 +36,7 @@ import org.mapsforge.map.model.DisplayModel;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ch.bailu.gtk.exception.AllocationError;
+import ch.bailu.gtk.type.exception.AllocationError;
 
 public class GtkGraphicFactory implements GraphicFactory {
     public static final GraphicFactory INSTANCE = new GtkGraphicFactory();
@@ -45,6 +45,8 @@ public class GtkGraphicFactory implements GraphicFactory {
      * Draw debug structures (red squares and lines)
      */
     public static boolean DRAW_DEBUG = false;
+
+    private static final int DEFAULT_SVG_SIZE = 20;
 
     public GtkGraphicFactory() {
         DisplayModel.setDeviceScaleFactor(DisplayMetrics.instance().getDensity());
@@ -137,9 +139,8 @@ public class GtkGraphicFactory implements GraphicFactory {
     @Override
     public TileBitmap createTileBitmap(InputStream inputStream, int tileSize, boolean isTransparent) throws IOException {
         try {
-            return new GtkTileBitmap(inputStream);
+            return new GtkTileBitmap(inputStream, tileSize);
         } catch (AllocationError allocationError) {
-
             return null;
         }
     }
@@ -150,13 +151,13 @@ public class GtkGraphicFactory implements GraphicFactory {
     }
 
     @Override
-    public InputStream platformSpecificSources(String relativePathPrefix, String src) throws IOException {
+    public InputStream platformSpecificSources(String relativePathPrefix, String src) {
         System.out.println("GtkGraphicFactory::platformSpecificSources");
         return null;
     }
 
     @Override
     public ResourceBitmap renderSvg(InputStream inputStream, float scaleFactor, int width, int height, int percent, int hash) throws IOException {
-        return new GtkBitmap(inputStream, hash, scaleFactor, width, height, percent);
+        return new GtkBitmap(inputStream, hash, scaleFactor, width == 0 ? DEFAULT_SVG_SIZE : width, height == 0 ? DEFAULT_SVG_SIZE : height, percent);
     }
 }

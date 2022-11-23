@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mapsforge.samples.gtk;
+package org.mapsforge.samples.gtk.config;
 
 import org.mapsforge.map.datastore.MultiMapDataStore;
 import org.mapsforge.map.reader.MapFile;
@@ -23,6 +23,7 @@ import java.util.List;
 
 public class VectorMapConfig {
     private final List<File> mapFiles = new ArrayList<>();
+    private File mapFile = null;
 
     public VectorMapConfig(String[] args) {
         for (String arg : args) {
@@ -34,14 +35,34 @@ public class VectorMapConfig {
         }
     }
 
-
-    public boolean hasMapFiles() {
-        return !mapFiles.isEmpty();
+    public boolean setMapFile(File mapFile) {
+        if (mapFile.exists() && mapFile.canRead()) {
+            this.mapFile = mapFile;
+            return true;
+        }
+        else this.mapFile = null;
+        return false;
     }
 
-    public void addMapDataStore(MultiMapDataStore mapDataStore) {
+    public boolean hasMapFiles() {
+        return !mapFiles.isEmpty() || mapFile != null;
+    }
+
+    public void addMapFilesToDataStore(MultiMapDataStore mapDataStore) {
         for (File file : mapFiles) {
             mapDataStore.addMapDataStore(new MapFile(file), false, false);
         }
+        if (mapFile != null) {
+            mapDataStore.addMapDataStore(new MapFile(mapFile), false, false);
+        }
+    }
+
+    public String getTitleExtra() {
+        if (mapFile != null) {
+            return " [" + mapFile.getName() + "]";
+        } else if (!mapFiles.isEmpty()) {
+            return " [" + mapFiles.get(0).getName() + "]";
+        }
+        return "";
     }
 }

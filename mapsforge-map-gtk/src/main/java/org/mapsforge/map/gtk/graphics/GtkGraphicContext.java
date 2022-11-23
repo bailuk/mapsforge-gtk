@@ -82,7 +82,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
         AwtMatrix awtMatrix = (AwtMatrix) matrix;
-        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
+        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.lib.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
 
         context.save();
@@ -101,7 +101,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
             System.out.println("GraphicContext::drawBitmap(matrix, "+alpha+ ", " + filter.toString() + ")");
         }
         AwtMatrix awtMatrix = (AwtMatrix) matrix;
-        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
+        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.lib.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
 
         context.save();
@@ -130,7 +130,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     public void drawCircle(int x, int y, int radius, Paint paint) {
         if (!paint.isTransparent()) {
             GtkPaint gtkPaint = (GtkPaint) paint;
-            
+
             context.save();
             var res = setLineAndColor(gtkPaint);
             context.arc(x , y , radius, 0.0, 2 * Math.PI);
@@ -144,7 +144,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     public void drawLine(int x1, int y1, int x2, int y2, Paint paint) {
         if (!paint.isTransparent()) {
             GtkPaint gtkPaint = (GtkPaint) paint;
-            
+
             context.save();
             var res = setLineAndColor(gtkPaint);
             context.moveTo(x1, y1);

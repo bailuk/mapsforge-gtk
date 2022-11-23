@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import ch.bailu.gtk.bridge.Image;
 import ch.bailu.gtk.cairo.Cairo;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Format;
 import ch.bailu.gtk.cairo.Surface;
 import ch.bailu.gtk.gdk.Gdk;
 import ch.bailu.gtk.gdkpixbuf.Pixbuf;
+import ch.bailu.gtk.lib.bridge.Image;
 
 
 public class GtkBitmap implements Bitmap, ResourceBitmap {
@@ -42,11 +42,11 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     private int refCount = 0;
 
     public GtkBitmap(InputStream inputStream, int hash, float scaleFactor, int width, int height, int percent) throws IOException {
-        this(load(inputStream, 20, 20));
+        this(load(inputStream, width, height));
     }
 
-    public GtkBitmap(InputStream inputStream) throws IOException {
-        this(load(inputStream));
+    public GtkBitmap(InputStream inputStream, int size) throws IOException {
+        this(load(inputStream, size, size));
     }
 
 
@@ -88,7 +88,7 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     }
 
     @Override
-    public synchronized  void decrementRefCount() {
+    public synchronized void decrementRefCount() {
         mustHaveRefCount();
         refCount--;
         if (refCount < 0) {

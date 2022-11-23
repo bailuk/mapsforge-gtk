@@ -21,7 +21,6 @@ import org.mapsforge.core.model.Point;
 import org.mapsforge.map.layer.Layer;
 import org.mapsforge.map.model.IMapViewPosition;
 
-import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.gtk.DrawingArea;
 import ch.bailu.gtk.gtk.EventControllerMotion;
 import ch.bailu.gtk.gtk.EventControllerScroll;
@@ -74,14 +73,14 @@ public class GestureHandler {
         scroller.onScroll((dx, dy) -> {
             if (dy < 0) {
                 zoomInAndCenter(mouseX, mouseY);
-                return GTK.TRUE;
+                return true;
 
             } else if (dy > 0) {
                 zoomOut();
-                return GTK.TRUE;
+                return true;
 
             }
-            return GTK.FALSE;
+            return false;
         });
 
 
@@ -149,7 +148,6 @@ public class GestureHandler {
         return null;
     }
 
-
     private void zoomInAndCenter(double x, double y) {
         IMapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
         if (mapViewPosition.getZoomLevel() < mapViewPosition.getZoomLevelMax()) {
@@ -172,4 +170,5 @@ public class GestureHandler {
             mapView.getModel().mapViewPosition.zoom((byte) -1);
         }
     }
+
 }

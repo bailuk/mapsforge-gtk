@@ -19,15 +19,15 @@ import org.mapsforge.core.graphics.TileBitmap;
 import java.io.IOException;
 import java.io.InputStream;
 
-import ch.bailu.gtk.exception.AllocationError;
+import ch.bailu.gtk.type.exception.AllocationError;
 
 public class GtkTileBitmap extends GtkBitmap implements TileBitmap {
     private long expiration = 0;
     private long timestamp = System.currentTimeMillis();
 
 
-    public GtkTileBitmap(InputStream inputStream) throws IOException, AllocationError {
-        super(inputStream);
+    public GtkTileBitmap(InputStream inputStream, int size) throws IOException, AllocationError {
+        super(inputStream, size);
     }
 
     public GtkTileBitmap(int tileSize) {

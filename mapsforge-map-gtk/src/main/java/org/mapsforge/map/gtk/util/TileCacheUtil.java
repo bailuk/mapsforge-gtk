@@ -28,6 +28,8 @@ import java.io.File;
 import java.util.UUID;
 
 public class TileCacheUtil {
+    private static final int DEFAULT_CAPACITY = 1024;
+
     /**
      * Utility function to create a two-level tile cache with the provided dimensions.
      * <p>
@@ -66,7 +68,7 @@ public class TileCacheUtil {
         return createTileCache(
                 tileSize,
                 model.frameBufferModel.getOverdrawFactor(),
-                1024,
+                DEFAULT_CAPACITY,
                 new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
     }
 

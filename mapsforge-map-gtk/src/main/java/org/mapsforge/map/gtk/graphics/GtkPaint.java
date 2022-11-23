@@ -112,7 +112,6 @@ public class GtkPaint implements Paint {
 
     @Override
     public void setBitmapShaderShift(Point origin) {
-        //System.out.println("GtkPaint::setBitmapShaderShift");
         bitmapShaderShift = origin;
     }
 
@@ -247,19 +246,13 @@ public class GtkPaint implements Paint {
     }
 
     public int getTextAlignment() {
-        int result = Alignment.LEFT;
-        switch (textAlign) {
-            case CENTER:
-                result = Alignment.CENTER;
-                break;
-            case LEFT:
-                result = Alignment.LEFT;
-                break;
-            case RIGHT:
-                result = Alignment.RIGHT;
-                break;
+        if (textAlign == Align.CENTER) {
+            return Alignment.CENTER;
+        } else if (textAlign == Align.RIGHT) {
+            return Alignment.RIGHT;
+        } else {
+            return Alignment.LEFT;
         }
-        return result;
     }
 
     public Style getStyle() {

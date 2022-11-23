@@ -12,7 +12,7 @@
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.mapsforge.samples.gtk;
+package org.mapsforge.samples.gtk.config;
 
 import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.LatLong;
@@ -36,23 +36,28 @@ import org.mapsforge.map.layer.renderer.TileRendererLayer;
 import org.mapsforge.map.model.IMapViewPosition;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 
+import java.io.File;
+
 public class LayerConfig {
 
     private final MapView mapView;
 
-
     private final HillsConfig hillsConfig;
-    private final VectorMapConfig renderMapConfig;
+    private final VectorMapConfig vectorMapConfig;
 
     private BoundingBox boundingBox = null;
 
     public LayerConfig(String[] args, MapView mapView) {
         this.mapView = mapView;
-        renderMapConfig = new VectorMapConfig(args);
+        vectorMapConfig = new VectorMapConfig(args);
         hillsConfig = new HillsConfig(args);
     }
 
-    public void setCoordsLayer(boolean on) {
+    public String getTitleExtra() {
+        return vectorMapConfig.getTitleExtra();
+    }
+
+    public void setCoordLayer(boolean on) {
         if (on) {
             if (!findLayer(TileCoordinatesLayer.class)) {
                 mapView.addLayer(new TileCoordinatesLayer(GtkGraphicFactory.INSTANCE, mapView.getModel().displayModel));
@@ -70,7 +75,6 @@ public class LayerConfig {
         }
         return false;
     }
-
 
     private boolean removeLayer(Class clazz) {
         var layers = mapView.getLayerManager().getLayers();
@@ -104,7 +108,7 @@ public class LayerConfig {
     }
 
     public boolean haveVectorMap() {
-        return renderMapConfig.hasMapFiles();
+        return vectorMapConfig.hasMapFiles();
     }
 
     public void setRasterMap(boolean on) {
@@ -125,7 +129,7 @@ public class LayerConfig {
         TileCache tileCache = TileCacheUtil.createTileCache(mapView.getModel());
 
         OpenStreetMapMapnik tileSource = OpenStreetMapMapnik.INSTANCE;
-        tileSource.setUserAgent("mapsforge-samples-awt");
+        tileSource.setUserAgent("mapsforge-samples-gtk");
         TileDownloadLayer tileDownloadLayer = createTileDownloadLayer(tileCache, mapView.getModel().mapViewPosition, tileSource);
         layers.add(0,tileDownloadLayer);
         tileDownloadLayer.start();
@@ -142,17 +146,20 @@ public class LayerConfig {
         } else {
             removeLayer(TileRendererLayer.class);
         }
+    }
 
+    public boolean setVectorMap(File file) {
+        return vectorMapConfig.setMapFile(file);
     }
 
     private BoundingBox initRenderMap(MapView mapView) {
         Layers layers = mapView.getLayerManager().getLayers();
 
-        mapView.getModel().displayModel.setFixedTileSize(512);
+        mapView.getModel().displayModel.setFixedTileSize(256);
         TileCache tileCache = TileCacheUtil.createTileCache(mapView.getModel());
         MultiMapDataStore mapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
 
-        renderMapConfig.addMapDataStore(mapDataStore);
+        vectorMapConfig.addMapFilesToDataStore(mapDataStore);
         TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsConfig.getConfig());
         layers.add(0,tileRendererLayer);
         return mapDataStore.boundingBox();

@@ -14,31 +14,29 @@
  */
 package org.mapsforge.map.gtk.util;
 
+import org.mapsforge.map.gtk.graphics.GtkBitmap;
+
+import ch.bailu.gtk.lib.util.SizeLog;
+
 /**
  * Count instances of allocated resources. Util class for debugging.
  * This is used to spot memory leaks
  */
 public class InstanceCount {
+    private final SizeLog sizeLog = new SizeLog(GtkBitmap.class.getSimpleName());
     private int count = 0;
-    private int rapportCount = 0;
 
-    public void increment() {
+    public synchronized void increment() {
         count++;
         rapport();
     }
 
-    public void decrement() {
+    public synchronized void decrement() {
         count--;
         rapport();
     }
 
-
     public void rapport() {
-        if (rapportCount < 0) {
-            System.out.println("GtkBitmap::instances: " + count);
-            rapportCount = 50;
-        }
-        rapportCount--;
-
+        sizeLog.log(count);
     }
 }

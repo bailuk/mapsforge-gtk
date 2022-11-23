@@ -21,10 +21,9 @@ package org.mapsforge.samples.gtk;
 
 import org.mapsforge.core.util.Parameters;
 import org.mapsforge.map.gtk.view.MapView;
+import org.mapsforge.samples.gtk.config.Config;
+import org.mapsforge.samples.gtk.config.MainMenu;
 
-import java.io.IOException;
-
-import ch.bailu.gtk.GTK;
 import ch.bailu.gtk.gio.ApplicationFlags;
 import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.ApplicationWindow;
@@ -33,7 +32,6 @@ import ch.bailu.gtk.gtk.Button;
 import ch.bailu.gtk.gtk.HeaderBar;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.Orientation;
-import ch.bailu.gtk.helper.ActionHelper;
 import ch.bailu.gtk.type.Str;
 import ch.bailu.gtk.type.Strs;
 
@@ -41,7 +39,7 @@ import ch.bailu.gtk.type.Strs;
 public final class SampleApp {
 
     private final static Str APP_ID   = new Str("org.mapsforge.samples.gtk");
-    private final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
+    public  final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
 
 
      /**
@@ -50,38 +48,26 @@ public final class SampleApp {
      * @param args command line args: expects the map files as multiple parameters
      *             with possible SRTM hgt folder as 1st argument.
      */
-    public static void main(final String[] args) throws IOException {
+    public static void main(final String[] args) {
         Parameters.SQUARE_FRAME_BUFFER = false;
         new SampleApp(args);
     }
 
     private SampleApp(String[] args) {
         final Application app = new Application(APP_ID, ApplicationFlags.FLAGS_NONE);
-        app.onActivate(() -> onActivate(new ApplicationWindow(app), new ActionHelper(app), args));
+        app.onActivate(() -> onActivate(new ApplicationWindow(app), app, args));
         app.run(1, new Strs(new Str[]{APP_NAME}));
     }
 
-
-
-    public void onActivate(ApplicationWindow window, ActionHelper actionHelper, String[] args) {
+    public void onActivate(ApplicationWindow window, Application app, String[] args) {
         final MapView mapView = new MapView();
-        final Config config = new Config(args, mapView);
+        final Config config = new Config(args, window, app, mapView);
 
-        window.setTitle(APP_NAME);
-
-        System.out.println("SampleApp::onActivate()");
-
-        window.setTitlebar(createHeader(mapView, new Menus(config, actionHelper).getMenuHelper()));
-
+        window.setTitlebar(createHeader(mapView, new MainMenu().createMenuButton()));
         window.setDefaultSize(1024, 768);
 
-        window.onShow(() -> {
-            System.out.println("SampleApp::onShow()");
-            config.initMapView();
-        });
-
+        window.onShow(config::initMapView);
         window.onDestroy(() -> {
-            System.out.println("SampleApp::onDestroy()");
             config.save();
             System.exit(0);
         });
@@ -92,22 +78,20 @@ public final class SampleApp {
     }
 
 
-    private HeaderBar createHeader(MapView mapView, Menus.MenuHelper menu) {
-        System.out.println("SampleApp::createHeader()");
+    private HeaderBar createHeader(MapView mapView, MenuButton menuButton) {
         final HeaderBar header = new HeaderBar();
-        header.setShowTitleButtons(GTK.TRUE);
+        header.setShowTitleButtons(true);
 
-        final MenuButton menuButton = menu.getMenuButton();
         header.packEnd(menuButton);
 
         Box box = new Box(Orientation.HORIZONTAL, 0);
-        box.getStyleContext().addClass(new Str("linked"));
+        box.getStyleContext().addClass("linked");
 
-        final Button zoomIn = Button.newFromIconNameButton(new Str("zoom-in-symbolic"));
+        final Button zoomIn = Button.newFromIconNameButton("zoom-in-symbolic");
         zoomIn.onClicked(() -> mapView.getModel().mapViewPosition.zoomIn());
         box.append(zoomIn);
 
-        final Button zoomOut = Button.newFromIconNameButton(new Str("zoom-out-symbolic"));
+        final Button zoomOut = Button.newFromIconNameButton("zoom-out-symbolic");
         zoomOut.onClicked(() -> mapView.getModel().mapViewPosition.zoomOut());
         box.append(zoomOut);
 
