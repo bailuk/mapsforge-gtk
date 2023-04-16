@@ -5,6 +5,7 @@ on:
     branches: [ disabled ]
   pull_request:
     branches: [ disabled ]
+  workflow_dispatch:
 
 jobs:
   build:
