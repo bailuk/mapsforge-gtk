@@ -38,10 +38,6 @@ import ch.bailu.gtk.type.Strs;
 
 public final class SampleApp {
 
-    private final static Str APP_ID   = new Str("org.mapsforge.samples.gtk");
-    public  final static Str APP_NAME = new Str("Mapsforge GTK4 Sample");
-
-
      /**
      * Starts the {@code Samples}.
      *
@@ -54,9 +50,9 @@ public final class SampleApp {
     }
 
     private SampleApp(String[] args) {
-        final Application app = new Application(APP_ID, ApplicationFlags.FLAGS_NONE);
+        final Application app = new Application(Constants.APP_ID, ApplicationFlags.FLAGS_NONE);
         app.onActivate(() -> onActivate(new ApplicationWindow(app), app, args));
-        app.run(1, new Strs(new Str[]{APP_NAME}));
+        app.run(1, new Strs(new Str[]{Constants.APP_NAME}));
     }
 
     public void onActivate(ApplicationWindow window, Application app, String[] args) {

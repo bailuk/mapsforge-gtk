@@ -14,6 +14,8 @@
  */
 package org.mapsforge.samples.gtk.config;
 
+import org.mapsforge.samples.gtk.lib.MenuHelper;
+
 import ch.bailu.gtk.gtk.MenuButton;
 
 public class MainMenu {
@@ -37,6 +39,10 @@ public class MainMenu {
         menuHelper.appendToggleItem("Fps counter", Key.displayFpsCounter);
         menuHelper.appendToggleItem("Draw debug", Key.enableDrawDebug);
         menuHelper.appendSection("Debug");
+
+        menuHelper.push();
+        menuHelper.appendItem("About...", Key.about);
+        menuHelper.appendSection();
 
         menuHelper.push();
         menuHelper.appendItem("ActionHandler",Key.dumpActionHandler);
