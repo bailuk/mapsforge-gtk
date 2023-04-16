@@ -37,8 +37,9 @@ import ch.bailu.gtk.pango.FontDescription;
 import ch.bailu.gtk.pango.Layout;
 import ch.bailu.gtk.pango.Pango;
 import ch.bailu.gtk.pangocairo.Pangocairo;
-import ch.bailu.gtk.type.Dbls;
+import ch.bailu.gtk.type.Dbl;
 import ch.bailu.gtk.type.Str;
+import ch.bailu.gtk.type.Wrapper;
 
 
 public class GtkGraphicContext implements GraphicContext, Canvas {
@@ -185,23 +186,23 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
 
-    private Dbls setLineAndColor(GtkPaint paint) {
+    private Dbl setLineAndColor(GtkPaint paint) {
         float[] dashes = paint.getDashPathEffect();
-        Dbls res = null;
+        Dbl res = null;
 
         setColor(paint.getColor());
         context.setLineWidth(paint.getStrokeWidth());
         context.setLineCap(paint.getStrokeCap());
         context.setLineJoin(paint.getStrokeJoin());
         if (dashes != null && dashes.length > 0) {
-            res = new Dbls(dashes);
+            res = new Dbl(dashes);
             context.setDash(res, dashes.length, 0d);
         }
         return res;
     }
 
-    private static void destroyResources(Dbls dbls) {
-        if (dbls != null) dbls.destroy();
+    private static void destroyResources(Wrapper res) {
+        if (res != null) res.destroy();
     }
 
     private void fillOrStroke(Style style) {
