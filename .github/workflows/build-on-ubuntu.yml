@@ -1,11 +1,6 @@
 name: Build on ubuntu
 
-on:
-  push:
-    branches: [ disabled ]
-  pull_request:
-    branches: [ disabled ]
-  workflow_dispatch:
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
