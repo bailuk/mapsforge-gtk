@@ -15,5 +15,6 @@ public enum Key {
     vectorMapPath,
     openVectorMap,
     centerMap,
-    frameMap
+    frameMap,
+    about
 }

@@ -1,13 +1,14 @@
-package org.mapsforge.samples.gtk.config;
+package org.mapsforge.samples.gtk.lib;
+
+import org.mapsforge.samples.gtk.config.Key;
 
 import java.util.Stack;
 
 import ch.bailu.gtk.gio.Menu;
 import ch.bailu.gtk.gio.MenuItem;
-import ch.bailu.gtk.gtk.Application;
 import ch.bailu.gtk.gtk.MenuButton;
 import ch.bailu.gtk.gtk.PopoverMenu;
-import ch.bailu.gtk.lib.handler.action.ActionHandler;
+import ch.bailu.gtk.type.Str;
 
 public class MenuHelper {
     private final Stack<Menu> menu = new Stack<>();
@@ -33,6 +34,13 @@ public class MenuHelper {
         if (menu.size() > 1) {
             var menu = this.menu.pop();
             this.menu.peek().appendSection(name, menu);
+        }
+    }
+
+    public void appendSection() {
+        if (menu.size() > 1) {
+            var menu = this.menu.pop();
+            this.menu.peek().appendSection(Str.NULL, menu);
         }
     }
 

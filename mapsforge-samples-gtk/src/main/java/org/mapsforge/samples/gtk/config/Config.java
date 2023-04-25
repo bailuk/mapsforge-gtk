@@ -20,7 +20,8 @@ import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.util.LatLongUtils;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.gtk.view.MapView;
-import org.mapsforge.samples.gtk.SampleApp;
+import org.mapsforge.samples.gtk.Constants;
+import org.mapsforge.samples.gtk.about.AppAboutDialog;
 import org.mapsforge.samples.gtk.lib.FileDialog;
 
 import java.io.File;
@@ -45,12 +46,13 @@ public class Config {
         this.layerConfig = new LayerConfig(args, mapView);
 
         layerConfig.setVectorMap(new File(PreferencesHelper.getString(Key.vectorMapPath)));
-        window.setTitle(SampleApp.APP_NAME + layerConfig.getTitleExtra());
+        window.setTitle(Constants.APP_NAME + layerConfig.getTitleExtra());
 
         actionHelper = new ActionHelper(app);
         actionHelper.onActivate(Key.openVectorMap, this::openVectorMap);
         actionHelper.onActivate(Key.frameMap, this::frameMap);
         actionHelper.onActivate(Key.centerMap, this::centerMap);
+        actionHelper.onActivate(Key.about, () -> AppAboutDialog.show(window));
         actionHelper.onActivate(Key.dumpActionHandler, () -> ActionHandler.dump(System.out));
         actionHelper.onActivate(Key.dumpCallbackHandler, () -> CallbackHandler.dump(System.out));
         actionHelper.onActivate(Key.dumpSignalHandler, () -> SignalHandler.dump(System.out));
@@ -68,8 +70,8 @@ public class Config {
 
     public void openVectorMap() {
         new FileDialog()
-                .pattern("Vector map", "*.map")
-                .title("Open vector map")
+                .pattern(Constants.VECTOR_MAP, "*.map")
+                .title(Constants.DIALOG_TITLE_OPEN_MAP)
                 .onResponse((path) -> {
                     if (layerConfig.setVectorMap(new File(path))) {
                         PreferencesHelper.setString(Key.vectorMapPath, path);
@@ -77,7 +79,7 @@ public class Config {
                         frameMap();
                         actionHelper.setBoolean(Key.enableVectorMap, true);
                         PreferencesHelper.setBoolean(Key.enableVectorMap, true);
-                        window.setTitle(SampleApp.APP_NAME + layerConfig.getTitleExtra());
+                        window.setTitle(Constants.APP_NAME + layerConfig.getTitleExtra());
                     }
                     actionHelper.setEnabled(Key.enableVectorMap, layerConfig.haveVectorMap());
                 }).show(window);
