@@ -83,7 +83,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     @Override
     public void drawBitmap(Bitmap bitmap, Matrix matrix) {
         AwtMatrix awtMatrix = (AwtMatrix) matrix;
-        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.lib.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
+        ch.bailu.gtk.cairo.Matrix cairoMatrix = awtMatrix.toCairoMatrix();
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
 
         context.save();
@@ -102,7 +102,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
             System.out.println("GraphicContext::drawBitmap(matrix, "+alpha+ ", " + filter.toString() + ")");
         }
         AwtMatrix awtMatrix = (AwtMatrix) matrix;
-        ch.bailu.gtk.cairo.Matrix cairoMatrix = ch.bailu.gtk.lib.bridge.Matrix.toCairoMatrix(awtMatrix.affineTransform);
+        ch.bailu.gtk.cairo.Matrix cairoMatrix = awtMatrix.toCairoMatrix();
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
 
         context.save();

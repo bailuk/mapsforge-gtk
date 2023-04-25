@@ -19,7 +19,11 @@ import org.mapsforge.core.graphics.Matrix;
 import java.awt.geom.AffineTransform;
 
 public class AwtMatrix implements Matrix {
-    final AffineTransform affineTransform = new AffineTransform();
+    private final AffineTransform affineTransform = new AffineTransform();
+
+    public ch.bailu.gtk.cairo.Matrix toCairoMatrix() {
+        return ch.bailu.gtk.lib.bridge.Matrix.toCairoMatrix(affineTransform);
+    }
 
     @Override
     public void reset() {
