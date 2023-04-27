@@ -55,6 +55,23 @@ public class GtkPath implements Path {
         }
     }
 
+    private static class QuadTo extends Command {
+        private final float x3, y3, x2, y2;
+        public QuadTo(float x1, float y1, float x2, float y2) {
+            super(x1,y1);
+            this.x3 = x2;
+            this.y3 = y2;
+
+            // control point (quadratic bezier expressed as cubic bezier)
+            this.x2 = x + 2f/3f * (x3 - x);
+            this.y2 = y + 2f/3f * (y3 - y);
+        }
+
+        @Override
+        public void exec(Context c) {
+            c.curveTo(x,y, x2, y2, x3, y3);
+        }
+    }
 
     public void exec(Context c) {
         for (Command cmd : commands) {
@@ -89,6 +106,11 @@ public class GtkPath implements Path {
     @Override
     public void moveTo(float x, float y) {
         commands.add(new MoveTo(x,y));
+    }
+
+    @Override
+    public void quadTo(float x1, float y1, float x2, float y2) {
+        commands.add(new QuadTo(x1, y1, x2, y2));
     }
 
     public float getXStart() {

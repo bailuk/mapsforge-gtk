@@ -42,7 +42,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.bailuk:mapsforge-gtk:0.2.0")
+    implementation("com.github.bailuk:mapsforge-gtk:0.3.0")
 }
 
 application {

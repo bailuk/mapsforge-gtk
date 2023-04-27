@@ -12,6 +12,10 @@ dependencies {
     implementation("org.mapsforge:mapsforge-map-reader:$mapsForgeVersion")
     implementation("org.mapsforge:mapsforge-themes:$mapsForgeVersion")
 
+    // https://mvnrepository.com/artifact/net.sf.kxml/kxml2
+    // xml parser implementation for render theme parsing (used to be part of mapsforge dependency prior 0.19)
+    implementation("net.sf.kxml:kxml2:2.3.0")
+
     val junitVersion: String by project
     testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
 }
@@ -38,4 +42,3 @@ tasks.run {
         }
     }
 }
-
