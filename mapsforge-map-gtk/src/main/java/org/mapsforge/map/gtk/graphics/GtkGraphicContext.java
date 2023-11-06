@@ -177,7 +177,8 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
                 Pattern pattern = Pattern.createForSurfacePattern(surface);
                 pattern.setExtend(Extend.REPEAT);
                 context.setSource(pattern);
-                context.fill();
+                context.setFillRule(gtkPath.getFillRule());
+                fillOrStroke(gtkPaint.getStyle());
                 context.restore();
                 pattern.destroy();
                 drawDebugPath(gtkPath);

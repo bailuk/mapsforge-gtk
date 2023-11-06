@@ -73,6 +73,17 @@ public class GtkPath implements Path {
         }
     }
 
+    private static class ClosePath extends Command {
+        public ClosePath() {
+            super(0,0);
+        }
+
+        @Override
+        public void exec(Context c) {
+            c.closePath();
+        }
+    }
+
     public void exec(Context c) {
         for (Command cmd : commands) {
             cmd.exec(c);
@@ -90,7 +101,7 @@ public class GtkPath implements Path {
 
     @Override
     public void close() {
-        System.out.println("GtkPath::close()");
+        commands.add(new ClosePath());
     }
 
     @Override
