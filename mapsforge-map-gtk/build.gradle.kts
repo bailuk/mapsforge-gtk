@@ -32,9 +32,7 @@ publishing {
 repositories {
     mavenLocal()
     mavenCentral()
-    repositories {
-        maven { url = uri("https://jitpack.io") }
-    }
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {

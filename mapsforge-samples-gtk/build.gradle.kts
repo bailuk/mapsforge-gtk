@@ -23,9 +23,7 @@ dependencies {
 repositories {
     mavenLocal()
     mavenCentral()
-    repositories {
-        maven { url = uri("https://jitpack.io") }
-    }
+    maven { url = uri("https://jitpack.io") }
 }
 
 val appMainClass = "org.mapsforge.samples.gtk.SampleApp"
