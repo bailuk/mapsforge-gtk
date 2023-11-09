@@ -71,7 +71,7 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     }
 
     private static Pixbuf load(InputStream stream, int width, int height) throws IOException {
-        return Image.load(stream, width, height);
+        return Image.load(stream, width, height, true);
     }
 
     private static Pixbuf load(InputStream stream) throws IOException {
