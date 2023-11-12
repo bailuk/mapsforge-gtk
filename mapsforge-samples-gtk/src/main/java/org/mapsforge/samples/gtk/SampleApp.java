@@ -55,7 +55,7 @@ public final class SampleApp {
         app.run(1, new Strs(new Str[]{Constants.APP_NAME}));
     }
 
-    public void onActivate(ApplicationWindow window, Application app, String[] args) {
+    private void onActivate(ApplicationWindow window, Application app, String[] args) {
         final MapView mapView = new MapView();
         final Config config = new Config(args, window, app, mapView);
 
