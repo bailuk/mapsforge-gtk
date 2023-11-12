@@ -20,6 +20,7 @@ public class ResourceBinder implements Runnable{
     public ResourceBinder(String label) {
         sizeLog = new SizeLog(label);
         thread.start();
+        thread.setName(ResourceBinder.class.getSimpleName());
     }
 
     public synchronized void bindResource(Object object, BoundResourceHandler recyclerResource) {
