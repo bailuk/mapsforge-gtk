@@ -46,6 +46,7 @@ public final class SampleApp {
      */
     public static void main(final String[] args) {
         Parameters.SQUARE_FRAME_BUFFER = false;
+        System.out.println("pid: " + ProcessHandle.current().pid()); // print pid for monitoring
         new SampleApp(args);
     }
 

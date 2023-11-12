@@ -8,6 +8,7 @@ public enum Key {
     enableDrawDebug,
     enableVectorMap,
     scale,
+    showInspector,
     dumpActionHandler,
     dumpCallbackHandler,
     dumpSignalHandler,

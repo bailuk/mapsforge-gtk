@@ -66,6 +66,7 @@ public class Config {
         actionHelper.onToggle(Key.enableDrawDebug, false, this::setDrawDebug);
 
         actionHelper.setEnabled(Key.enableVectorMap, layerConfig.haveVectorMap());
+        actionHelper.onActivate(Key.showInspector, ()-> Window.setInteractiveDebugging(true));
     }
 
     public void openVectorMap() {

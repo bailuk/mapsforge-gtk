@@ -38,6 +38,7 @@ public class MainMenu {
         menuHelper.appendToggleItem("Show grid", Key.displayGrid);
         menuHelper.appendToggleItem("Fps counter", Key.displayFpsCounter);
         menuHelper.appendToggleItem("Draw debug", Key.enableDrawDebug);
+        menuHelper.appendItem("Show inspector...", Key.showInspector);
         menuHelper.appendSection("Debug");
 
         menuHelper.push();
