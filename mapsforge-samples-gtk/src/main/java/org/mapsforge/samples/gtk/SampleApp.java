@@ -66,7 +66,8 @@ public final class SampleApp {
         window.onShow(config::initMapView);
         window.onDestroy(() -> {
             config.save();
-            System.exit(0);
+            mapView.destroy();
+            System.exit(0); // TODO mapsforge download thread does not terminate
         });
 
         window.setChild(mapView.getDrawingArea());

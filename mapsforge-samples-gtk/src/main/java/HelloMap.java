@@ -29,7 +29,8 @@ public class HelloMap {
             window.setTitle(TITLE);
             window.setSizeRequest(400,400);
             window.setChild(mapView.getDrawingArea());
-            window.onDestroy(()->System.exit(0));
+            window.onDestroy(mapView::destroy);
+            window.onDestroy(()->System.exit(0)); // TODO Download thread does not terminate in mapsforge
             window.show();
         });
 

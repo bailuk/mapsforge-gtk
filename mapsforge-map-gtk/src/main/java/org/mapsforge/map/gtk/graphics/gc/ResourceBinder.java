@@ -4,7 +4,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.bailu.gtk.lib.util.SizeLog;
 
@@ -14,13 +13,11 @@ public class ResourceBinder implements Runnable{
     private final Set<BoundResourceReference<Object>> references = new HashSet<>();
     private final ReferenceQueue<Object> reverencesQueue = new ReferenceQueue<>();
 
-    private final AtomicBoolean running = new AtomicBoolean(true);
-    private final Thread thread = new Thread(this);
-
     public ResourceBinder(String label) {
         sizeLog = new SizeLog(label);
+        final Thread thread = new Thread(this, ResourceBinder.class.getSimpleName());
+        thread.setDaemon(true); // Will terminate when application exits
         thread.start();
-        thread.setName(ResourceBinder.class.getSimpleName());
     }
 
     public synchronized void bindResource(Object object, BoundResourceHandler recyclerResource) {
@@ -30,7 +27,7 @@ public class ResourceBinder implements Runnable{
 
     @Override
     public void run() {
-        while (running.get()) {
+        while (true) {
             try {
                 Reference<?> recyclerReference = reverencesQueue.remove();
                 freeResource(recyclerReference);
@@ -52,10 +49,4 @@ public class ResourceBinder implements Runnable{
             System.err.println("Reference is of invalid type");
         }
     }
-
-    public void stop() {
-        running.set(false);
-        thread.interrupt();
-    }
-
 }
