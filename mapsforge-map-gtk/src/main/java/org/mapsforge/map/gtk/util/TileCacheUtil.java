@@ -15,6 +15,7 @@
  */
 package org.mapsforge.map.gtk.util;
 
+import org.mapsforge.core.model.Dimension;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.layer.cache.FileSystemTileCache;
 import org.mapsforge.map.layer.cache.InMemoryTileCache;
@@ -22,10 +23,12 @@ import org.mapsforge.map.layer.cache.TileCache;
 import org.mapsforge.map.layer.cache.TwoLevelTileCache;
 import org.mapsforge.map.model.Model;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.File;
 import java.util.UUID;
+
+import ch.bailu.gtk.gdk.Display;
+import ch.bailu.gtk.gdk.Monitor;
+import ch.bailu.gtk.gdk.Rectangle;
 
 public class TileCacheUtil {
     private static final int DEFAULT_CAPACITY = 1024;
@@ -82,9 +85,25 @@ public class TileCacheUtil {
      * @return the minimum cache size for the view
      */
     public static int getMinimumCacheSize(int tileSize, double overdrawFactor) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        return (int) Math.max(4, Math.round((2 + screenSize.getWidth() * overdrawFactor / tileSize)
-                * (2 + screenSize.getHeight() * overdrawFactor / tileSize)));
+        var dimension = getMonitorDimension();
+        return (int) Math.max(4, Math.round((2 + dimension.width * overdrawFactor / tileSize)
+                * (2 + dimension.height * overdrawFactor / tileSize)));
+    }
+
+    private static Dimension getMonitorDimension() {
+        final var monitors = Display.getDefault().getMonitors();
+        final var rectangle = new Rectangle();
+        int width = 800;
+        int height = 600;
+
+        for (int i=0; i< monitors.getNItems(); i++) {
+            var monitor = new Monitor(monitors.getItem(i).cast());
+            monitor.getGeometry(rectangle);
+            width = Math.max(width, rectangle.getFieldWidth());
+            height = Math.max(height, rectangle.getFieldHeight());
+        }
+        rectangle.destroy();
+        return new Dimension(width, height);
     }
 
     private TileCacheUtil() {}
