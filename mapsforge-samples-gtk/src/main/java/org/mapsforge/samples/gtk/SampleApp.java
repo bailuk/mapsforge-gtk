@@ -46,6 +46,7 @@ public final class SampleApp {
      */
     public static void main(final String[] args) {
         Parameters.SQUARE_FRAME_BUFFER = false;
+        System.out.println("pid: " + ProcessHandle.current().pid()); // print pid for monitoring
         new SampleApp(args);
     }
 
@@ -55,7 +56,7 @@ public final class SampleApp {
         app.run(1, new Strs(new Str[]{Constants.APP_NAME}));
     }
 
-    public void onActivate(ApplicationWindow window, Application app, String[] args) {
+    private void onActivate(ApplicationWindow window, Application app, String[] args) {
         final MapView mapView = new MapView();
         final Config config = new Config(args, window, app, mapView);
 
@@ -65,7 +66,8 @@ public final class SampleApp {
         window.onShow(config::initMapView);
         window.onDestroy(() -> {
             config.save();
-            System.exit(0);
+            mapView.destroy();
+            System.exit(0); // TODO mapsforge download thread does not terminate
         });
 
         window.setChild(mapView.getDrawingArea());

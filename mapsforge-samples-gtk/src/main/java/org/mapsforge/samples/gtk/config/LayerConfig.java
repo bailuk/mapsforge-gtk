@@ -76,15 +76,14 @@ public class LayerConfig {
         return false;
     }
 
-    private boolean removeLayer(Class clazz) {
+    private void removeLayer(Class clazz) {
         var layers = mapView.getLayerManager().getLayers();
         for (Layer layer : layers) {
             if (clazz.isInstance(layer)) {
                 layers.remove(layer);
-                return true;
+                layer.onDestroy();
             }
         }
-        return false;
     }
 
     public void setGridLayer(boolean on) {

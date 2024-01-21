@@ -161,30 +161,39 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         if (!paint.isTransparent() && !path.isEmpty()) {
             GtkPaint gtkPaint = (GtkPaint) paint;
             GtkPath gtkPath = (GtkPath) path;
-            if (gtkPaint.getBitmapShader() == null) {
-                context.save();
-                var res = setLineAndColor(gtkPaint);
-                context.setFillRule(gtkPath.getFillRule());
-                gtkPath.exec(context);
-                fillOrStroke(gtkPaint.getStyle());
-                context.restore();
-                destroyResources(res);
 
+            if (gtkPaint.getBitmapShader() == null) {
+                drawLinePath(gtkPath, gtkPaint);
             } else {
-                context.save();
-                gtkPath.exec(context);
-                Surface surface = gtkPaint.getBitmapShader().getSurface();
-                Pattern pattern = Pattern.createForSurfacePattern(surface);
-                pattern.setExtend(Extend.REPEAT);
-                context.setSource(pattern);
-                context.fill();
-                context.restore();
-                pattern.destroy();
+                drawShaderPath(gtkPath, gtkPaint);
                 drawDebugPath(gtkPath);
             }
         }
     }
 
+
+    private void drawLinePath(GtkPath gtkPath, GtkPaint gtkPaint) {
+        context.save();
+        var res = setLineAndColor(gtkPaint);
+        context.setFillRule(gtkPath.getFillRule());
+        gtkPath.exec(context);
+        fillOrStroke(gtkPaint.getStyle());
+        context.restore();
+        destroyResources(res);
+    }
+
+    private void drawShaderPath(GtkPath gtkPath, GtkPaint gtkPaint) {
+        context.save();
+        gtkPath.exec(context);
+        Surface surface = gtkPaint.getBitmapShader().getSurface();
+        Pattern pattern = Pattern.createForSurfacePattern(surface);
+        pattern.setExtend(Extend.REPEAT);
+        context.setSource(pattern);
+        context.setFillRule(gtkPath.getFillRule());
+        fillOrStroke(gtkPaint.getStyle());
+        context.restore();
+        pattern.destroy();
+    }
 
     private Dbl setLineAndColor(GtkPaint paint) {
         float[] dashes = paint.getDashPathEffect();

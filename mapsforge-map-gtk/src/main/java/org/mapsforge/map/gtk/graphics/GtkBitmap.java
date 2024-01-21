@@ -16,7 +16,7 @@ package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.ResourceBitmap;
-import org.mapsforge.map.gtk.util.InstanceCount;
+import org.mapsforge.map.gtk.graphics.gc.ResourceBinder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,13 +33,11 @@ import ch.bailu.gtk.lib.bridge.Image;
 
 public class GtkBitmap implements Bitmap, ResourceBitmap {
 
-    private final static InstanceCount INSTANCE_COUNT = new InstanceCount();
+    private final static ResourceBinder GTK_BITMAP_RESOURCE_BINDER = new ResourceBinder(GtkBitmap.class.getSimpleName());
 
     private final Surface surface;
     private final Context context;
     final int width, height;
-
-    private int refCount = 0;
 
     public GtkBitmap(InputStream inputStream, int hash, float scaleFactor, int width, int height, int percent) throws IOException {
         this(load(inputStream, width, height));
@@ -55,7 +53,7 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
         this.height = height;
         surface = Cairo.imageSurfaceCreate(Format.ARGB32, width, height);
         context = surface.createContext();
-        INSTANCE_COUNT.increment();
+        GTK_BITMAP_RESOURCE_BINDER.bindResource(this, new GtkBitmapResource(surface, context));
     }
 
 
@@ -67,11 +65,11 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
         Gdk.cairoSetSourcePixbuf(context,pixbuf,0,0);
         context.paint();
         pixbuf.unref();
-        INSTANCE_COUNT.increment();
+        GTK_BITMAP_RESOURCE_BINDER.bindResource(this, new GtkBitmapResource(surface, context));
     }
 
     private static Pixbuf load(InputStream stream, int width, int height) throws IOException {
-        return Image.load(stream, width, height);
+        return Image.load(stream, width, height, true);
     }
 
     private static Pixbuf load(InputStream stream) throws IOException {
@@ -81,28 +79,13 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
 
     @Override
     public synchronized  void compress(OutputStream outputStream) throws IOException {
-        mustHaveRefCount();
         Pixbuf pixbuf = Gdk.pixbufGetFromSurface(surface, 0, 0, width, height);
         Image.save(outputStream, pixbuf, "png");
         pixbuf.unref();
     }
 
     @Override
-    public synchronized void decrementRefCount() {
-        mustHaveRefCount();
-        refCount--;
-        if (refCount < 0) {
-            surface.destroy();
-            context.destroy();
-            INSTANCE_COUNT.decrement();
-        }
-    }
-
-    private void mustHaveRefCount() {
-        if (refCount < 0) {
-            throw new IndexOutOfBoundsException("refCount: " + refCount);
-        }
-    }
+    public synchronized void decrementRefCount() {}
 
     @Override
     public synchronized  int getHeight() {
@@ -115,38 +98,30 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
     }
 
     @Override
-    public synchronized  void incrementRefCount() {
-        mustHaveRefCount();
-        refCount++;
-    }
+    public synchronized  void incrementRefCount() {}
 
     @Override
     public synchronized  boolean isDestroyed() {
-        return refCount < 0;
+        return false;
     }
 
     @Override
     public void scaleTo(int width, int height) {
-        mustHaveRefCount();
-
         if (width != this.getWidth() || height != this.getHeight())
             System.out.println("GtkBitmap::scaleTo("+ width + "," + height + ")");
     }
 
     @Override
     public void setBackgroundColor(int color) {
-        mustHaveRefCount();
         new GtkGraphicContext(getContext(), getWidth(), getHeight()).fillColor(color);
 
     }
 
     public Context getContext() {
-        mustHaveRefCount();
         return context;
     }
 
     public Surface getSurface() {
-        mustHaveRefCount();
         return surface;
     }
 }
