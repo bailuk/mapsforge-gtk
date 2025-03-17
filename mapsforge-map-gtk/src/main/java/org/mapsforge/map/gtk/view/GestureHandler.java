@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -19,7 +19,7 @@ package org.mapsforge.map.gtk.view;
 import org.mapsforge.core.model.LatLong;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.map.layer.Layer;
-import org.mapsforge.map.model.IMapViewPosition;
+import org.mapsforge.map.model.MapViewPosition;
 
 import ch.bailu.gtk.gtk.DrawingArea;
 import ch.bailu.gtk.gtk.EventControllerMotion;
@@ -149,7 +149,7 @@ public class GestureHandler {
     }
 
     private void zoomInAndCenter(double x, double y) {
-        IMapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
+        MapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
         if (mapViewPosition.getZoomLevel() < mapViewPosition.getZoomLevelMax()) {
             org.mapsforge.core.model.Point center = this.mapView.getModel().mapViewDimension.getDimension().getCenter();
             byte zoomLevelDiff = 1;
@@ -164,7 +164,7 @@ public class GestureHandler {
     }
 
     private void zoomOut() {
-        IMapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
+        MapViewPosition mapViewPosition = this.mapView.getModel().mapViewPosition;
 
         if (mapViewPosition.getZoomLevel() > mapViewPosition.getZoomLevelMin()) {
             mapView.getModel().mapViewPosition.zoom((byte) -1);

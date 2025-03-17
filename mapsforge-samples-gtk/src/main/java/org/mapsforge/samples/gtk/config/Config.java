@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -34,7 +34,6 @@ import ch.bailu.gtk.lib.handler.SignalHandler;
 import ch.bailu.gtk.lib.handler.action.ActionHandler;
 
 public class Config {
-
     private final MapView mapView;
     private final LayerConfig layerConfig;
     private final Window window;
@@ -105,7 +104,8 @@ public class Config {
     public void initMapView() {
         GtkGraphicFactory.DRAW_DEBUG = PreferencesHelper.getBoolean(Key.enableDrawDebug);
 
-        mapView.getModel().init(PreferencesHelper.PREFERENCES);
+        mapView.getModel().mapViewPosition.setMapPosition(PreferencesHelper.getMapViewPosition());
+
         initMapLayer(PreferencesHelper.getBoolean(Key.enableVectorMap));
         setScaleBar(PreferencesHelper.getBoolean(Key.scale));
         setGridLayer(PreferencesHelper.getBoolean(Key.displayGrid));
@@ -133,8 +133,8 @@ public class Config {
     }
 
     public void save() {
-        mapView.getModel().save(PreferencesHelper.PREFERENCES);
-        PreferencesHelper.PREFERENCES.save();
+        PreferencesHelper.setMapViewPosition(mapView.getModel().mapViewPosition);
+        PreferencesHelper.save();
     }
 
     private void centerMap() {

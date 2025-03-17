@@ -4,7 +4,7 @@
  * Copyright 2014 Ludwig M Brinckmann
  * Copyright 2014-2020 devemux86
  * Copyright 2017 usrusr
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -71,7 +71,7 @@ public final class SampleApp {
         });
 
         window.setChild(mapView.getDrawingArea());
-        window.show();
+        window.present();
 
     }
 
@@ -83,7 +83,7 @@ public final class SampleApp {
         header.packEnd(menuButton);
 
         Box box = new Box(Orientation.HORIZONTAL, 0);
-        box.getStyleContext().addClass("linked");
+        box.addCssClass("linked");
 
         final Button zoomIn = Button.newFromIconNameButton("zoom-in-symbolic");
         zoomIn.onClicked(() -> mapView.getModel().mapViewPosition.zoomIn());

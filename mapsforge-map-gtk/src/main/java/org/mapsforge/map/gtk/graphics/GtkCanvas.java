@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -17,12 +17,12 @@ package org.mapsforge.map.gtk.graphics;
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
-import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.Rectangle;
+import org.mapsforge.core.model.Rotation;
 
 public class GtkCanvas implements Canvas {
     private Dimension dimension = new Dimension(0,0);
@@ -49,10 +49,40 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
+    public void restore() {
+        System.out.println("GtkCanvas::restore()");
+    }
+
+    @Override
+    public void rotate(float degrees, float px, float py) {
+        System.out.println("GtkCanvas::rotate()");
+    }
+
+    @Override
+    public void rotate(Rotation rotation) {
+        System.out.println("GtkCanvas::rotate()");
+    }
+
+    @Override
+    public void save() {
+        System.out.println("GtkCanvas::save()");
+    }
+
+    @Override
     public synchronized void setBitmap(Bitmap bitmap) {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
         graphicContext = new GtkGraphicContext(gtkBitmap.getContext(), getWidth(), getHeight());
         dimension = new Dimension(bitmap.getWidth(), bitmap.getHeight());
+    }
+
+    @Override
+    public void setBitmap(Bitmap bitmap, float dx, float dy, float degrees, float px, float py) {
+        System.out.println("GtkCanvas::setBitmap()");
+    }
+
+    @Override
+    public void translate(float dx, float dy) {
+        System.out.println("GtkCanvas::translate()");
     }
 
     @Override
@@ -61,8 +91,8 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public synchronized void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
-        graphicContext.drawBitmap(bitmap, left, top, alpha, filter);
+    public synchronized void drawBitmap(Bitmap bitmap, int left, int top, float alpha) {
+        graphicContext.drawBitmap(bitmap, left, top, alpha);
     }
 
     @Override
@@ -71,8 +101,8 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public synchronized void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
-        graphicContext.drawBitmap(bitmap, matrix, alpha, filter);
+    public synchronized void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha) {
+        graphicContext.drawBitmap(bitmap, matrix, alpha);
     }
 
     @Override
@@ -82,8 +112,8 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public synchronized void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha, Filter filter) {
-        drawBitmap(bitmap, dstLeft, dstTop, alpha, filter);
+    public synchronized void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha) {
+        drawBitmap(bitmap, dstLeft, dstTop, alpha);
     }
 
     @Override
@@ -169,7 +199,7 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude) {
+    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color) {
         System.out.println("GtkCanvas::shadeBitmap()");
     }
 

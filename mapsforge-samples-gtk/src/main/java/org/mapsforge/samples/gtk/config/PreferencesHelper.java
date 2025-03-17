@@ -1,15 +1,20 @@
 package org.mapsforge.samples.gtk.config;
 
+import org.mapsforge.core.model.LatLong;
+import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.map.gtk.util.JavaPreferences;
-import org.mapsforge.map.model.common.PreferencesFacade;
+import org.mapsforge.map.model.MapViewPosition;
 import org.mapsforge.samples.gtk.SampleApp;
 
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
 public class PreferencesHelper {
+    private static final String LATITUDE = "latitude";
+    private static final String LONGITUDE = "longitude";
+    private static final String ZOOM_LEVEL = "zoomLevel";
 
-    public static final PreferencesFacade PREFERENCES = new JavaPreferences(Preferences.userNodeForPackage(SampleApp.class));
+    private static final JavaPreferences PREFERENCES = new JavaPreferences(Preferences.userNodeForPackage(SampleApp.class));
 
     public static boolean hasChanged(Key key, boolean val) {
         return getBoolean(key) != val;
@@ -46,5 +51,22 @@ public class PreferencesHelper {
             return true;
         }
         return false;
+    }
+
+    public static MapPosition getMapViewPosition() {
+        double latitude = PREFERENCES.getDouble(LATITUDE, 0);
+        double longitude = PREFERENCES.getDouble(LONGITUDE, 0);
+        byte zoomLevel = PREFERENCES.getByte(ZOOM_LEVEL, (byte) 0);
+        return new MapPosition(new LatLong(latitude, longitude), zoomLevel);
+    }
+
+    public static void setMapViewPosition(MapViewPosition mapViewPosition) {
+        PREFERENCES.putDouble(LATITUDE, mapViewPosition.getCenter().latitude);
+        PREFERENCES.putDouble(LONGITUDE, mapViewPosition.getCenter().longitude);
+        PREFERENCES.putByte(ZOOM_LEVEL, mapViewPosition.getZoomLevel());
+    }
+
+    public static void save() {
+        PREFERENCES.save();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -76,6 +76,15 @@ public class GtkBitmap implements Bitmap, ResourceBitmap {
         return Image.load(stream);
     }
 
+
+    /**
+     * This gets called by CanvasRasterer::drawHillshading
+     * @return
+     */
+    @Override
+    public Object getMutex() {
+        return this;
+    }
 
     @Override
     public synchronized  void compress(OutputStream outputStream) throws IOException {

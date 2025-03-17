@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package org.mapsforge.map.gtk.graphics;
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
-import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.GraphicContext;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
@@ -25,6 +24,7 @@ import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.Rectangle;
+import org.mapsforge.core.model.Rotation;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
 
@@ -68,11 +68,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
-        if (filter != Filter.NONE) {
-            System.out.println("GraphicContext::drawBitmap("+alpha+ ", " + filter.toString() + ")");
-        }
-
+    public void drawBitmap(Bitmap bitmap, int left, int top, float alpha) {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
         context.save();
         context.setSourceSurface(gtkBitmap.getSurface(), left, top);
@@ -97,10 +93,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
-        if (filter != Filter.NONE) {
-            System.out.println("GraphicContext::drawBitmap(matrix, "+alpha+ ", " + filter.toString() + ")");
-        }
+    public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha) {
         AwtMatrix awtMatrix = (AwtMatrix) matrix;
         ch.bailu.gtk.cairo.Matrix cairoMatrix = awtMatrix.toCairoMatrix();
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
@@ -122,8 +115,8 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha, Filter filter) {
-        drawBitmap(bitmap, srcLeft,srcTop, alpha, filter);
+    public void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha) {
+        drawBitmap(bitmap, srcLeft,srcTop, alpha);
         System.out.println("GraphicContext::drawBitmap(6)");
     }
 
@@ -387,7 +380,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude) {
+    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color) {
         System.out.println("GraphicContext::shadeBitmap()");
     }
 
@@ -439,9 +432,39 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         return dimension.width;
     }
 
+    @Override
+    public void restore() {
+        System.out.println("GraphicContext::restore()");
+    }
+
+    @Override
+    public void rotate(float degrees, float px, float py) {
+        System.out.println("GraphicContext::rotate()");
+    }
+
+    @Override
+    public void rotate(Rotation rotation) {
+        System.out.println("GraphicContext::rotate()");
+    }
+
+    @Override
+    public void save() {
+        System.out.println("GraphicContext::save()");
+    }
+
     /**
      * Does nothing. Exists to satisfy Canvas interface
      */
     @Override
     public void setBitmap(Bitmap bitmap) {}
+
+    @Override
+    public void setBitmap(Bitmap bitmap, float dx, float dy, float degrees, float px, float py) {
+        System.out.println("GraphicContext::setBitmap()");
+    }
+
+    @Override
+    public void translate(float dx, float dy) {
+        System.out.println("GraphicContext::translate()");
+    }
 }

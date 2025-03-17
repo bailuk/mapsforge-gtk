@@ -3,7 +3,7 @@
  * Copyright 2014 Ludwig M Brinckmann
  * Copyright 2014-2018 devemux86
  * Copyright 2018 mikes222
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -18,11 +18,12 @@
  */
 package org.mapsforge.map.gtk.view;
 
-import org.mapsforge.core.graphics.GraphicContext;
+import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.GraphicFactory;
 import org.mapsforge.core.model.BoundingBox;
 import org.mapsforge.core.model.Dimension;
 import org.mapsforge.core.model.LatLong;
+import org.mapsforge.core.model.Rotation;
 import org.mapsforge.map.controller.FrameBufferController;
 import org.mapsforge.map.controller.LayerManagerController;
 import org.mapsforge.map.controller.MapViewController;
@@ -80,9 +81,9 @@ public class MapView implements org.mapsforge.map.view.MapView {
         this.drawingArea.setHexpand(true);
 
         DrawingArea.OnDrawingAreaDrawFunc drawFunc = (self, drawing_area, cr, width, height, user_data) -> {
-            final GraphicContext graphicContext = new GtkGraphicContext(cr, dimension);
+            final Canvas graphicContext = new GtkGraphicContext(cr, dimension);
 
-            frameBuffer.draw(graphicContext);
+            frameBuffer.draw(graphicContext, null);
             if (mapScaleBar != null) {
                 mapScaleBar.draw(graphicContext);
             }
@@ -152,8 +153,13 @@ public class MapView implements org.mapsforge.map.view.MapView {
 
     @Override
     public BoundingBox getBoundingBox() {
-        return MapPositionUtil.getBoundingBox(this.model.mapViewPosition.getMapPosition(),
-                getDimension(), this.model.displayModel.getTileSize());
+        return MapPositionUtil.getBoundingBox(
+                this.model.mapViewPosition.getMapPosition(),
+                getMapRotation(),
+                this.model.displayModel.getTileSize(),
+                getDimension(),
+                0,
+                0);
     }
 
     @Override
@@ -182,8 +188,23 @@ public class MapView implements org.mapsforge.map.view.MapView {
     }
 
     @Override
+    public Rotation getMapRotation() {
+        return this.getModel().mapViewPosition.getRotation();
+    }
+
+    @Override
     public MapScaleBar getMapScaleBar() {
         return this.mapScaleBar;
+    }
+
+    @Override
+    public float getMapViewCenterX() {
+        return this.getModel().mapViewPosition.getMapViewCenterX();
+    }
+
+    @Override
+    public float getMapViewCenterY() {
+        return this.getModel().mapViewPosition.getMapViewCenterX();
     }
 
     @Override
@@ -194,6 +215,16 @@ public class MapView implements org.mapsforge.map.view.MapView {
     @Override
     public Model getModel() {
         return this.model;
+    }
+
+    @Override
+    public float getOffsetX() {
+        return getWidth() * (getMapViewCenterX()* 0.5f);
+    }
+
+    @Override
+    public float getOffsetY() {
+        return getHeight() * (getMapViewCenterY()* 0.5f);
     }
 
     @Override
@@ -214,6 +245,11 @@ public class MapView implements org.mapsforge.map.view.MapView {
          */
         redrawNeeded = true;
         Glib.idleAdd(onSourceFunc, null);
+    }
+
+    @Override
+    public void rotate(Rotation rotation) {
+        this.getModel().mapViewPosition.setRotation(rotation);
     }
 
     private Glib.OnSourceFunc onSourceFunc = (self, user_data) -> {
@@ -238,6 +274,15 @@ public class MapView implements org.mapsforge.map.view.MapView {
         this.mapScaleBar = mapScaleBar;
     }
 
+    @Override
+    public void setMapViewCenterX(float mapViewCenterX) {
+        this.model.mapViewPosition.setMapViewCenterX(mapViewCenterX);
+    }
+
+    @Override
+    public void setMapViewCenterY(float mapViewCenterY) {
+        this.model.mapViewPosition.setMapViewCenterY(mapViewCenterY);
+    }
 
     @Override
     public void setZoomLevel(byte zoomLevel) {

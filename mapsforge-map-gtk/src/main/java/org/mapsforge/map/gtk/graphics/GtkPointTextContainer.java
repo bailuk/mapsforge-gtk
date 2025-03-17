@@ -1,7 +1,7 @@
 /*
  * Copyright 2014 Ludwig M Brinckmann
  * Copyright 2014-2016 devemux86
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -18,8 +18,6 @@ package org.mapsforge.map.gtk.graphics;
 
 import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Display;
-import org.mapsforge.core.graphics.Filter;
-import org.mapsforge.core.graphics.GraphicUtils;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Position;
@@ -27,26 +25,21 @@ import org.mapsforge.core.mapelements.PointTextContainer;
 import org.mapsforge.core.mapelements.SymbolContainer;
 import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
+import org.mapsforge.core.model.Rotation;
 import org.mapsforge.map.gtk.util.MultiLineText;
 
 public class GtkPointTextContainer extends PointTextContainer {
     private final MultiLineText lines;
 
+    private final Rectangle boundary;
     /**
      * Create a new point container, that holds the x-y coordinates of a point, a text variable, two paint objects, and
      * a reference on a symbolContainer, if the text is connected with a POI.
      */
-    protected GtkPointTextContainer(
-            Point point,
-            Display display,
-            int priority,
-            String text,
-            Paint paintFront,
-            Paint paintBack,
-            SymbolContainer symbolContainer,
-            Position position,
-            int maxTextWidth) {
-        super(point, display, priority, text, paintFront, paintBack, symbolContainer, position, maxTextWidth);
+    protected GtkPointTextContainer(Point point, double horizontalOffset, double verticalOffset,
+                                 Display display, int priority, String text, Paint paintFront, Paint paintBack,
+                                 SymbolContainer symbolContainer, Position position, int maxTextWidth) {
+        super(point, horizontalOffset, verticalOffset, display, priority, text, paintFront, paintBack, symbolContainer, position, maxTextWidth);
 
         final int charWidth = paintBack.getTextWidth("W");
         final int charHeight = paintBack.getTextHeight("Y");
@@ -57,9 +50,9 @@ public class GtkPointTextContainer extends PointTextContainer {
 
 
     @Override
-    public void draw(Canvas canvas, Point origin, Matrix matrix, Filter filter) {
+    public void draw(Canvas canvas, Point origin, Matrix matrix, Rotation rotation) {
         if (canDraw()) {
-            doDraw(canvas, origin, filter);
+            doDraw(canvas, origin);
         }
     }
 
@@ -70,15 +63,15 @@ public class GtkPointTextContainer extends PointTextContainer {
         return paint != null && !paint.isTransparent();
     }
 
-    private void doDraw(Canvas canvas, Point origin, Filter filter) {
+    private void doDraw(Canvas canvas, Point origin) {
         final GtkCanvas gtkCanvas = (GtkCanvas) canvas;
         final Point pointAdjusted = this.xy.offset(-origin.x, -origin.y);
         final Rectangle boundary = this.boundary.shift(pointAdjusted);
-        drawLines(gtkCanvas, boundary, filter);
+        drawLines(gtkCanvas, boundary);
     }
 
 
-    private void drawLines(GtkCanvas gtkCanvas, Rectangle boundary, Filter filter) {
+    private void drawLines(GtkCanvas gtkCanvas, Rectangle boundary) {
         if (lines.size() > 0) {
             Rectangle lineBoundary = new Rectangle(
                     boundary.left, boundary.top,
@@ -86,26 +79,26 @@ public class GtkPointTextContainer extends PointTextContainer {
             Point shift = new Point(0, lineBoundary.getHeight());
 
             for (String line : lines.getLines()) {
-                drawTextIntoBoundary(gtkCanvas, line, lineBoundary, (GtkPaint) paintBack, filter);
-                drawTextIntoBoundary(gtkCanvas, line, lineBoundary, (GtkPaint) paintFront, filter);
+                drawTextIntoBoundary(gtkCanvas, line, lineBoundary, (GtkPaint) paintBack);
+                drawTextIntoBoundary(gtkCanvas, line, lineBoundary, (GtkPaint) paintFront);
                 lineBoundary = lineBoundary.shift(shift);
             }
         }
     }
 
 
-    private void drawTextIntoBoundary(GtkCanvas canvas, String text, Rectangle boundary, GtkPaint paint, Filter filter) {
+    private void drawTextIntoBoundary(GtkCanvas canvas, String text, Rectangle boundary, GtkPaint paint) {
         if (paint != null) {
             int color = paint.getColor();
-            setFilterColor(paint, filter);
+            setFilterColor(paint);
             canvas.drawTextIntoBoundary(text, boundary, paint);
             paint.setColor(color);
         }
     }
 
-    private static void setFilterColor(Paint paint, Filter filter) {
+    private static void setFilterColor(Paint paint) {
         if (paint != null) {
-            paint.setColor(GraphicUtils.filterColor(paint.getColor(), filter));
+            paint.setColor(paint.getColor());
         }
     }
 
@@ -137,4 +130,10 @@ public class GtkPointTextContainer extends PointTextContainer {
                 return new Point(w, h / -2);
         }
     }
+
+    @Override
+    protected Rectangle getBoundary() {
+        return boundary;
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -33,8 +33,8 @@ import org.mapsforge.map.layer.download.tilesource.OpenStreetMapMapnik;
 import org.mapsforge.map.layer.download.tilesource.TileSource;
 import org.mapsforge.map.layer.hills.HillsRenderConfig;
 import org.mapsforge.map.layer.renderer.TileRendererLayer;
-import org.mapsforge.map.model.IMapViewPosition;
-import org.mapsforge.map.rendertheme.InternalRenderTheme;
+import org.mapsforge.map.model.MapViewPosition;
+import org.mapsforge.map.rendertheme.internal.MapsforgeThemes;
 
 import java.io.File;
 
@@ -164,7 +164,7 @@ public class LayerConfig {
         return mapDataStore.boundingBox();
     }
 
-    private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, IMapViewPosition mapViewPosition, TileSource tileSource) {
+    private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, MapViewPosition mapViewPosition, TileSource tileSource) {
         return new TileDownloadLayer(tileCache, mapViewPosition, tileSource, GtkGraphicFactory.INSTANCE) {
             @Override
             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
@@ -174,7 +174,7 @@ public class LayerConfig {
         };
     }
 
-    private static TileRendererLayer createTileRendererLayer(TileCache tileCache, MapDataStore mapDataStore, IMapViewPosition mapViewPosition, HillsRenderConfig hillsRenderConfig) {
+    private static TileRendererLayer createTileRendererLayer(TileCache tileCache, MapDataStore mapDataStore, MapViewPosition mapViewPosition, HillsRenderConfig hillsRenderConfig) {
         TileRendererLayer tileRendererLayer = new TileRendererLayer(tileCache, mapDataStore, mapViewPosition, false, true, false, GtkGraphicFactory.INSTANCE, hillsRenderConfig) {
             @Override
             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
@@ -182,7 +182,7 @@ public class LayerConfig {
                 return true;
             }
         };
-        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.DEFAULT);
+        tileRendererLayer.setXmlRenderTheme(MapsforgeThemes.DEFAULT);
         return tileRendererLayer;
     }
 
