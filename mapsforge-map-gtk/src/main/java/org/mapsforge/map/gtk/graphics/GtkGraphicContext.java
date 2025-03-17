@@ -362,14 +362,14 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         context.rectangle(lx, top, left, height);
         context.clip();
 
-        final int rw=dimension.width- left -width;
-        final int rx=dimension.width-rw;
+        final float rw=dimension.width- left -width;
+        final float rx=dimension.width-rw;
         context.rectangle(rx, top, left, height);
         context.clip();
 
-        final int bh=dimension.height-height- top;
-        final int bx=0;
-        final int by=dimension.height-bh;
+        final float bh=dimension.height-height- top;
+        final float bx=0f;
+        final float by=dimension.height-bh;
         context.rectangle(bx, by, tw, bh);
         context.clip();
     }

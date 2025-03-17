@@ -28,8 +28,6 @@ public class GtkCanvas implements Canvas {
     private Dimension dimension = new Dimension(0,0);
     private GtkGraphicContext graphicContext;
 
-
-
     @Override
     public void destroy() {}
 
