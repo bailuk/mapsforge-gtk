@@ -17,8 +17,8 @@ public class MenuHelper {
         push();
     }
 
-    public void appendToggleItem(String label, Key id) {
-        menu.peek().appendItem(new MenuItem(label, "app." + id));
+    public void appendItem(String label, Key id, int i) {
+        menu.peek().appendItem(new MenuItem(label, "app." + id +"(" + i + ")"));
     }
 
     public void appendItem(String label, Key id) {

@@ -19,6 +19,14 @@ public class ActionHelper {
         });
     }
 
+    public SignalHandler onSelect(Key key, ActionHandler.OnChange signal) {
+        return ActionHandler.get(app, key.name(), PreferencesHelper.getInt(key, 0)).onChange((value) -> {
+            if (PreferencesHelper.setInt(key, value)){
+                signal.onActivate(value);
+            }
+        });
+    }
+
     public SignalHandler onActivate(Key key, ActionHandler.OnActivate signal) {
         return ActionHandler.get(app, key.name()).onActivate(signal);
     }

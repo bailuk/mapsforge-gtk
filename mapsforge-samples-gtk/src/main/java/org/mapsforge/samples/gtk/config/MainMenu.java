@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -24,33 +24,40 @@ public class MainMenu {
     public MainMenu() {
         menuHelper = new MenuHelper();
 
-        menuHelper.appendToggleItem("Scale bar", Key.scale);
+        menuHelper.appendItem("Scale bar", Key.scale);
 
         menuHelper.push();
         menuHelper.appendItem("Open...", Key.openVectorMap);
-        menuHelper.appendToggleItem("Enable", Key.enableVectorMap);
+        menuHelper.appendItem("Enable", Key.enableVectorMap);
         menuHelper.appendItem("Frame", Key.frameMap);
         menuHelper.appendItem("Center", Key.centerMap);
+
+        menuHelper.push();
+        menuHelper.appendItem("Default", Key.mapTheme, 0);
+        menuHelper.appendItem("Motorider", Key.mapTheme, 1);
+        menuHelper.appendItem("Motorider Dark", Key.mapTheme, 2);
+        menuHelper.appendItem("Osmarender", Key.mapTheme,3 );
+        menuHelper.appendSubmenu("Theme");
         menuHelper.appendSection("Vector map");
 
         menuHelper.push();
-        menuHelper.appendToggleItem("Tile coordinates", Key.displayCoordinates);
-        menuHelper.appendToggleItem("Show grid", Key.displayGrid);
-        menuHelper.appendToggleItem("Fps counter", Key.displayFpsCounter);
-        menuHelper.appendToggleItem("Draw debug", Key.enableDrawDebug);
+        menuHelper.appendItem("Tile coordinates", Key.displayCoordinates);
+        menuHelper.appendItem("Show grid", Key.displayGrid);
+        menuHelper.appendItem("Fps counter", Key.displayFpsCounter);
+        menuHelper.appendItem("Draw debug", Key.enableDrawDebug);
         menuHelper.appendItem("Show inspector...", Key.showInspector);
-        menuHelper.appendSection("Debug");
-
-        menuHelper.push();
-        menuHelper.appendItem("About...", Key.about);
-        menuHelper.appendSection();
 
         menuHelper.push();
         menuHelper.appendItem("ActionHandler",Key.dumpActionHandler);
         menuHelper.appendItem("CallbackHandler", Key.dumpCallbackHandler);
         menuHelper.appendItem("SignalHandler", Key.dumpSignalHandler);
         menuHelper.appendItem("ClassHandler", Key.dumpClassHandler);
-        menuHelper.appendSection("Dump resources");
+        menuHelper.appendSubmenu("Dump resources");
+        menuHelper.appendSection("Debug");
+
+        menuHelper.push();
+        menuHelper.appendItem("About...", Key.about);
+        menuHelper.appendSection();
     }
 
     public MenuButton createMenuButton() {

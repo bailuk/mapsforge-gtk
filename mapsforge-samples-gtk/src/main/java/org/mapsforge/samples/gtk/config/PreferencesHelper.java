@@ -36,9 +36,12 @@ public class PreferencesHelper {
         return false;
     }
 
-
     public static boolean hasChanged(Key key, String val) {
         return !Objects.equals(getString(key), val);
+    }
+
+    private static boolean hasChanged(Key key, int val) {
+        return getInt(key, -1) != val;
     }
 
     public static String getString(Key key) {
@@ -48,6 +51,17 @@ public class PreferencesHelper {
     public static boolean setString(Key key, String val) {
         if (hasChanged(key, val)) {
             PREFERENCES.putString(key.name(), val);
+            return true;
+        }
+        return false;
+    }
+    public static int getInt(Key key, int val) {
+        return PREFERENCES.getInt(key.name(), val);
+    }
+
+    public static boolean setInt(Key key, int val) {
+        if (hasChanged(key, val)) {
+            PREFERENCES.putInt(key.name(), val);
             return true;
         }
         return false;

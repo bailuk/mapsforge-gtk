@@ -68,4 +68,12 @@ public class JavaPreferences  {
             throw new IllegalStateException(e);
         }
     }
+
+    public int getInt(String key, int value) {
+        return this.preferences.getInt(key, value);
+    }
+
+    public void putInt(String key, int value) {
+        this.preferences.putInt(key, value);
+    }
 }
