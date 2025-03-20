@@ -21,6 +21,7 @@ import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.model.Dimension;
+import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.core.model.Rotation;
 
@@ -130,6 +131,11 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
+    public void drawLines(Point[][] coordinates, float dy, Paint paint) {
+        graphicContext.drawLines(coordinates, dy, paint);
+    }
+
+    @Override
     public synchronized void drawPathText(String text, Path path, Paint paint) {
         graphicContext.drawPathText(text, path, paint);
     }
@@ -185,7 +191,7 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public synchronized void setClipDifference(int left, int top, int width, int height) {
+    public void setClipDifference(float left, float top, float width, float height) {
         graphicContext.setClipDifference(left,top,width, height);
     }
 
@@ -195,8 +201,8 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color) {
-        graphicContext.shadeBitmap(bitmap, shadeRect, tileRect, magnitude, color);
+    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color, boolean external) {
+        graphicContext.shadeBitmap(bitmap, shadeRect, tileRect, magnitude, color, external);
     }
 
     public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paintFront) {

@@ -101,6 +101,11 @@ public class GtkPaint implements Paint {
     }
 
     @Override
+    public boolean isComplexStyle() {
+        return true; // prevents call of GtkGraphicContext::drawLines
+    }
+
+    @Override
     public void setBitmapShader(Bitmap bitmap) {
         if (bitmapShader != null) {
             bitmapShader.decrementRefCount();
@@ -137,7 +142,6 @@ public class GtkPaint implements Paint {
 
     @Override
     public void setDashPathEffect(float[] strokeDasharray) {
-        //System.out.println("GtkPaint::setDashPathEffect");
         dashes = strokeDasharray;
     }
 

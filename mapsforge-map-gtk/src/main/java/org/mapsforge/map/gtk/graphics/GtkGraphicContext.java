@@ -23,6 +23,7 @@ import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Dimension;
+import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.core.model.Rotation;
 import org.mapsforge.map.gtk.util.color.ARGB;
@@ -164,6 +165,11 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
                 drawDebugPath(gtkPath);
             }
         }
+    }
+
+    @Override
+    public void drawLines(Point[][] coordinates, float dy, Paint paint) {
+        System.out.println("GraphicContext::drawLines");
     }
 
 
@@ -357,7 +363,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void setClipDifference(int left, int top, int width, int height) {
+    public void setClipDifference(float left, float top, float width, float height) {
         context.resetClip();
         context.newPath();
 
@@ -385,7 +391,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     public void setFilterBitmap(boolean filter) {}
 
     @Override
-    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color) {
+    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color, boolean external) {
         System.out.println("GraphicContext::shadeBitmap()");
     }
 
