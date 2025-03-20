@@ -14,6 +14,7 @@
  */
 package org.mapsforge.samples.gtk.config;
 
+import org.mapsforge.map.rendertheme.internal.MapsforgeThemes;
 import org.mapsforge.samples.gtk.lib.MenuHelper;
 
 import ch.bailu.gtk.gtk.MenuButton;
@@ -33,10 +34,10 @@ public class MainMenu {
         menuHelper.appendItem("Center", Key.centerMap);
 
         menuHelper.push();
-        menuHelper.appendItem("Default", Key.mapTheme, 0);
-        menuHelper.appendItem("Motorider", Key.mapTheme, 1);
-        menuHelper.appendItem("Motorider Dark", Key.mapTheme, 2);
-        menuHelper.appendItem("Osmarender", Key.mapTheme,3 );
+
+        for (int i = 0; i < MapsforgeThemes.values().length; i++) {
+            menuHelper.appendItem(MapsforgeThemes.values()[i].name(), Key.mapTheme, i);
+        }
         menuHelper.appendSubmenu("Theme");
         menuHelper.appendSection("Vector map");
 
