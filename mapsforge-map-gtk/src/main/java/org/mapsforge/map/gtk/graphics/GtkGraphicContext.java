@@ -28,6 +28,7 @@ import org.mapsforge.core.model.Rotation;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
 
+import ch.bailu.gtk.cairo.Antialias;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Extend;
 import ch.bailu.gtk.cairo.Operator;
@@ -47,6 +48,8 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     private final Context context;
     private final Dimension dimension;
 
+    private boolean antialias = false;
+
     public GtkGraphicContext(Context context, Dimension dimension) {
         this.context = context;
         this.dimension = dimension;
@@ -64,7 +67,6 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         context.setSourceSurface(gtkBitmap.getSurface(), left, top);
         context.paint();
         context.restore();
-
     }
 
     @Override
@@ -316,13 +318,11 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
     @Override
     public boolean isAntiAlias() {
-        System.out.println("GraphicContext::isAntiAlias()");
-        return false;
+        return antialias;
     }
 
     @Override
     public boolean isFilterBitmap() {
-        System.out.println("GraphicContext::isFilterBitmap()");
         return false;
     }
 
@@ -333,7 +333,14 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
     @Override
     public void setAntiAlias(boolean aa) {
-        System.out.println("GraphicContext::setAntiAlias()");
+        if (this.antialias != aa) {
+            this.antialias = aa;
+            if (aa) {
+                context.setAntialias(Antialias.BEST);
+            } else {
+                context.setAntialias(Antialias.NONE);
+            }
+        }
     }
 
     @Override
@@ -375,9 +382,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void setFilterBitmap(boolean filter) {
-        System.out.println("GraphicContext::setFilterBitmap()");
-    }
+    public void setFilterBitmap(boolean filter) {}
 
     @Override
     public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color) {

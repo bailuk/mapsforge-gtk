@@ -141,7 +141,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void drawTextRotated(String text, int x1, int y1, int x2, int y2, Paint paint) {
-        System.out.println("GtkCanvas::drawTextRotated()");
+        graphicContext.drawTextRotated(text, x1, y1, x2, y2, paint);
     }
 
     @Override
@@ -156,14 +156,12 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized boolean isAntiAlias() {
-        System.out.println("GtkCanvas::isAntiAlias()");
-        return false;
+        return graphicContext.isAntiAlias();
     }
 
     @Override
     public boolean isFilterBitmap() {
-        System.out.println("GtkCanvas::isFilterBitmap()");
-        return false;
+        return graphicContext.isFilterBitmap();
     }
 
     @Override
@@ -173,7 +171,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void setAntiAlias(boolean aa) {
-        System.out.println("GtkCanvas::setAntiAlias()");
+        graphicContext.setAntiAlias(aa);
     }
 
     @Override
@@ -183,7 +181,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void setClip(int left, int top, int width, int height, boolean intersect) {
-        System.out.println("GtkCanvas::setClip(intersect)");
+        graphicContext.setClip(left, top, width, height, intersect);
     }
 
     @Override
@@ -193,12 +191,12 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void setFilterBitmap(boolean filter) {
-        System.out.println("GtkCanvas::setFilterBitmap()");
+        graphicContext.setFilterBitmap(filter);
     }
 
     @Override
     public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color) {
-        System.out.println("GtkCanvas::shadeBitmap()");
+        graphicContext.shadeBitmap(bitmap, shadeRect, tileRect, magnitude, color);
     }
 
     public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paintFront) {
