@@ -158,8 +158,8 @@ public class MapView implements org.mapsforge.map.view.MapView {
                 getMapRotation(),
                 this.model.displayModel.getTileSize(),
                 getDimension(),
-                0,
-                0);
+                getMapViewCenterX(),
+                getMapViewCenterY());
     }
 
     @Override
@@ -252,7 +252,7 @@ public class MapView implements org.mapsforge.map.view.MapView {
         this.getModel().mapViewPosition.setRotation(rotation);
     }
 
-    private Glib.OnSourceFunc onSourceFunc = (self, user_data) -> {
+    private final Glib.OnSourceFunc onSourceFunc = (self, user_data) -> {
         if (redrawNeeded) {
             redrawNeeded = false;
             drawingArea.queueDraw();
