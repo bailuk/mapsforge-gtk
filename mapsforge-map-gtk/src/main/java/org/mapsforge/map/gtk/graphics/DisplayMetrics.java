@@ -1,12 +1,11 @@
 package org.mapsforge.map.gtk.graphics;
 
-
 public class DisplayMetrics {
     private final float dpi;
     private static DisplayMetrics INSTANCE = null;
 
     public DisplayMetrics() {
-        dpi = 96f;
+        dpi = 120f;
     }
 
     public static DisplayMetrics instance() {

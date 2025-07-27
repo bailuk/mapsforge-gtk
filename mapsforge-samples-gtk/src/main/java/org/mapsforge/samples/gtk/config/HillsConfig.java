@@ -4,7 +4,7 @@
  * Copyright 2014 Ludwig M Brinckmann
  * Copyright 2014-2020 devemux86
  * Copyright 2017 usrusr
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -57,7 +57,6 @@ public class HillsConfig {
 
     private HillsRenderConfig getHillsCfg(DemFolder folder, GraphicFactory factory) {
         MemoryCachingHgtReaderTileSource tileSource = new MemoryCachingHgtReaderTileSource(folder, new DiffuseLightShadingAlgorithm(), factory);
-        tileSource.setEnableInterpolationOverlap(true);
         HillsRenderConfig result = new HillsRenderConfig(tileSource);
         result.indexOnThread();
         return result;

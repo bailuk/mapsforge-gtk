@@ -17,5 +17,6 @@ public enum Key {
     openVectorMap,
     centerMap,
     frameMap,
+    mapTheme,
     about
 }

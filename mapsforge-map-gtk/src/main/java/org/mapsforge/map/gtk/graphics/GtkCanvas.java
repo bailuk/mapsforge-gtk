@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -17,18 +17,17 @@ package org.mapsforge.map.gtk.graphics;
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
-import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.model.Dimension;
+import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
+import org.mapsforge.core.model.Rotation;
 
 public class GtkCanvas implements Canvas {
     private Dimension dimension = new Dimension(0,0);
     private GtkGraphicContext graphicContext;
-
-
 
     @Override
     public void destroy() {}
@@ -49,10 +48,40 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
+    public void restore() {
+        System.out.println("GtkCanvas::restore()");
+    }
+
+    @Override
+    public void rotate(float degrees, float px, float py) {
+        System.out.println("GtkCanvas::rotate()");
+    }
+
+    @Override
+    public void rotate(Rotation rotation) {
+        System.out.println("GtkCanvas::rotate()");
+    }
+
+    @Override
+    public void save() {
+        System.out.println("GtkCanvas::save()");
+    }
+
+    @Override
     public synchronized void setBitmap(Bitmap bitmap) {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
         graphicContext = new GtkGraphicContext(gtkBitmap.getContext(), getWidth(), getHeight());
         dimension = new Dimension(bitmap.getWidth(), bitmap.getHeight());
+    }
+
+    @Override
+    public void setBitmap(Bitmap bitmap, float dx, float dy, float degrees, float px, float py) {
+        System.out.println("GtkCanvas::setBitmap()");
+    }
+
+    @Override
+    public void translate(float dx, float dy) {
+        System.out.println("GtkCanvas::translate()");
     }
 
     @Override
@@ -61,8 +90,8 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public synchronized void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
-        graphicContext.drawBitmap(bitmap, left, top, alpha, filter);
+    public synchronized void drawBitmap(Bitmap bitmap, int left, int top, float alpha) {
+        graphicContext.drawBitmap(bitmap, left, top, alpha);
     }
 
     @Override
@@ -71,8 +100,8 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public synchronized void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
-        graphicContext.drawBitmap(bitmap, matrix, alpha, filter);
+    public synchronized void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha) {
+        graphicContext.drawBitmap(bitmap, matrix, alpha);
     }
 
     @Override
@@ -82,8 +111,8 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
-    public synchronized void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha, Filter filter) {
-        drawBitmap(bitmap, dstLeft, dstTop, alpha, filter);
+    public synchronized void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha) {
+        drawBitmap(bitmap, dstLeft, dstTop, alpha);
     }
 
     @Override
@@ -102,6 +131,11 @@ public class GtkCanvas implements Canvas {
     }
 
     @Override
+    public void drawLines(Point[][] coordinates, float dy, Paint paint) {
+        graphicContext.drawLines(coordinates, dy, paint);
+    }
+
+    @Override
     public synchronized void drawPathText(String text, Path path, Paint paint) {
         graphicContext.drawPathText(text, path, paint);
     }
@@ -113,7 +147,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void drawTextRotated(String text, int x1, int y1, int x2, int y2, Paint paint) {
-        System.out.println("GtkCanvas::drawTextRotated()");
+        graphicContext.drawTextRotated(text, x1, y1, x2, y2, paint);
     }
 
     @Override
@@ -128,14 +162,12 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized boolean isAntiAlias() {
-        System.out.println("GtkCanvas::isAntiAlias()");
-        return false;
+        return graphicContext.isAntiAlias();
     }
 
     @Override
     public boolean isFilterBitmap() {
-        System.out.println("GtkCanvas::isFilterBitmap()");
-        return false;
+        return graphicContext.isFilterBitmap();
     }
 
     @Override
@@ -145,7 +177,7 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public synchronized void setAntiAlias(boolean aa) {
-        System.out.println("GtkCanvas::setAntiAlias()");
+        graphicContext.setAntiAlias(aa);
     }
 
     @Override
@@ -155,22 +187,22 @@ public class GtkCanvas implements Canvas {
 
     @Override
     public void setClip(int left, int top, int width, int height, boolean intersect) {
-        System.out.println("GtkCanvas::setClip(intersect)");
+        graphicContext.setClip(left, top, width, height, intersect);
     }
 
     @Override
-    public synchronized void setClipDifference(int left, int top, int width, int height) {
+    public void setClipDifference(float left, float top, float width, float height) {
         graphicContext.setClipDifference(left,top,width, height);
     }
 
     @Override
     public void setFilterBitmap(boolean filter) {
-        System.out.println("GtkCanvas::setFilterBitmap()");
+        graphicContext.setFilterBitmap(filter);
     }
 
     @Override
-    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude) {
-        System.out.println("GtkCanvas::shadeBitmap()");
+    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color, boolean external) {
+        graphicContext.shadeBitmap(bitmap, shadeRect, tileRect, magnitude, color, external);
     }
 
     public void drawTextIntoBoundary(String text, Rectangle boundary, GtkPaint paintFront) {

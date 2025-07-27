@@ -14,8 +14,10 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
 
-    - name: Install GTK 4
-      run: sudo apt-get -y install libgtk-4-1
+    - name: Install GTK-4
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtk-4-1
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle

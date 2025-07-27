@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -17,17 +17,19 @@ package org.mapsforge.map.gtk.graphics;
 import org.mapsforge.core.graphics.Bitmap;
 import org.mapsforge.core.graphics.Canvas;
 import org.mapsforge.core.graphics.Color;
-import org.mapsforge.core.graphics.Filter;
 import org.mapsforge.core.graphics.GraphicContext;
 import org.mapsforge.core.graphics.Matrix;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Path;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Dimension;
+import org.mapsforge.core.model.Point;
 import org.mapsforge.core.model.Rectangle;
+import org.mapsforge.core.model.Rotation;
 import org.mapsforge.map.gtk.util.color.ARGB;
 import org.mapsforge.map.gtk.util.color.Conv255;
 
+import ch.bailu.gtk.cairo.Antialias;
 import ch.bailu.gtk.cairo.Context;
 import ch.bailu.gtk.cairo.Extend;
 import ch.bailu.gtk.cairo.Operator;
@@ -47,6 +49,8 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     private final Context context;
     private final Dimension dimension;
 
+    private boolean antialias = false;
+
     public GtkGraphicContext(Context context, Dimension dimension) {
         this.context = context;
         this.dimension = dimension;
@@ -64,15 +68,10 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         context.setSourceSurface(gtkBitmap.getSurface(), left, top);
         context.paint();
         context.restore();
-
     }
 
     @Override
-    public void drawBitmap(Bitmap bitmap, int left, int top, float alpha, Filter filter) {
-        if (filter != Filter.NONE) {
-            System.out.println("GraphicContext::drawBitmap("+alpha+ ", " + filter.toString() + ")");
-        }
-
+    public void drawBitmap(Bitmap bitmap, int left, int top, float alpha) {
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
         context.save();
         context.setSourceSurface(gtkBitmap.getSurface(), left, top);
@@ -97,10 +96,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha, Filter filter) {
-        if (filter != Filter.NONE) {
-            System.out.println("GraphicContext::drawBitmap(matrix, "+alpha+ ", " + filter.toString() + ")");
-        }
+    public void drawBitmap(Bitmap bitmap, Matrix matrix, float alpha) {
         AwtMatrix awtMatrix = (AwtMatrix) matrix;
         ch.bailu.gtk.cairo.Matrix cairoMatrix = awtMatrix.toCairoMatrix();
         GtkBitmap gtkBitmap = (GtkBitmap) bitmap;
@@ -122,8 +118,8 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha, Filter filter) {
-        drawBitmap(bitmap, srcLeft,srcTop, alpha, filter);
+    public void drawBitmap(Bitmap bitmap, int srcLeft, int srcTop, int srcRight, int srcBottom, int dstLeft, int dstTop, int dstRight, int dstBottom, float alpha) {
+        drawBitmap(bitmap, srcLeft,srcTop, alpha);
         System.out.println("GraphicContext::drawBitmap(6)");
     }
 
@@ -169,6 +165,11 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
                 drawDebugPath(gtkPath);
             }
         }
+    }
+
+    @Override
+    public void drawLines(Point[][] coordinates, float dy, Paint paint) {
+        System.out.println("GraphicContext::drawLines");
     }
 
 
@@ -323,13 +324,11 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
     @Override
     public boolean isAntiAlias() {
-        System.out.println("GraphicContext::isAntiAlias()");
-        return false;
+        return antialias;
     }
 
     @Override
     public boolean isFilterBitmap() {
-        System.out.println("GraphicContext::isFilterBitmap()");
         return false;
     }
 
@@ -340,7 +339,14 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
 
     @Override
     public void setAntiAlias(boolean aa) {
-        System.out.println("GraphicContext::setAntiAlias()");
+        if (this.antialias != aa) {
+            this.antialias = aa;
+            if (aa) {
+                context.setAntialias(Antialias.BEST);
+            } else {
+                context.setAntialias(Antialias.NONE);
+            }
+        }
     }
 
     @Override
@@ -357,7 +363,7 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
     }
 
     @Override
-    public void setClipDifference(int left, int top, int width, int height) {
+    public void setClipDifference(float left, float top, float width, float height) {
         context.resetClip();
         context.newPath();
 
@@ -369,25 +375,23 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         context.rectangle(lx, top, left, height);
         context.clip();
 
-        final int rw=dimension.width- left -width;
-        final int rx=dimension.width-rw;
+        final float rw=dimension.width- left -width;
+        final float rx=dimension.width-rw;
         context.rectangle(rx, top, left, height);
         context.clip();
 
-        final int bh=dimension.height-height- top;
-        final int bx=0;
-        final int by=dimension.height-bh;
+        final float bh=dimension.height-height- top;
+        final float bx=0f;
+        final float by=dimension.height-bh;
         context.rectangle(bx, by, tw, bh);
         context.clip();
     }
 
     @Override
-    public void setFilterBitmap(boolean filter) {
-        System.out.println("GraphicContext::setFilterBitmap()");
-    }
+    public void setFilterBitmap(boolean filter) {}
 
     @Override
-    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude) {
+    public void shadeBitmap(Bitmap bitmap, Rectangle shadeRect, Rectangle tileRect, float magnitude, int color, boolean external) {
         System.out.println("GraphicContext::shadeBitmap()");
     }
 
@@ -439,9 +443,39 @@ public class GtkGraphicContext implements GraphicContext, Canvas {
         return dimension.width;
     }
 
+    @Override
+    public void restore() {
+        System.out.println("GraphicContext::restore()");
+    }
+
+    @Override
+    public void rotate(float degrees, float px, float py) {
+        System.out.println("GraphicContext::rotate()");
+    }
+
+    @Override
+    public void rotate(Rotation rotation) {
+        System.out.println("GraphicContext::rotate()");
+    }
+
+    @Override
+    public void save() {
+        System.out.println("GraphicContext::save()");
+    }
+
     /**
      * Does nothing. Exists to satisfy Canvas interface
      */
     @Override
     public void setBitmap(Bitmap bitmap) {}
+
+    @Override
+    public void setBitmap(Bitmap bitmap, float dx, float dy, float degrees, float px, float py) {
+        System.out.println("GraphicContext::setBitmap()");
+    }
+
+    @Override
+    public void translate(float dx, float dy) {
+        System.out.println("GraphicContext::translate()");
+    }
 }

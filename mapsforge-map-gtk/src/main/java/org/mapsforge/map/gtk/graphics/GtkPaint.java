@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import org.mapsforge.core.graphics.Join;
 import org.mapsforge.core.graphics.Paint;
 import org.mapsforge.core.graphics.Style;
 import org.mapsforge.core.model.Point;
+import org.mapsforge.core.model.Rectangle;
 import org.mapsforge.map.gtk.util.color.ARGB;
 
 import ch.bailu.gtk.cairo.LineCap;
@@ -80,6 +81,11 @@ public class GtkPaint implements Paint {
     }
 
     @Override
+    public Rectangle getTextBounds(String text) {
+        return null;
+    }
+
+    @Override
     public int getTextHeight(String text) {
         return (int) (DisplayMetrics.instance().pointsToPixel(fontSize));
     }
@@ -92,6 +98,11 @@ public class GtkPaint implements Paint {
     @Override
     public boolean isTransparent() {
         return bitmapShader == null && ARGB.alpha(color) == 0;
+    }
+
+    @Override
+    public boolean isComplexStyle() {
+        return true; // prevents call of GtkGraphicContext::drawLines
     }
 
     @Override
@@ -131,7 +142,6 @@ public class GtkPaint implements Paint {
 
     @Override
     public void setDashPathEffect(float[] strokeDasharray) {
-        //System.out.println("GtkPaint::setDashPathEffect");
         dashes = strokeDasharray;
     }
 

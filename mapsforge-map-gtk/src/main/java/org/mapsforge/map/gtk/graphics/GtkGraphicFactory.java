@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -106,7 +106,7 @@ public class GtkGraphicFactory implements GraphicFactory {
     }
 
     @Override
-    public HillshadingBitmap createMonoBitmap(int width, int height, byte[] buffer, int padding, BoundingBox area) {
+    public HillshadingBitmap createMonoBitmap(int width, int height, byte[] buffer, int padding, BoundingBox area, int color) {
         System.out.println("GtkGraphicFactory::createMonoBitmap");
         return null;
     }
@@ -127,8 +127,8 @@ public class GtkGraphicFactory implements GraphicFactory {
     }
 
     @Override
-    public PointTextContainer createPointTextContainer(Point xy, Display display, int priority, String text, Paint paintFront, Paint paintBack, SymbolContainer symbolContainer, Position position, int maxTextWidth) {
-        return new GtkPointTextContainer(xy, display, priority, text, paintFront, paintBack, symbolContainer, position, maxTextWidth);
+    public PointTextContainer createPointTextContainer(Point xy, double horizontalOffset, double verticalOffset, Display display, int priority, String text, Paint paintFront, Paint paintBack, SymbolContainer symbolContainer, Position position, int maxTextWidth) {
+        return new GtkPointTextContainer(xy, horizontalOffset, verticalOffset, display, priority, text, paintFront, paintBack, symbolContainer, position, maxTextWidth);
     }
 
     @Override

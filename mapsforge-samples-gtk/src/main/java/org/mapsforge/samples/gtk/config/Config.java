@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import org.mapsforge.core.model.MapPosition;
 import org.mapsforge.core.util.LatLongUtils;
 import org.mapsforge.map.gtk.graphics.GtkGraphicFactory;
 import org.mapsforge.map.gtk.view.MapView;
+import org.mapsforge.map.rendertheme.internal.MapsforgeThemes;
 import org.mapsforge.samples.gtk.Constants;
 import org.mapsforge.samples.gtk.about.AppAboutDialog;
 import org.mapsforge.samples.gtk.lib.FileDialog;
@@ -34,7 +35,6 @@ import ch.bailu.gtk.lib.handler.SignalHandler;
 import ch.bailu.gtk.lib.handler.action.ActionHandler;
 
 public class Config {
-
     private final MapView mapView;
     private final LayerConfig layerConfig;
     private final Window window;
@@ -64,6 +64,7 @@ public class Config {
         actionHelper.onToggle(Key.displayFpsCounter, false, this::setFpsLayer);
         actionHelper.onToggle(Key.enableVectorMap, false, this::initMapLayer);
         actionHelper.onToggle(Key.enableDrawDebug, false, this::setDrawDebug);
+        actionHelper.onSelect(Key.mapTheme, this::selectMapTheme);
 
         actionHelper.setEnabled(Key.enableVectorMap, layerConfig.haveVectorMap());
         actionHelper.onActivate(Key.showInspector, ()-> Window.setInteractiveDebugging(true));
@@ -105,7 +106,8 @@ public class Config {
     public void initMapView() {
         GtkGraphicFactory.DRAW_DEBUG = PreferencesHelper.getBoolean(Key.enableDrawDebug);
 
-        mapView.getModel().init(PreferencesHelper.PREFERENCES);
+        mapView.getModel().mapViewPosition.setMapPosition(PreferencesHelper.getMapViewPosition());
+
         initMapLayer(PreferencesHelper.getBoolean(Key.enableVectorMap));
         setScaleBar(PreferencesHelper.getBoolean(Key.scale));
         setGridLayer(PreferencesHelper.getBoolean(Key.displayGrid));
@@ -113,17 +115,35 @@ public class Config {
         setFpsLayer(PreferencesHelper.getBoolean(Key.displayFpsCounter));
     }
 
+    private void selectMapTheme(int i) {
+        resetMapLayer(PreferencesHelper.getBoolean(Key.enableVectorMap));
+    }
+
+    private void resetMapLayer(boolean vector) {
+        if (vector && layerConfig.haveVectorMap()) {
+            layerConfig.resetVectorMap(getTheme());
+        }
+    }
+
+    private MapsforgeThemes getTheme() {
+        var index = PreferencesHelper.getInt(Key.mapTheme, 0);
+        if (index >= MapsforgeThemes.values().length || index < 0) {
+            index = 0;
+        }
+        return MapsforgeThemes.values()[index];
+    }
+
     private void initVectorMapLayer() {
-        layerConfig.setVectorMap(false);
+        layerConfig.setVectorMap(getTheme(), false);
         initMapLayer(true);
     }
 
     private void initMapLayer(boolean vector) {
         if (vector && layerConfig.haveVectorMap()) {
             layerConfig.setRasterMap(false);
-            layerConfig.setVectorMap(true);
+            layerConfig.setVectorMap(getTheme(), true);
         } else {
-            layerConfig.setVectorMap(false);
+            layerConfig.setVectorMap(getTheme(),false);
             layerConfig.setRasterMap(true);
         }
     }
@@ -133,8 +153,8 @@ public class Config {
     }
 
     public void save() {
-        mapView.getModel().save(PreferencesHelper.PREFERENCES);
-        PreferencesHelper.PREFERENCES.save();
+        PreferencesHelper.setMapViewPosition(mapView.getModel().mapViewPosition);
+        PreferencesHelper.save();
     }
 
     private void centerMap() {

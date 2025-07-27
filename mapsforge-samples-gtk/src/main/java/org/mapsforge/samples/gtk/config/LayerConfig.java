@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Lukas Bai
+ * Copyright 2021-2025 Lukas Bai
  *
  * This program is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free Software
@@ -33,8 +33,8 @@ import org.mapsforge.map.layer.download.tilesource.OpenStreetMapMapnik;
 import org.mapsforge.map.layer.download.tilesource.TileSource;
 import org.mapsforge.map.layer.hills.HillsRenderConfig;
 import org.mapsforge.map.layer.renderer.TileRendererLayer;
-import org.mapsforge.map.model.IMapViewPosition;
-import org.mapsforge.map.rendertheme.InternalRenderTheme;
+import org.mapsforge.map.model.MapViewPosition;
+import org.mapsforge.map.rendertheme.internal.MapsforgeThemes;
 
 import java.io.File;
 
@@ -137,10 +137,17 @@ public class LayerConfig {
         return new BoundingBox(LatLongUtils.LATITUDE_MIN, LatLongUtils.LONGITUDE_MIN, LatLongUtils.LATITUDE_MAX, LatLongUtils.LONGITUDE_MAX);
     }
 
-    public void setVectorMap(boolean on) {
+    public void resetVectorMap(MapsforgeThemes theme) {
+        if (findLayer(TileRendererLayer.class)) {
+            removeLayer(TileRendererLayer.class);
+            boundingBox = initRenderMap(mapView, theme);
+        }
+    }
+
+    public void setVectorMap(MapsforgeThemes theme, boolean on) {
         if (on) {
             if (!findLayer(TileRendererLayer.class)) {
-                boundingBox = initRenderMap(mapView);
+                boundingBox = initRenderMap(mapView, theme);
             }
         } else {
             removeLayer(TileRendererLayer.class);
@@ -151,7 +158,7 @@ public class LayerConfig {
         return vectorMapConfig.setMapFile(file);
     }
 
-    private BoundingBox initRenderMap(MapView mapView) {
+    private BoundingBox initRenderMap(MapView mapView, MapsforgeThemes theme) {
         Layers layers = mapView.getLayerManager().getLayers();
 
         mapView.getModel().displayModel.setFixedTileSize(256);
@@ -159,12 +166,12 @@ public class LayerConfig {
         MultiMapDataStore mapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
 
         vectorMapConfig.addMapFilesToDataStore(mapDataStore);
-        TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsConfig.getConfig());
+        TileRendererLayer tileRendererLayer = createTileRendererLayer(tileCache, mapDataStore, mapView.getModel().mapViewPosition, hillsConfig.getConfig(), theme);
         layers.add(0,tileRendererLayer);
         return mapDataStore.boundingBox();
     }
 
-    private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, IMapViewPosition mapViewPosition, TileSource tileSource) {
+    private static TileDownloadLayer createTileDownloadLayer(TileCache tileCache, MapViewPosition mapViewPosition, TileSource tileSource) {
         return new TileDownloadLayer(tileCache, mapViewPosition, tileSource, GtkGraphicFactory.INSTANCE) {
             @Override
             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
@@ -174,7 +181,7 @@ public class LayerConfig {
         };
     }
 
-    private static TileRendererLayer createTileRendererLayer(TileCache tileCache, MapDataStore mapDataStore, IMapViewPosition mapViewPosition, HillsRenderConfig hillsRenderConfig) {
+    private static TileRendererLayer createTileRendererLayer(TileCache tileCache, MapDataStore mapDataStore, MapViewPosition mapViewPosition, HillsRenderConfig hillsRenderConfig, MapsforgeThemes theme) {
         TileRendererLayer tileRendererLayer = new TileRendererLayer(tileCache, mapDataStore, mapViewPosition, false, true, false, GtkGraphicFactory.INSTANCE, hillsRenderConfig) {
             @Override
             public boolean onTap(LatLong tapLatLong, Point layerXY, Point tapXY) {
@@ -182,7 +189,7 @@ public class LayerConfig {
                 return true;
             }
         };
-        tileRendererLayer.setXmlRenderTheme(InternalRenderTheme.DEFAULT);
+        tileRendererLayer.setXmlRenderTheme(theme);
         return tileRendererLayer;
     }
 
