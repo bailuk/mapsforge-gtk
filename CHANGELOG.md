@@ -1,4 +1,4 @@
-# Next
+# 0.5.0
 
 - Fix MapView::getBoundingBox(): add map-center as offset
 - Update java-gtk to 0.6.1
